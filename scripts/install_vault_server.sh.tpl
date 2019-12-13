@@ -2,17 +2,17 @@
 set -e
 
 # Install packages
-${install_unzip}
+# ${install_unzip}
 
 # Download Vault into some temporary directory
-curl -L "${vault_download_url}" > /tmp/vault.zip
+# curl -L "${vault_download_url}" > /tmp/vault.zip
 
 # Unzip it
-cd /tmp
-sudo unzip vault.zip
-sudo mv vault /usr/local/bin
-sudo chmod 0755 /usr/local/bin/vault
-sudo chown root:root /usr/local/bin/vault
+# cd /tmp
+# sudo unzip vault.zip
+# sudo mv vault /usr/local/bin
+# sudo chmod 0755 /usr/local/bin/vault
+# sudo chown root:root /usr/local/bin/vault
 sudo setcap cap_ipc_lock=+ep /usr/local/bin/vault
 
 # Setup the configuration
@@ -50,14 +50,14 @@ sudo mv /tmp/systemd /etc/systemd/system/vault.service
 sudo chmod 0664 /etc/systemd/system/vault.service
 
 # Download Consul into some temporary directory
-curl -L "${consul_download_url}" > /tmp/consul.zip
+# curl -L "${consul_download_url}" > /tmp/consul.zip
 
 # Unzip it
-cd /tmp
-sudo unzip consul.zip
-sudo mv consul /usr/local/bin
-sudo chmod 0755 /usr/local/bin/consul
-sudo chown root:root /usr/local/bin/consul
+# cd /tmp
+# sudo unzip consul.zip
+# sudo mv consul /usr/local/bin
+# sudo chmod 0755 /usr/local/bin/consul
+# sudo chown root:root /usr/local/bin/consul
 
 # Setup the configuration
 cat <<EOF >/tmp/consul-config

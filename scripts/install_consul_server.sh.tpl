@@ -2,17 +2,17 @@
 set -e
 
 # Install packages
-${install_unzip}
+# ${install_unzip}
 
 # Download Consul into some temporary directory
-curl -L "${consul_download_url}" > /tmp/consul.zip
+# curl -L "${consul_download_url}" > /tmp/consul.zip
 
 # Unzip it
-cd /tmp
-sudo unzip consul.zip
-sudo mv consul /usr/local/bin
-sudo chmod 0755 /usr/local/bin/consul
-sudo chown root:root /usr/local/bin/consul
+# cd /tmp
+# sudo unzip consul.zip
+# sudo mv consul /usr/local/bin
+# sudo chmod 0755 /usr/local/bin/consul
+# sudo chown root:root /usr/local/bin/consul
 
 # Setup the configuration
 cat <<EOF >/tmp/consul-config
