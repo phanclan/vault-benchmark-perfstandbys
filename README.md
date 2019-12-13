@@ -167,6 +167,7 @@ wrk -t1 -c1 -d30s -H "X-Vault-Token: $VAULT_TOKEN" -s write-secrets.lua http://1
 
 
 # Transit Test
+
 We will use the `wrk` benchmarking tool to test the throughput of HashiCorp Vault's transit backend. 
 I tested on a single Vault node, connected to a 3-node Consul cluster for backend storage. Only the transit engine is mounted.
 
@@ -200,14 +201,16 @@ sudo cp wrk /usr/local/bin
     - t3.xlarge has 4 vCPU, t3.2xlarge has 8 vCPU
     - c5.xlarge has 4 vCPU, 2xlarge has 8 vCPU
   - Play around with the number of connections you use to determine what the ideal settings for your system are. The connections are a total number of connections, split across your threads, as described here: https://github.com/wg/wrk#command-line-options 
-  - A sample wrk command to run these files looks like this: `wrk -t8 -c8 -d1m -H "X-Vault-Token: TOKEN_GOES_HERE_SO_PASTE_IT" -s /home/ubuntu/postbatch320.lua http://10.0.0.50:8200/v1/transit/encrypt/test` where the IP and path correspond to the Transit secret engine you'd configured.
+  - A sample `wrk` command to run these files looks like this: 
+    `wrk -t8 -c8 -d1m -H "X-Vault-Token: TOKEN_GOES_HERE_SO_PASTE_IT" -s /home/ubuntu/postbatch320.lua http://10.0.0.50:8200/v1/transit/encrypt/test` 
+    - where the IP and path correspond to the Transit secret engine you'd configured.
   - Sample
-```
-cd ~/Vault-Transit-Load-Testing/
-wrk -t2 -c8 -d30s -H "X-Vault-Token: ${VAULT_TOKEN}" -s postbatch320.lua http://localhost:8200/v1/transit/encrypt/test
-```
+    ```
+    cd ~/Vault-Transit-Load-Testing/
+    wrk -t2 -c8 -d30s -H "X-Vault-Token: ${VAULT_TOKEN}" -s postbatch320.lua http://localhost:8200/v1/transit/encrypt/test
+    ```
 
-# Sizing up
+# Sizing up (or down)
 I started with a t3.small and then scaled up to a c5.2xlarge.
 
 Here are the steps to resize your vault server.
@@ -234,14 +237,19 @@ cd ~
 git clone https://github.com/jdfriedma/Vault-Transit-Load-Testing.git
 #------------------------------------------------------------------------------
 cd ~/Vault-Transit-Load-Testing/
-wrk -t2 -c8 -d30s -H "X-Vault-Token: ${VAULT_TOKEN}" -s postbatch320.lua http://localhost:8200/v1/transit/encrypt/test
+for i in 320 160; do
+echo "# postbatch${i}.lua on $(date)" > postbatch-${i}.log
+wrk -t2 -c8 -d30s -H "X-Vault-Token: ${VAULT_TOKEN}" -s postbatch${i}.lua http://localhost:8200/v1/transit/encrypt/test >> postbatch-${i}.log
+done
 EOF
 chmod +x test.sh
 export VAULT_ADDR=http://127.0.0.1:8200
 export VAULT_TOKEN=s.8aQruVrp9YJ834NLCvjVCNcZ
 vault operator unseal jxWdVApsw6FHCTfx5PwG0nn7v/rrEpk1uv0XYyF5xOs=
+vault audit enable file file_path=/tmp/audit.log log_raw=true
 ./test.sh
 ```
+
 
 # Sample Results
 
@@ -274,21 +282,30 @@ Requests/sec:  47593.08
 Transfer/sec:      8.22MB
 ```
 
-## Results on Vault 1-node c5.xlarge with Consul 3-node t3-small
+## Results on Vault 1-node c5.xlarge; Consul 3-node t3-small; Auditing On
 ```
-wrk -t2 -c8 -d30s -H 'X-Vault-Token: ' -s postbatch320.lua http://localhost:8200/v1/transit/encrypt/test
+# postbatch160.lua on Fri Dec 13 04:05:34 UTC 2019
 Running 30s test @ http://localhost:8200/v1/transit/encrypt/test
   2 threads and 8 connections
   Thread Stats   Avg      Stdev     Max   +/- Stdev
-    Latency   395.07us    1.19ms  19.92ms   94.85%
-    Req/Sec    27.59k     1.27k   31.21k    70.17%
-  1647596 requests in 30.01s, 284.40MB read
-  Non-2xx or 3xx responses: 1647596
-Requests/sec:  54905.24
-Transfer/sec:      9.48MB
+    Latency    10.88ms    7.90ms  65.21ms   86.49%
+    Req/Sec   404.98     43.91   525.00     64.33%
+  24205 requests in 30.02s, 328.97MB read
+Requests/sec:    806.30
+Transfer/sec:     10.96MB
+
+# postbatch320.lua on Fri Dec 13 04:05:04 UTC 2019
+Running 30s test @ http://localhost:8200/v1/transit/encrypt/test
+  2 threads and 8 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency    19.72ms   11.83ms  98.90ms   71.10%
+    Req/Sec   212.34     24.64   300.00     69.67%
+  12695 requests in 30.02s, 341.06MB read
+Requests/sec:    422.92
+Transfer/sec:     11.36MB
 ```
 
-## Results on Vault 1-node c5.2xlarge with Consul 3-node t3-small; Auditing Off
+## Results: Vault 1-node c5.2xlarge with Consul 3-node t3-small; Auditing Off
 ```
 $ wrk -t2 -c8 -d30s -H "X-Vault-Token: ${VAULT_TOKEN}" -s single-key-post.lua http://localhost:8200/v1/transit/encrypt/test
 Running 30s test @ http://localhost:8200/v1/transit/encrypt/test
