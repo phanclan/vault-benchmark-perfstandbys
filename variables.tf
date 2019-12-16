@@ -185,3 +185,5 @@ variable "private_ips" {
     "10.10.11.10" = 3
   }
 }
+
+variable "zone_id" {}

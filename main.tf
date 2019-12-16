@@ -73,7 +73,7 @@ resource "aws_launch_configuration" "vault" {
   image_id                    = data.aws_ami.hashistack.id
   instance_type               = var.instance_type_vault
   key_name                    = var.key_name
-  security_groups             = ["${aws_security_group.vault.id}"]
+  security_groups             = [aws_security_group.vault.id]
   user_data                   = data.template_file.install_vault.rendered
   associate_public_ip_address = var.public_ip
   iam_instance_profile        = aws_iam_instance_profile.instance_profile.name
@@ -82,7 +82,9 @@ resource "aws_launch_configuration" "vault" {
     volume_size = 50
     iops        = "2500"
   }
-
+  
+  # Required when using a launch configuration with an auto scaling group.
+  # https://www.terraform.io/docs/providers/aws/r/launch_configuration.html
   lifecycle {
     create_before_destroy = true
   }
@@ -209,6 +211,15 @@ resource "aws_security_group_rule" "vault_ssh" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
+resource "aws_security_group_rule" "vault_8200_in" {
+  security_group_id = aws_security_group.vault.id
+  type              = "ingress"
+  from_port         = 8200
+  to_port           = 8200
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
 resource "aws_security_group_rule" "vault_external_egress" {
   security_group_id = aws_security_group.vault.id
   type              = "egress"
@@ -304,6 +315,9 @@ resource "aws_security_group_rule" "consul_dns_udp" {
   source_security_group_id = aws_security_group.vault.id
 }
 
+# --------------------------------------------------------
+# CREATE A NEW ELB - VAULT
+# --------------------------------------------------------
 // Launch the ELB that is serving Vault. This has proper health checks
 // to only serve healthy, unsealed Vaults.
 resource "aws_elb" "vault" {
@@ -312,7 +326,7 @@ resource "aws_elb" "vault" {
   connection_draining_timeout = 400
   internal                    = var.elb_internal
   subnets                     = module.vpc_usw2-1.public_subnets
-  security_groups             = ["${aws_security_group.vault_elb.id}"]
+  security_groups             = [aws_security_group.vault_elb.id]
 
   listener {
     instance_port     = 8200
@@ -323,10 +337,10 @@ resource "aws_elb" "vault" {
 
   health_check {
     healthy_threshold   = 2
-    unhealthy_threshold = 3
-    timeout             = 5
+    unhealthy_threshold = 2 # was 3
+    timeout             = 3 # was 5
     target              = var.vault_elb_health_check
-    interval            = 15
+    interval            = 10 # was 15
   }
 }
 

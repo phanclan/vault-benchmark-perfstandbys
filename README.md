@@ -41,20 +41,17 @@ export AWS_SESSION_TOKEN=<your_token>
     - Set `ami` to the ID of a Ubuntu 16.04 or RHEL 7.5 AMI. Public Ubuntu AMIs include `ami-759bc50a` or `ami-059eeca93cf09eebd`.  A public RHEL 7.5 AMI is `ami-6871a115`.
     - Set `instance_type` to the size you want to use for the EC2 instances.
     - `key_name` should be the name of an existing AWS keypair in your AWS account in the `us-east-1` region. Use the name as it is shown in the AWS Console, not the name of the private key on your computer.  Of course, you'll need that private key file in order to ssh to the Vault instance that is created for you.
-
     - `vault_name_prefix` and `consul_name_prefix` can be anything you want; they affect the names of some of the resources.
-
     - `vpc_id` should be the id of the VPC into which you want to deploy Vault.
-
     - `subnets` should be the ids of one or more subnets in your AWS VPC in `us-east-1`. (You can also list multiple subnets and separate them with commas, but you only need one.)
 
       If using a public subnet, use the following for `elb_internal` and `public_ip`:
       - `elb_internal = false`
       - `public_ip = true`
 
-      If using a private subnet, use the following for elb_internal and public_ip:
-      - elb_internal = true
-      - public_ip = false
+      If using a private subnet, use the following for `elb_internal` and `public_ip`:
+      - `elb_internal = true`
+      - `public_ip = false`
     - NOTE: Do not add quotes around true and false when setting `elb_internal` and `public_ip`.
     - The `owner` and `ttl` variables are intended for use by HashiCorp employees and will be ignored for customers.  You can set `owner` to your name or email.
 
@@ -83,15 +80,20 @@ You will be able to use the Vault ELB URL after Vault is initialized which you w
 1. In the AWS Console, find and select your Vault instances and pick one.
 1. Click the **Connect** button for your selected Vault instance to find the command you can use to ssh to the instance.
 1. From a directory containing your private SSH key, run that ssh command.
+```
+aws --region us-west-2 \
+ec2 describe-instances --filter Name=tag-key,Values=aws:autoscaling:groupName \
+--query 'Reservations[*].Instances[*].{Instance:InstanceId,AZ:Placement.AvailabilityZone,Name:Tags[?Key==`Name`]|[0].Value,PIP:PublicIpAddress}' \
+--output text | grep pphan
+```
 1. On the Vault server, run the following commands:
 
 ```
 export VAULT_ADDR=http://127.0.0.1:8200
 vault operator init -key-shares=1 -key-threshold=1 > /tmp/vault.init
-
 ```
 
-Save the values for Unseal Key and Initial Root Token. Example:
+Save the values for **Unseal Key** and **Initial Root Token**. Example:
 
 ```
 Unseal Key 1: jxWdVApsw6FHCTfx5PwG0nn7v/rrEpk1uv0XYyF5xOs=
@@ -218,9 +220,9 @@ Here are the steps to resize your vault server.
 1. Change `instance_type_vault` and run `terraform apply`.
 1. ssh into vault.
 1. Run `vault operator unseal` and provide unseal key.
-1. 
+1. Run the following commands:
 ```
-tee test.sh <<EOF
+tee test.sh <<"EOF"
 #!/bin/bash -x
 #------------------------------------------------------------------------------
 git clone https://github.com/hashicorp/vault-guides.git
@@ -239,7 +241,8 @@ git clone https://github.com/jdfriedma/Vault-Transit-Load-Testing.git
 cd ~/Vault-Transit-Load-Testing/
 for i in 320 160; do
 echo "# postbatch${i}.lua on $(date)" > postbatch-${i}.log
-wrk -t2 -c8 -d30s -H "X-Vault-Token: ${VAULT_TOKEN}" -s postbatch${i}.lua http://localhost:8200/v1/transit/encrypt/test >> postbatch-${i}.log
+echo wrk -t2 -c8 -d120s -H "X-Vault-Token: ${VAULT_TOKEN}" -s postbatch${i}.lua http://localhost:8200/v1/transit/encrypt/test
+wrk -t2 -c8 -d120s -H "X-Vault-Token: ${VAULT_TOKEN}" -s postbatch${i}.lua http://localhost:8200/v1/transit/encrypt/test >> postbatch-${i}.log
 done
 EOF
 chmod +x test.sh
@@ -256,33 +259,50 @@ vault audit enable file file_path=/tmp/audit.log log_raw=true
 ## Results on Vault 1-node t3.large with Consul 3-node t3-small
 
 ```
+# postbatch160.lua on Fri Dec 13 05:14:31 UTC 2019
+Running 2m test @ http://localhost:8200/v1/transit/encrypt/test
+  2 threads and 8 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency    31.10ms   36.71ms 382.74ms   87.11%
+    Req/Sec   187.59     53.00   414.00     68.40%
+  44877 requests in 2.00m, 609.91MB read
+Requests/sec:    373.72
+Transfer/sec:      5.08MB
+# postbatch320.lua on Fri Dec 13 05:12:31 UTC 2019
+Running 2m test @ http://localhost:8200/v1/transit/encrypt/test
+  2 threads and 8 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency    48.11ms   42.41ms 424.39ms   85.66%
+    Req/Sec    98.01     28.43   212.00     73.29%
+  23470 requests in 2.00m, 630.54MB read
+Requests/sec:    195.44
+Transfer/sec:      5.25MB
+```
+
+## Results: Vault 1-node t3.xlarge; Consul 3-node t3-small; Audit On
+
+```
+# postbatch160.lua on Fri Dec 13 04:33:38 UTC 2019
 Running 30s test @ http://localhost:8200/v1/transit/encrypt/test
   2 threads and 8 connections
   Thread Stats   Avg      Stdev     Max   +/- Stdev
-    Latency     9.37ms   17.64ms 219.83ms   89.81%
-    Req/Sec     1.01k   222.26     1.96k    70.50%
-  60460 requests in 30.01s, 10.26MB read
-  Non-2xx or 3xx responses: 60460
-Requests/sec:   2014.81
-Transfer/sec:    350.23KB
-```
-
-## Results on Vault 1-node t3.xlarge with Consul 3-node t3-small
-
-```
-$ wrk -t2 -c8 -d30s -H "X-Vault-Token: ${VAULT_TOKEN}" -s postbatch320.lua http://localhost:8200/v1/transit/encrypt/test
+    Latency    12.12ms    8.79ms  77.53ms   86.35%
+    Req/Sec   363.37     37.61   474.00     67.67%
+  21719 requests in 30.02s, 295.18MB read
+Requests/sec:    723.53
+Transfer/sec:      9.83MB
+# postbatch320.lua on Fri Dec 13 04:33:08 UTC 2019
 Running 30s test @ http://localhost:8200/v1/transit/encrypt/test
   2 threads and 8 connections
   Thread Stats   Avg      Stdev     Max   +/- Stdev
-    Latency   394.06us    1.10ms  20.24ms   94.70%
-    Req/Sec    23.92k     1.32k   27.12k    73.50%
-  1428352 requests in 30.01s, 246.56MB read
-  Non-2xx or 3xx responses: 1428352
-Requests/sec:  47593.08
-Transfer/sec:      8.22MB
+    Latency    22.13ms   13.41ms 120.43ms   71.08%
+    Req/Sec   189.34     23.65   292.00     71.00%
+  11325 requests in 30.02s, 304.26MB read
+Requests/sec:    377.23
+Transfer/sec:     10.13MB
 ```
 
-## Results on Vault 1-node c5.xlarge; Consul 3-node t3-small; Auditing On
+## Results: Vault 1-node c5.xlarge; Consul 3-node t3-small; Audit On
 ```
 # postbatch160.lua on Fri Dec 13 04:05:34 UTC 2019
 Running 30s test @ http://localhost:8200/v1/transit/encrypt/test
@@ -333,6 +353,7 @@ Transfer/sec:      7.36MB
 
 ## Sample Response from Audit Log with Raw Output
 ```
+sudo tail -n 50 /tmp/audit.log | jq
 {
   "time": "2019-12-13T02:12:13.917000292Z",
   "type": "response",
