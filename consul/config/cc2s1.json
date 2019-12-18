@@ -1,0 +1,15 @@
+{
+  "server": true,
+  "datacenter": "us-east-2",
+  "data_dir": "/consul/data",
+  "bind_addr": "0.0.0.0",
+  "client_addr": "0.0.0.0",
+  "ui": true,
+  "log_level": "DEBUG",
+  "ports": {
+    "grpc": 8502
+  },
+  "connect": {
+    "enabled": true
+  }
+}

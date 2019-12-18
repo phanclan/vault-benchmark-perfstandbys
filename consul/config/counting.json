@@ -1,0 +1,13 @@
+{
+  "service": {
+    "name": "counting",
+    "port": 9003,
+    "check": {
+      "id": "counting-check",
+      "http": "http://counting-service-9003:9003/health",
+      "method": "GET",
+      "interval": "1s",
+      "timeout": "1s"
+    }
+  }
+}

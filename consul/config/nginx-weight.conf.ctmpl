@@ -1,0 +1,14 @@
+## upstream block added for consul-template
+upstream consulWebservice {
+        {{range service "webserver"}}
+                server {{.Address}}:{{.Port}} weight={{ keyOrDefault (print .Node "/numWorkers") "2"}};
+        {{end}}
+}
+server {
+        listen 80 default_server;
+        listen [::]:80 default_server;
+
+        location / {
+                proxy_pass http://consulWebservice; ## added for consul-template
+        }
+}

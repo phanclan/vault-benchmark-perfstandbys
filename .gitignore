@@ -9,7 +9,9 @@
 .vagrant
 nomad
 # vault
-consul
+# consul
+consul/logs/*
+consul/scripts/*
 *.pem
 .DS_Store
 license*

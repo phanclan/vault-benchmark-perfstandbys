@@ -1,0 +1,15 @@
+# Dynamically created by 0_consul_demo_init.sh
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    # root /var/www/html; 
+    # index index.html index.htm index.nginx-debian.html;
+    # server_name _;
+
+    resolver 127.0.0.1:8600 valid=250; ## added for consul
+    set $consulWebserver http://webserver.service.consul; ## added for consul
+
+    location / {
+        proxy_pass $consulWebserver; ## added for consul
+    }
+}

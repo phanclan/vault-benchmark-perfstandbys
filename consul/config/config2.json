@@ -1,0 +1,20 @@
+{
+  "datacenter": "dc2",
+  "data_dir": "/consul/data",
+  "bind_addr": "0.0.0.0",
+  "client_addr": "0.0.0.0",
+  "ui": true,
+  "log_level": "DEBUG",
+  "retry_join": [
+    "cc2s1",
+    "cc2s2",
+    "cc2s3"
+  ],
+  "ports": {
+    "grpc": 8502
+  },
+  "connect": {
+    "enabled": true
+  },
+  "enable_local_script_checks": true
+}
