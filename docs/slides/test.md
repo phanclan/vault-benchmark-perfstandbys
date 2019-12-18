@@ -256,6 +256,8 @@ consul license put "<contents_of_consul_license_file>"
 
 - To avoid having to export `VAULT_ADDR` and `VAULT_TOKEN` in future SSH sessions, edit `/home/ubuntu/.profile`, `/home/ubuntu/.bash_profile`, and/or `/home/ec2-user/.bash_profile` and add the two export commands at the bottom.
 
+---
+
 ## Unseal Second and Third Nodes
 Please do the following additional steps for your second and third Vault nodes:
 
@@ -264,7 +266,7 @@ Please do the following additional steps for your second and third Vault nodes:
 1. From a directory containing your private SSH key, run that ssh command.
 1. On the Vault server, run the following commands:
 
-```
+``` shell
 export VAULT_ADDR=http://127.0.0.1:8200
 export VAULT_TOKEN=<your_root_token>
 vault operator unseal
@@ -274,11 +276,15 @@ For the last command, provide your unseal key. If you selected a `key-threshold`
 
 **Remember to repeat the last set of steps for the third instance.**
 
+---
+
 Your Vault and Consul Servers are now set up and licensed.  Additionally, it is running Consul as Vault's storage backend.  You can confirm that both Vault and Consul are running with the commands `ps -ef | grep vault` and `ps -ef | grep consul`.  But if you were able to access the Vault UI, you already know both are running.
 
 Now that you have initialized Vault, you can actually access the Vault UI using your Vault ELB: `http://<Vault_ELB_address>:8200/ui`.
 
 You can also access your Consul UI through the Consul ELB: `http://<Consul_ELB_address>:8500/ui`.
+
+---
 
 # Running a Benchmark
 
@@ -305,6 +311,7 @@ wrk -t1 -c1 -d30s -H "X-Vault-Token: $VAULT_TOKEN" -s write-secrets.lua http://1
 10k concurrent connections for 5 minutes for 5k target RPS & 10s timeout & latency stats.<br/>
 `wrk2 -t4 -R5000 -c10000 -d300s --latency  --timeout 10s --header 'X-VAULT-TOKEN: <token>'  'https://10.0.1.20:8443/v1/secret/foo'`
 
+---
 
 # Transit Test
 
