@@ -132,6 +132,8 @@ class: compact
 1. Clone this repository to some directory on your laptop
 1. On a Linux or Mac system, export your AWS keys and AWS default region as variables. On Windows, you would use `set` instead of `export`. You can also `export AWS_SESSION_TOKEN` if you need to use an MFA token to provision resources in AWS.
 
+---
+
 ```
 export AWS_ACCESS_KEY_ID=<your_aws_key>
 export AWS_SECRET_ACCESS_KEY=<your_aws_secret_key>
