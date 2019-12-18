@@ -88,6 +88,7 @@ variable "ami" {
   description = "AMI for Vault instances"
 }
 
+# might not need this. define in module variables.
 variable "public_ip" {
   default     = false
   description = "should ec2 instance have public ip?"
@@ -187,3 +188,16 @@ variable "private_ips" {
 }
 
 variable "zone_id" {}
+variable "spot_price" {
+  default = "0.025"
+}
+
+variable "enable_monitoring" {
+  type    = bool
+  default = false
+}
+
+variable "ebs_optimized" {
+  default = false
+}
+

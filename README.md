@@ -84,13 +84,30 @@ You will be able to use the Vault ELB URL after Vault is initialized which you w
 aws --region us-west-2 \
 ec2 describe-instances --filter Name=tag-key,Values=aws:autoscaling:groupName \
 --query 'Reservations[*].Instances[*].{Instance:InstanceId,AZ:Placement.AvailabilityZone,Name:Tags[?Key==`Name`]|[0].Value,PIP:PublicIpAddress}' \
---output text | grep pphan
+--output text | grep pphan | tee /tmp/describe-instances.txt
+
+us-west-2a	i-09c3966f19182ccaf	pphan-benchmark-consul	34.210.58.127
+us-west-2b	i-0eefe1616ca431997	pphan-benchmark-consul	52.12.105.181
+us-west-2b	i-04883a05926eb4f89	pphan-benchmark-vault	34.221.221.30
+us-west-2c	i-09ee3f9e1642847be	pphan-benchmark-consul	34.213.76.192
+
+ssh ubuntu@34.221.221.30
+export VAULT_ADDR=http://$(grep vault /tmp/describe-instances.txt | awk '{print $NF}'):8200
 ```
 1. On the Vault server, run the following commands:
 
 ```
-export VAULT_ADDR=http://127.0.0.1:8200
-vault operator init -key-shares=1 -key-threshold=1 > /tmp/vault.init
+#export VAULT_ADDR=http://127.0.0.1:8200
+#vault operator init -key-shares=1 -key-threshold=1 > /tmp/vault.init
+
+export CONSUL_HTTP_ADDR=http://pphan-benchmark-consul-elb-1195120718.us-west-2.elb.amazonaws.com:8500
+vault operator init -key-shares=1 -key-threshold=1 -format=json | tee /tmp/vault.init
+jq -r ".unseal_keys_b64[0]" /tmp/vault.init | consul kv put service/vault/recovery-key -
+jq -r ".root_token" /tmp/vault.init | consul kv put service/vault/root-token -
+curl -X PUT -d '{"key": "'"$(consul kv get service/vault/recovery-key)"'"}' \
+    ${VAULT_ADDR}/v1/sys/unseal
+export VAULT_TOKEN=$(consul kv get service/vault/root-token)
+curl -H "X-Vault-Token: $VAULT_TOKEN" -X PUT -d @/license/licensepayload.json $VAULT_ADDR/v1/sys/license
 ```
 
 Save the values for **Unseal Key** and **Initial Root Token**. Example:

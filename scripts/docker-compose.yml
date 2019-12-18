@@ -1,0 +1,546 @@
+version: "3"
+services:
+  vault1: &vault-standalone
+    build: "vault/."
+    container_name: vault1
+    hostname: vault1
+    ports:
+      - "8200:8200"
+    environment:
+      - VAULT_ADDR=http://127.0.0.1:8200
+      - VAULT_DEV_ROOT_TOKEN_ID=root
+      - VAULT_DEV_LISTEN_ADDRESS=0.0.0.0:8200
+      - VAULT_LOG_LEVEL=debug
+    volumes:
+      - ".:/vault/scripts" # Using this instead of vault_essentials_patterns
+      - "./vault/config:/vault/config"
+      - "./vault/policies:/vault/policies"
+      - "./vault/data:/vault/data" # comment out if don't want persistent
+      - "./vault/logs:/vault/logs"
+      - "./vault/files:/vault/files"
+    tty: true
+    command: >
+      bash -c "echo $$(hostname) commented out /vault/config/base.sh && 
+      /vault/files/start_vault_dev.sh && 
+      tail -f /dev/null"
+    cap_add:
+      - IPC_LOCK
+    networks:
+        vault_net:
+          ipv4_address: 10.0.10.11
+  vault2:
+    <<: *vault-standalone
+    container_name: vault2
+    hostname: vault2
+    ports:
+      - "8202:8200"
+    networks:
+        vault_net:
+          ipv4_address: 10.0.10.12
+  vault3:
+    <<: *vault-standalone
+    container_name: vault3
+    hostname: vault3
+    ports:
+      - "8204:8200"
+    networks:
+        vault_net:
+          ipv4_address: 10.0.10.13
+  vault4:
+    <<: *vault-standalone
+    container_name: vault4
+    hostname: vault4
+    ports:
+      - "8206:8200"
+    networks:
+        vault_net:
+          ipv4_address: 10.0.10.14
+# vault-1 for pointing to config file
+  vault-1:
+    <<: *vault-standalone
+    build: "vault/."
+    container_name: "vault-1"
+    hostname: vault-1
+    command: >
+      bash -c "vault server -config=/vault/config/vault1-file-config.hcl > /vault/logs/$$(hostname).stdout \& &&
+      tail -f /dev/null"
+    networks:
+        vault_net:
+          ipv4_address: 10.0.10.100
+  vc1s1: &vault-server
+    build: "vault/."
+    container_name: vc1s1
+    hostname: vc1s1
+    ports:
+      - "10101:8200"
+    environment:
+      - VAULT_ADDR=http://127.0.0.1:8200
+    volumes:
+      - ".:/vault/scripts"
+      - "./vault/config:/vault/config"
+      - "./vault/policies:/vault/policies"
+      - "./vault/data:/vault/data"
+      - "./vault/logs:/vault/logs"
+      - "./vault/files:/vault/files"
+    command: >
+      bash -c "/vault/config/base.sh && vault server -config=/vault/config/vc1s1.hcl"
+    cap_add:
+      - IPC_LOCK
+    depends_on:
+      - cc1s1
+    networks:
+        vault_net:
+          ipv4_address: 10.0.10.101
+  vc1s2:
+    <<: *vault-server
+    container_name: vc1s2
+    hostname: vc1s2
+    ports:
+      - "10102:8200"
+    command: >
+      bash -c "/vault/config/base.sh && 
+      vault server -config=/vault/config/vc1s2.hcl"
+    networks:
+        vault_net:
+          ipv4_address: 10.0.10.102
+  vc1s3:
+    <<: *vault-server
+    container_name: vc1s3
+    hostname: vc1s3
+    ports:
+      - "10103:8200"
+    command: >
+      bash -c "/vault/config/base.sh && vault server -config=/vault/config/vc1s3.hcl"
+    networks:
+        vault_net:
+          ipv4_address: 10.0.10.103
+  cc1s1:
+    build: "consul/."
+    container_name: cc1s1
+    hostname: cc1s1
+    ports:
+      - "10111:8500"
+      # - "8300:8300" # for consul client outside of docker
+      - 8600:8600
+      - 8600:8600/udp
+      # 8080 used for nginx
+      - 8080:80
+    command: >
+      bash -c "/consul/config/consul.sh &&
+      service nginx start &&
+      cp /consul/scripts/start_consul_cc1s1.sh /bin/start_consul.sh &&
+      chmod +x /bin/start_consul.sh && /bin/start_consul.sh &&
+      tail -f /dev/null"
+    environment:
+      - CONSUL_HTTP_ADDR=http://127.0.0.1:8500
+    volumes:
+      - "../vault_essential_patterns_blog:/tmp/vault"
+      - "./consul/config:/consul/config"
+      # - "./consul/data:/consul/data" # not using. want data flushed everytime.
+      # - "./consul/policies:/consul/policies"
+      - "./consul/logs:/consul/logs"
+      - "./consul/scripts:/consul/scripts"
+    networks:
+      vault_net:
+        ipv4_address: 10.0.10.111
+  cc1s2: &consul-server
+    build: "consul/."
+    container_name: cc1s2
+    hostname: cc1s2
+    ports:
+      - "10112:8500"
+    command: >
+      bash -c "/consul/config/consul.sh &&
+      cp /consul/scripts/start_consul_server1.sh /bin/start_consul.sh &&
+      chmod +x /bin/start_consul.sh && /bin/start_consul.sh &&
+      tail -f /dev/null"
+    environment:
+      - CONSUL_HTTP_ADDR=http://127.0.0.1:8500
+    volumes:
+      - "../vault_essential_patterns_blog:/tmp/vault_essential_patterns_blog"
+      - "./consul/config:/consul/config"
+      - "./consul/logs:/consul/logs"
+      - "./consul/scripts:/consul/scripts"
+    depends_on:
+      - cc1s1
+    networks:
+      vault_net:
+        ipv4_address: 10.0.10.112
+  cc1s3:
+    <<: *consul-server
+    container_name: cc1s3
+    hostname: cc1s3
+    command: >
+      bash -c "/consul/config/consul.sh &&
+      cp /consul/scripts/start_consul_server1.sh /bin/start_consul.sh &&
+      chmod +x /bin/start_consul.sh && /bin/start_consul.sh &&
+      tail -f /dev/null"
+    # command: >
+    #   bash -c "/consul/config/consul.sh &&
+    #   consul agent -server -retry-join cc1s1 -config-file=/consul/config/config.json"
+    ports:
+      - "10113:8500"
+    networks:
+      vault_net:
+        ipv4_address: 10.0.10.113
+  cc1c1:
+    <<: *consul-server
+    container_name: cc1c1
+    hostname: cc1c1
+    ports:
+      - "10114:8500"
+      - "9002:9002"
+    command: >
+      bash -c "/consul/config/consul.sh &&
+      cp /consul/scripts/start_consul_client.sh /bin/start_consul.sh &&
+      chmod +x /bin/start_consul.sh && /bin/start_consul.sh &&
+      tail -f /dev/null"
+    networks:
+      vault_net:
+  cc1c2:
+    <<: *consul-server
+    container_name: cc1c2
+    hostname: cc1c2
+    ports:
+      - "10115:8500"
+    command: >
+      bash -c "/consul/config/consul.sh &&
+      cp /consul/scripts/start_consul_client.sh /bin/start_consul.sh &&
+      chmod +x /bin/start_consul.sh && /bin/start_consul.sh &&
+      tail -f /dev/null"
+    networks:
+      vault_net:
+  cc1c3:
+    <<: *consul-server
+    container_name: cc1c3
+    hostname: cc1c3
+    ports:
+      - "10116:8500"
+    command: >
+      bash -c "/consul/config/consul.sh &&
+      service nginx start &&
+      consul agent -retry-join cc1s1 -config-file=/consul/config/config.json -config-dir /etc/consul.d &&
+      tail -f /dev/null"
+    networks:
+      vault_net:
+  counting-svc:
+    container_name: counting-svc
+    hostname: countint-svc
+    image: hashicorp/counting-service:0.0.2
+    ports: 
+      - 9001:9001
+    networks:
+      vault_net:
+  echo-svc:
+    container_name: echo-svc
+    hostname: echo-svc
+    command: --port 9090
+    image: abrarov/tcp-echo
+    networks:
+      vault_net:
+  echo-proxy:
+    container_name: echo-proxy
+    hostname: echo-proxy
+    command: -sidecar-for echo
+    build: 
+      context: "consul-envoy/."
+    networks:
+      vault_net:
+  client-proxy:
+    container_name: client-proxy
+    hostname: client-proxy
+    command: -sidecar-for client -admin-bind localhost:19001 
+    build: 
+      context: "consul-envoy/."
+    networks:
+      vault_net:
+  postgres:
+    image: "postgres:11"
+    container_name: "postgres"
+    hostname: "postgres"
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=1234
+    volumes:
+      - "../vault_essential_patterns_blog/sql:/docker-entrypoint-initdb.d"
+    networks:
+      vault_net:
+        ipv4_address: 10.0.10.20
+  openldap:
+    image: "osixia/openldap:1.2.5"
+    container_name: "openldap"
+    hostname: "ldap.ourcorp.com"
+    command: [--copy-service, --loglevel, debug]
+    ports:
+      - "389:389"
+      - "689:689"
+    environment:
+      - LDAP_ORGANISATION="OurCorp Inc"
+      - LDAP_DOMAIN=ourcorp.com
+      - LDAP_ADMIN_PASSWORD=ldap.ourcorp.com
+      - LDAP_READONLY_USER=true
+      - LDAP_READONLY_USER_USERNAME=read-only
+      - LDAP_READONLY_USER_PASSWORD=devsecopsFTW
+    volumes:
+      - "./ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom"
+    networks:
+      vault_net:
+        ipv4_address: 10.0.10.30
+  vc2s1:
+    <<: *vault-server
+    container_name: vc2s1
+    hostname: vc2s1
+    ports:
+      - "10201:8200"
+    command: >
+      bash -c "/vault/config/base2.sh && vault server -config=/vault/config/vc2s1.hcl"
+    # command: server -config=/vault/config/vc2s1.hcl > /vault/logs/vc1s2.log 2>&1
+    networks:
+        vault_net:
+          ipv4_address: 10.0.10.201
+  vc2s2:
+    <<: *vault-server
+    container_name: vc2s2
+    hostname: vc2s2
+    ports:
+      - "10202:8200"
+    command: >
+      bash -c "/vault/config/base2.sh && vault server -config=/vault/config/vc2s2.hcl"
+    networks:
+        vault_net:
+          ipv4_address: 10.0.10.202
+  vc2s3:
+    <<: *vault-server
+    container_name: vc2s3
+    hostname: vc2s3
+    ports:
+      - "10203:8200"
+    command: >
+      bash -c "/vault/config/base2.sh && vault server -config=/vault/config/vc2s3.hcl"
+    networks:
+        vault_net:
+          ipv4_address: 10.0.10.203
+  cc2s1:
+    build: "consul/."
+    container_name: cc2s1
+    hostname: cc2s1
+    ports:
+      - "10211:8500"
+      - 8602:8600/udp
+      - 8082:80
+    # command: >
+    #   bash -c "/consul/config/consul2.sh &&
+    #   consul agent -server -bootstrap-expect 1 -config-file=/consul/config/config2.json  -enable-local-script-checks -config-dir=/etc/consul.d &&
+    #   tail -f /dev/null"
+    command: >
+      bash -c "/consul/config/consul2.sh &&
+      cp /consul/scripts/start_consul_server2boot.sh /bin/start_consul.sh &&
+      chmod +x /bin/start_consul.sh && /bin/start_consul.sh &&
+      tail -f /dev/null"
+    environment:
+      - CONSUL_HTTP_ADDR=http://127.0.0.1:8500
+      - DC=1
+      - BOOTSTRAP=boot
+      - BOOT=-bootstrap-expect 1 
+    volumes:
+      - "../vault_essential_patterns_blog:/tmp/vault_essential_patterns_blog"
+      - "./consul/config:/consul/config"
+      - "./consul/logs:/consul/logs"
+      - "./consul/scripts:/consul/scripts"
+    networks:
+      vault_net:
+        ipv4_address: 10.0.10.211
+  cc2s2:
+    <<: *consul-server
+    container_name: cc2s2
+    hostname: cc2s2
+    ports:
+      - "10212:8500"
+    # command: >
+    #   bash -c "/consul/config/consul2.sh &&
+    #   consul agent -server -retry-join cc2s1 -config-file=/consul/config/cc2s1.json &&
+    #   tail -f /dev/null"
+    command: >
+      bash -c "/consul/config/consul2.sh &&
+      cp /consul/scripts/start_consul_server2boot.sh /bin/start_consul.sh &&
+      chmod +x /bin/start_consul.sh && /bin/start_consul.sh &&
+      tail -f /dev/null"
+    depends_on:
+      - cc2s1
+    networks:
+      vault_net:
+        ipv4_address: 10.0.10.212
+  cc2s3:
+    <<: *consul-server
+    container_name: cc2s3
+    hostname: cc2s3
+    ports:
+      - "10213:8500"
+    command: >
+      bash -c "/consul/config/consul2.sh &&
+      cp /consul/scripts/start_consul_server2boot.sh /bin/start_consul.sh &&
+      chmod +x /bin/start_consul.sh && /bin/start_consul.sh &&
+      tail -f /dev/null"
+    depends_on:
+      - cc2s1
+    networks:
+      vault_net:
+        ipv4_address: 10.0.10.213
+  mysql-1:
+    image: "mysql:5.7"
+    container_name: "mysql-1"
+    ports:
+      - "3306:3306"
+    # restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=my_app
+      - MYSQL_USER=vault
+      - MYSQL_PASSWORD=vaultpw    
+    volumes:
+      - ./wp-data:/docker-entrypoint-initdb.d
+      - ./workshop-data:/var/lib/mysql
+    networks:
+      vault_net:
+        ipv4_address: 10.0.10.41
+  # wordpress:
+  #   depends_on:
+  #     - mysql-1
+  #   image: "wordpress:latest"
+  #   container_name: "workdpress"
+  #   ports:
+  #     - "8000:80"
+  #   restart: always
+  #   environment:
+  #     - WORDPRESS_DB_HOST=mysql-1:3306
+  #     - WORDPRESS_DB_USER=wordpress
+  #     - WORDPRESS_DB_PASSWORD=wordpress
+  #     - WORDPRESS_DB_NAME=wordpress    
+  #   volumes:
+  #     - "./wp-app:/var/www/html" # Existing Wordpress project
+  #   networks:
+  #     vault_net:
+  #       ipv4_address: 10.0.10.42
+  #--- This section is for ghost blog.
+  #-----------------------------------
+  # ghost:
+  #   container_name: ghost
+  #   hostname: ghost
+  #   image: ghost:latest
+  #   ports:
+  #     - "80:2368"
+  #   environment:
+  #     - database__client=mysql
+  #     - database__connection__host=ghost-db # needs to match name of db service
+  #     - database__connection__user=root
+  #     - database__connection__password=P4SSw0rd0! # needs to match db password
+  #     - database__connection__database=ghost
+  #   volumes:
+  #     - ghost-volume:/var/lib/ghost
+  #   networks:
+  #     # - ghost_network #public facing network
+  #     # - mysql_network #internal network
+  #     vault_net:
+  #       ipv4_address: 10.0.10.51
+  #   depends_on:
+  #     - ghost-db
+  # ghost-db:
+  #   container_name: ghost-db
+  #   hostname: ghost-db
+  #   image: mysql:5.7
+  #   environment:
+  #     - MYSQL_ROOT_PASSWORD=P4SSw0rd0!
+  #   volumes:
+  #     - mysql-volume:/var/lib/mysql
+  #   networks:
+  #     vault_net:
+  #       ipv4_address: 10.0.10.52
+  #     # - mysql_network  
+  python:
+    build: "python/."
+    tty: true
+    container_name: "python"
+    hostname: python
+    ports:
+      - "5000:5000"
+      - "22:22"
+    command: >
+      bash -c "service nginx start &&
+      wget https://releases.hashicorp.com/terraform/0.12.12/terraform_0.12.12_linux_amd64.zip -O /tmp/terraform.zip &&
+      unzip /tmp/terraform.zip -d /usr/local/bin && chmod +x /usr/local/bin/terraform &&
+      wget https://releases.hashicorp.com/terraform/0.11.14/terraform_0.11.14_linux_amd64.zip -O /tmp/terraform11.zip &&
+      unzip /tmp/terraform11.zip -d /tmp/terraform && mv /tmp/terraform/terraform /usr/local/bin/tf11 && chmod +x /usr/local/bin/tf11 &&
+      apt -y install graphviz && pip3 install BlastRadius &&
+      tail -f /dev/null"
+    env_file:
+      - .env
+    volumes:
+      - "../vault_essential_patterns_blog:/tmp/vault"
+      - "~/Dropbox/code/HashiCorp:/terraform"
+      - "./python:/python"
+    # command: >
+    #   bash -c "tail -f /dev/null"
+    networks:
+        vault_net:
+  dashboard: &dashboard
+    container_name: dashboard
+    hostname: dashboard
+    image: hashicorp/dashboard-service:0.0.4
+    restart: always
+    ports:
+      - "8080"
+    environment:
+      PORT: 8080
+      COUNTING_SERVICE_URL: 'http://counting-service:9001'
+    depends_on:
+      - counting-service
+    networks:
+      vault_net:
+  counting-service: &counting-service
+    container_name: counting-service
+    hostname: counting-service
+    image: 'hashicorp/counting-service:0.0.2'
+    restart: always
+    ports:
+      - '9001:9001'
+    environment:
+      PORT: 9001
+    networks:
+      vault_net:
+  dashboard-9002:
+    <<: *dashboard
+    container_name: dashboard-9002
+    hostname: dashboard-9002
+    ports:
+      - "9002:9002"
+    environment:
+      PORT: 9002
+      COUNTING_SERVICE_URL: 'http://localhost:9003'
+    depends_on:
+      - counting-service-9003
+  counting-service-9003:
+    <<: *counting-service
+    container_name: counting-service-9003
+    hostname: counting-service-9003
+    ports:
+      - '9003' 
+    environment:
+      PORT: 9003
+volumes:
+  db_data: {}
+  #--- ghost blog
+  ghost-volume:
+  mysql-volume:  
+networks:
+  #--- ghost blog
+  # ghost_network:
+  # mysql_network:
+  #--- HashiCorp
+  vault_net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.0.10.0/24
+

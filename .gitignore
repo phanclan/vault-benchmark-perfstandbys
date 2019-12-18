@@ -12,7 +12,8 @@ vault
 consul
 *.pem
 .DS_Store
-license
+license*
+license/
 
 # .terraform
 # *.iml
