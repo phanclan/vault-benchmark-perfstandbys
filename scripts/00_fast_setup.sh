@@ -214,6 +214,7 @@ The configuration options are categorized and detailed below."
 
 green "Configure Unique Member group lookups"
 # Using group of unique names lookups
+export LDAP_URL="ldap://127.0.0.1"
 echo vault write auth/ldap-um/config \
     url="${LDAP_URL}" \
     binddn="${BIND_DN}" \
