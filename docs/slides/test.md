@@ -2,6 +2,8 @@
 
 This folder contains a Terraform module for deploying Vault to AWS (within a VPC) along with Consul as the storage backend. It can be used as-is or can be modified to work in your scenario, but should serve as a strong starting point for deploying Vault. It can be used with Ubuntu 16.04 or RHEL 7.5.
 
+---
+
 The Terraform code will create the following resources in a VPC and subnet that you specify in the AWS us-east-1 region:
 
 * IAM instance profile, IAM role, IAM policy, and associated IAM policy documents
@@ -16,6 +18,8 @@ The Terraform code will create the following resources in a VPC and subnet that 
   - outbound calls on port 443 to anywhere (so that the installation scripts can download the vault and consul binaries)
   - After installation, those broader security group rules could be made tighter.
 
+---
+
 You can deploy this in either a public or a private subnet.  But you must set `elb_internal` and `public_ip` as instructed below in both cases. The VPC should have at least one subnet with 2 or 3 being preferred for high availability.
 
 Note that the `create-iam-and-sgs` branch of this repository can be used to create the IAM and security group resources separately. If you do use that, you can then use the `asgs-instances-elbs` branch to create the auto scaling groups, EC2 instances, and ELBs.
@@ -23,6 +27,8 @@ Note that the `create-iam-and-sgs` branch of this repository can be used to crea
 Note that if using the HTTP download links for the evaulation binaries of Vault Enterprise and Consul Enterprise, you will need to apply license files for both of these. See more below. Note, however, that you could use Consul Open Source instead of Consul Enterprise with no loss of functionality. In that case, you would change the `consul_download_url` to https://releases.hashicorp.com/consul/1.5.0/consul_1.5.0_linux_amd64.zip.
 
 **The licenses must be applied within 30 minutes after starting the servers**. If you don't do this, you will need to restart them and then apply the licenses within 30 minutes.
+
+---
 
 ## Preparation
 1. Download [terraform](https://www.terraform.io/downloads.html) and extract the terraform binary to some directory in your path.
