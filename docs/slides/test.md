@@ -320,14 +320,14 @@ I tested on a single Vault node, connected to a 3-node Consul cluster for backen
 
 - Enable the Transit secret engine and write a keyring for your testing:
 
-```
+``` shell
 vault secrets enable -path=transit transit
 vault write -f transit/keys/test
 ```
 
 - Clone Jacob Friedman's repo, which contains our testing scripts for Vault Transit.
 
-```
+``` shell
 git clone https://github.com/jdfriedma/Vault-Transit-Load-Testing.git
 ```
 
@@ -341,6 +341,8 @@ make
 # move the executable to somewhere in your PATH, ex:
 sudo cp wrk /usr/local/bin
 ```
+
+---
 
 - Run your workload. 
   - The makers of wrk recommend running a **maximum of 1 thread per core**. 
@@ -357,6 +359,8 @@ sudo cp wrk /usr/local/bin
     wrk -t2 -c8 -d30s -H "X-Vault-Token: ${VAULT_TOKEN}" -s postbatch320.lua http://localhost:8200/v1/transit/encrypt/test
     ```
 
+---
+
 # Sizing up (or down)
 I started with a t3.small and then scaled up to a c5.2xlarge.
 
@@ -365,8 +369,11 @@ Here are the steps to resize your vault server.
 1. Change `instance_type_vault` and run `terraform apply`.
 1. ssh into vault.
 1. Run `vault operator unseal` and provide unseal key.
-1. Run the following commands:
-```
+
+---
+
+4. Run the following commands:
+``` shell
 tee test.sh <<"EOF"
 #!/bin/bash -x
 #------------------------------------------------------------------------------
@@ -398,6 +405,7 @@ vault audit enable file file_path=/tmp/audit.log log_raw=true
 ./test.sh
 ```
 
+--- 
 
 # Sample Results
 
