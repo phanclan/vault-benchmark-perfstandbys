@@ -120,6 +120,8 @@ Note that the `create-iam-and-sgs` branch of this repository can be used to crea
 
 Note that if using the HTTP download links for the evaulation binaries of Vault Enterprise and Consul Enterprise, you will need to apply license files for both of these. See more below. Note, however, that you could use Consul Open Source instead of Consul Enterprise with no loss of functionality. In that case, you would change the `consul_download_url` to https://releases.hashicorp.com/consul/1.5.0/consul_1.5.0_linux_amd64.zip.
 
+---
+
 **The licenses must be applied within 30 minutes after starting the servers**. If you don't do this, you will need to restart them and then apply the licenses within 30 minutes.
 
 ---
