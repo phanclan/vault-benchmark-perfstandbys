@@ -89,7 +89,7 @@ module "example" {
   #-------------------
   asg_name                  = "pphan-benchmark-vault" # CHANGE
   vpc_zone_identifier       = module.vpc_usw2-1.public_subnets
-  health_check_type         = "ELB"
+  health_check_type         = "EC2" # ELB health check triggers failure loop
   min_size                  = 0
   max_size                  = var.vault_nodes
   desired_capacity          = var.vault_nodes
@@ -340,6 +340,15 @@ resource "aws_security_group_rule" "vault_8200_in" {
   to_port           = 8200
   protocol          = "tcp"
   # cidr_blocks       = ["0.0.0.0/0"]
+  cidr_blocks       = ["${chomp(data.http.current_ip.body)}/32"]
+}
+
+resource "aws_security_group_rule" "vault_postgres_in" {
+  security_group_id = aws_security_group.vault.id
+  type              = "ingress"
+  from_port         = 5432
+  to_port           = 5432
+  protocol          = "tcp"
   cidr_blocks       = ["${chomp(data.http.current_ip.body)}/32"]
 }
 

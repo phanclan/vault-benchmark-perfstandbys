@@ -85,11 +85,13 @@ You will be able to use the Vault ELB URL after Vault is initialized which you w
 
 Alternatively...
 1. Find the public IP of a Vault instance via CLI.
-    aws --region us-west-2 \
-    ec2 describe-instances --filter Name=tag-key,Values=aws:autoscaling:groupName \
-    --query 'Reservations[*].Instances[*].{Instance:InstanceId,AZ:Placement.AvailabilityZone,Name:Tags[?Key==`Name`]|[0].Value,PIP:PublicIpAddress}' \
-    --output text | grep pphan | tee /tmp/describe-instances.txt
-    - Sample Output
+```
+aws --region us-west-2 \
+  ec2 describe-instances --filter Name=tag-key,Values=aws:autoscaling:groupName \
+  --query 'Reservations[*].Instances[*].{Instance:InstanceId,AZ:Placement.AvailabilityZone,Name:Tags[?Key==`Name`]|[0].Value,PIP:PublicIpAddress}' \
+  --output text | grep pphan | grep -iv "None" | tee /tmp/describe-instances.txt
+```
+- Sample Output
 ```
 us-west-2a	i-09c3966f19182ccaf	pphan-benchmark-consul	34.210.58.127
 us-west-2b	i-0eefe1616ca431997	pphan-benchmark-consul	52.12.105.181
