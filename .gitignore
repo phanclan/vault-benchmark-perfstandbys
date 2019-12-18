@@ -16,6 +16,8 @@ consul/scripts/*
 .DS_Store
 license*
 license/
+scripts/tmp/*
+tmp/*
 
 # .terraform
 # *.iml

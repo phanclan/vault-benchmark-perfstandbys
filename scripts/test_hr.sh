@@ -1,13 +1,6 @@
 shopt -s expand_aliases
 . env.sh
 
-export VAULT_ADDR=http://$(grep vault /tmp/describe-instances.txt | awk '{print $NF}'):8200
-cd ..
-export CONSUL_HTTP_ADDR=$(terraform output | grep consul_ui | awk '{print $NF}')
-echo $VAULT_ADDR
-echo $CONSUL_HTTP_ADDR
-export PGHOST=127.0.0.1
-
 tput clear
 cyan "#-------------------------------------------------------------------------------
 #--- Running: $0: Testing HR requirements

@@ -26,7 +26,6 @@ p
 export LDAP_HOST=openldap
 p
 
-
 #-------------------------------------------------------------------------------
 
 echo '#------------------------------------------------------------------------------
@@ -58,38 +57,45 @@ set +e
 vault audit enable file file_path=./tmp/audit-1.log log_raw=true
 set -e
 
-tput clear
+#-------------------------------------------------------------------------------
+
 cyan "#-------------------------------------------------------------------------------
-#  3_enable_kv.sh
+#  CREATE ADMIN POLICY AND USER
+#-------------------------------------------------------------------------------\n"
+
+green "#--- Admin Policies"
+vault policy write admin ./vault/policies/admin-policy.hcl
+
+green "#--- Create admin user and store in consul"
+vault token create -policy=admin -field=token | consul kv put service/vault/admin-token -
+
+# tput clear
+cyan "#-------------------------------------------------------------------------------
+#  3_enable_kv.sh - ENABLE STATIC SECRETS
 #-------------------------------------------------------------------------------\n"
 green "#--- Enable a KV V2 Secret engine at the path 'labsecrets' and kv-blog"
-export KV_PATH=labsecrets
 set +e
 vault secrets enable -path=labsecrets -version=2 kv > /dev/null 2>&1
 vault secrets enable -path=kv-blog -version=2 kv > /dev/null 2>&1
 set -e
-green '#--- Create a new secret with a "key of apikey" and 
-"value of master-api-key-111111" within the "${KV_PATH}" path:'
-vault kv put ${KV_PATH}/apikeys/googlemain apikey=master-api-key-111111
-green "Create a new secret called 'gvoiceapikey' with a value of 'PassTheHash!:'"
+green '#--- CLI: Create a new secret with a "key of apikey" and 
+"value of master-api-key-111111" within the "labsecrets" path:'
+vault kv put labsecrets/apikeys/googlemain apikey=master-api-key-111111
+green "#--- API: Create a new secret called 'gvoiceapikey' with a value of 'PassTheHash!:'"
 curl -s \
     -H "X-Vault-Token: $VAULT_TOKEN" \
     -H "Content-Type: application/json" \
     -X POST \
     -d '{ "data": { "gvoiceapikey": "PassTheHash!" } }' \
-    ${VAULT_ADDR}/v1/${KV_PATH}/data/apikeys/googlevoice | jq 
-green '#--- POST SECRET: MULTIPLE FIELDS'
+    ${VAULT_ADDR}/v1/labsecrets/data/apikeys/googlevoice | jq 
+green '#--- CLI: POST SECRET: MULTIPLE FIELDS'
 vault kv put labsecrets/webapp username="beaker" password="meepmeepmeep"
-green "#--- RETRIEVE SECRET:"
-vault kv get labsecrets/webapp
-green "#--- RETRIEVE SECRET BY FIELD:"
-vault kv get -field=password labsecrets/webapp
-green "#--- LOAD SECRET VIA FILE PAYLOAD: vault kv put <secrets engine>/<location> @<name of file>.json"
+green "#--- CLI: LOAD SECRET VIA FILE PAYLOAD: vault kv put <secrets engine>/<location> @<name of file>.json"
 vault kv put labsecrets/labinfo @./vault/files/data.json
-green "#--- Insert some additional secrets for use later in demo / hide action"
+green "#--- CLI: Insert some additional secrets for use later in demo / hide action"
 vault kv put labsecrets/lab_keypad code="12345" >/dev/null
 vault kv put labsecrets/lab_room room="A113" >/dev/null
-green "#--- WRITE A SECRET VIA API:\n"
+green "#--- API: WRITE A SECRET"
 curl -s -H "X-Vault-Token: $VAULT_TOKEN" \
     -X POST \
     -d '{"data":{"gmapapikey": "where-am-i-??????"}}' \
@@ -98,86 +104,72 @@ p "Press Enter to continue"
 
 #-------------------------------------------------------------------------------
 
-
-
-
-
 # tput clear
-# cyan "#-------------------------------------------------------------------------------
-# # 4_enable_db.sh
-# #-------------------------------------------------------------------------------\n"
-# osascript -e "tell application \"pgAdmin 4\" to activate"
-# set +e
-# green "#--- Enable Database Secret engine."
-# vault secrets enable -path=${DB_PATH} database
-# set -e
-# green "#--- Configure plugin and connection info that Vault uses to connect to database."
-# vault write ${DB_PATH}/config/${PGDATABASE} \
-#     plugin_name=postgresql-database-plugin \
-#     allowed_roles=* \
-#     connection_url="postgresql://{{username}}:{{password}}@postgres:${PGPORT}/${PGDATABASE}?sslmode=disable" \
-#     username="${VAULT_ADMIN_USER}" \
-#     password="${VAULT_ADMIN_PW}"
+cyan "#-------------------------------------------------------------------------------
+# 4_enable_db.sh - ENABLE DYNAMIC SECRETS - DB
+#-------------------------------------------------------------------------------\n"
+osascript -e "tell application \"pgAdmin 4\" to activate"
+set +e
+green "#--- Enable Database Secret engine."
+vault secrets enable -path=${DB_PATH} database
+set -e
+green "#--- Configure plugin and connection info that Vault uses to connect to database."
+vault write ${DB_PATH}/config/${PGDATABASE} \
+    plugin_name=postgresql-database-plugin \
+    allowed_roles=* \
+    connection_url="postgresql://{{username}}:{{password}}@127.0.0.1:${PGPORT}/${PGDATABASE}?sslmode=disable" \
+    username="${VAULT_ADMIN_USER}" \
+    password="${VAULT_ADMIN_PW}"
 
-# green "Rotate the credentials for ${VAULT_ADMIN_USER} so no human has access to them anymore"
-# white "vault write -force ${DB_PATH}/rotate-root/${PGDATABASE}"
+green "Rotate the credentials for ${VAULT_ADMIN_USER} so no human has access to them anymore"
+white "vault write -force ${DB_PATH}/rotate-root/${PGDATABASE}"
 
-# green "#--- Configure the Vault/Postgres database roles with time bound credential templates"
-# MAX_TTL=24h
+green "#--- Configure the Vault/Postgres database roles with time bound credential templates"
+MAX_TTL=24h
 
-# green "#--- Full read can be used by security teams to scan for credentials in any schema - 30s \n"
-# ROLE_NAME="full-read"
-# CREATION_STATEMENT="CREATE ROLE \"{{name}}\" WITH LOGIN PASSWORD '{{password}}' VALID UNTIL '{{expiration}}';
-#   GRANT USAGE ON SCHEMA public,it,hr,security,finance,engineering TO \"{{name}}\"; 
-#   GRANT SELECT ON ALL TABLES IN SCHEMA public,it,hr,security,finance,engineering TO \"{{name}}\";"
-# TTL=30s
-# write_db_role
+green "#--- Full read can be used by security teams to scan for credentials in any schema - 30s \n"
+ROLE_NAME="full-read"
+CREATION_STATEMENT="CREATE ROLE \"{{name}}\" WITH LOGIN PASSWORD '{{password}}' VALID UNTIL '{{expiration}}';
+  GRANT USAGE ON SCHEMA public,it,hr,security,finance,engineering TO \"{{name}}\"; 
+  GRANT SELECT ON ALL TABLES IN SCHEMA public,it,hr,security,finance,engineering TO \"{{name}}\";"
+TTL=30s
+write_db_role
 
-# green "#--- Full read can be used by security teams to scan for credentials in any schema - 1h \n"
-# TTL=1h
-# write_db_role
+green "#--- Full read can be used by security teams to scan for credentials in any schema - 1h \n"
+TTL=1h
+write_db_role
 
-# green "#--- HR will be granted full access to their schema - 30s \n"
-# ROLE_NAME="hr-full"
-# CREATION_STATEMENT="CREATE ROLE \"{{name}}\" WITH LOGIN PASSWORD '{{password}}' VALID UNTIL '{{expiration}}'; 
-# GRANT USAGE ON SCHEMA hr TO \"{{name}}\"; 
-# GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA hr TO \"{{name}}\";"
-# TTL=30s
-# write_db_role
+green "#--- HR will be granted full access to their schema - 30s \n"
+ROLE_NAME="hr-full"
+CREATION_STATEMENT="CREATE ROLE \"{{name}}\" WITH LOGIN PASSWORD '{{password}}' VALID UNTIL '{{expiration}}'; 
+GRANT USAGE ON SCHEMA hr TO \"{{name}}\"; 
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA hr TO \"{{name}}\";"
+TTL=30s
+write_db_role
 
-# green "#--- HR will be granted full access to their schema - 1h \n"
-# TTL=1h
-# write_db_role
+green "#--- HR will be granted full access to their schema - 1h \n"
+TTL=1h
+write_db_role
 
-# green "#--- Engineering will be granted full access to their schema - 30s \n"
-# green "Engineering will be granted full access to their schema"
-# ROLE_NAME="engineering-full"
-# CREATION_STATEMENT="CREATE ROLE \"{{name}}\" WITH LOGIN PASSWORD '{{password}}' VALID UNTIL '{{expiration}}'; 
-# GRANT USAGE ON SCHEMA engineering TO \"{{name}}\"; 
-# GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA engineering TO \"{{name}}\";"
-# TTL=30s
-# write_db_role
+green "#--- Engineering will be granted full access to their schema - 30s \n"
+green "Engineering will be granted full access to their schema"
+ROLE_NAME="engineering-full"
+CREATION_STATEMENT="CREATE ROLE \"{{name}}\" WITH LOGIN PASSWORD '{{password}}' VALID UNTIL '{{expiration}}'; 
+GRANT USAGE ON SCHEMA engineering TO \"{{name}}\"; 
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA engineering TO \"{{name}}\";"
+TTL=30s
+write_db_role
 
-# green "#--- Engineering will be granted full access to their schema - 1h \n"
-# TTL=1h
-# write_db_role
-# p "Press Enter to continue"
+green "#--- Engineering will be granted full access to their schema - 1h \n"
+TTL=1h
+write_db_role
+p "Press Enter to continue"
 
 #-------------------------------------------------------------------------------
 
-
-
-
-
-
-
-
-
-
-
-tput clear
+# tput clear
 cyan "#-------------------------------------------------------------------------------
-# 5_enable_transit.sh
+# 5_enable_transit.sh - ENABLE TRANSIT SECRETS
 #-------------------------------------------------------------------------------\n"
 green "#--- Enable Transit Secret Engine"
 set +e
@@ -188,20 +180,12 @@ vault write -f ${TRANSIT_PATH}/keys/hr
 
 #-------------------------------------------------------------------------------
 
-
-
-
-
-
-
-
-
 tput clear
 cyan "#-------------------------------------------------------------------------------
-# Enable and Configure the LDAP Auth Method
+# ENABLE AND CONFIGURE THE LDAP AUTH METHOD
 #-------------------------------------------------------------------------------\n"
 
-green "Enable ldap auth method for two paths."
+green "#--- Enable ldap auth method for two paths."
 set +e
 vault auth enable -path=ldap-um ldap
 vault auth enable -path=ldap-mo ldap
@@ -252,7 +236,6 @@ echo vault write auth/ldap-mo/config \
     groupattr="${MO_GROUP_ATTR}" \
     insecure_tls=true
 
-
 vault write auth/ldap-mo/config \
     url="${LDAP_URL}" \
     binddn="${BIND_DN}" \
@@ -264,15 +247,13 @@ vault write auth/ldap-mo/config \
     groupattr="${MO_GROUP_ATTR}" \
     insecure_tls=true
 
-# #-------------------------------------------------------------------------------
+p
 
-
-
-
+#-------------------------------------------------------------------------------
 
 tput clear
 cyan "#-------------------------------------------------------------------------------
-# Generating a dynamic policy
+# GENERATE DYNAMIC POLICY
 #-------------------------------------------------------------------------------\n"
 UM_ACCESS=$(vault auth list -format=json | jq -r '.["ldap-um/"].accessor')
 MO_ACCESS=$(vault auth list -format=json | jq -r '.["ldap-mo/"].accessor')
@@ -394,50 +375,25 @@ EOF
 
 vault policy write kv-user-template ./tmp/kv-user-template-policy.hcl
 
+p
+
 #-------------------------------------------------------------------------------
 
-
-
-
-
-tput clear
+# tput clear
 cyan "#-------------------------------------------------------------------------------
 # Running: CREATE POLICIES
 #-------------------------------------------------------------------------------\n"
-cyan "Before enabling authentication, you create policies that will be used to grant a role and permissions.
-
-An example role could be a simple as only allowing access to certain secrets.
-
-EXAMPLE POLICY:
----------------"
-# cat vault/files/base_example.hcl
-
 green "Load the policy into Vault\n"
 vault policy write base ./vault/files/base.hcl
 
-tput clear
-cyan "#-------------------------------------------------------------------------------
-# LIST AND CHECK POLICIES
-#-------------------------------------------------------------------------------\n"
-green "Once the policy has been written, check availability..."
-echo
-white "COMMAND: vault policy list"
-vault policy list
-
-green "Review the policy:"
-echo ""
-white "COMMAND: vault policy read \<name of policy\>"
-echo ""
-vault policy read base
-
-# p "Press Enter to continue"
+p "Press Enter to continue"
 
 
-# KV Policies
+cyan "# KV Policies"
 green "Create KV policy for IT access"
 vault policy write kv-it ./vault/policies/kv-it-policy.hcl
 
-# DB Policies
+cyan "# DB Policies"
 green "Create DB policies for access."
 cat ./vault/policies/db-full-read-policy.hcl
 vault policy write db-full-read ./vault/policies/db-full-read-policy.hcl
@@ -451,44 +407,27 @@ green 'Create DB transit policies for HR.'
 cat ./vault/policies/transit-hr-policy.hcl
 vault policy write transit-hr ./vault/policies/transit-hr-policy.hcl
 
-green "#--- Admin Policies"
-vault policy write admin ./vault/policies/admin-policy.hcl
-
-green "#--- Create admin user and store in consul"
-vault token create -policy=admin -field=token | consul kv put service/vault/admin-token -
-
 #-------------------------------------------------------------------------------
 
+# tput clear
+cyan "#-------------------------------------------------------------------------------
+#--- Running: Associating Policies with Authentication Methods
+#-------------------------------------------------------------------------------\n"
+# Unique Member configs
+green "Setup Unique Member group logins for LDAP.   These can use alias names when logging in"
+echo
+vault write auth/ldap-um/groups/it policies=kv-it,kv-user-template
+vault write auth/ldap-um/groups/security policies=db-full-read,kv-user-template
 
+# MemberOf configs
+green "Setup MemberOf group logins for LDAP.   Need to use the entire DN for the group here as these are in the user's attributes"
+echo
+#pe "vault write auth/ldap-mo/groups/cn=hr,ou=um_group,dc=ourcorp,dc=com policies=db-hr,transit-hr,kv-user-template"
+#pe "vault write auth/ldap-mo/groups/cn=engineering,ou=um_group,dc=ourcorp,dc=com policies=db-engineering,kv-user-template"
+vault write auth/ldap-mo/groups/hr policies=db-hr,transit-hr,kv-user-template
+vault write auth/ldap-mo/groups/engineering policies=db-engineering,kv-user-template
 
-
-
-tput clear
-# cyan "#-------------------------------------------------------------------------------
-# #--- Running: Associating Policies with Authentication Methods
-# #-------------------------------------------------------------------------------\n"
-# # Unique Member configs
-# green "Setup Unique Member group logins for LDAP.   These can use alias names when logging in"
-# echo
-# vault write auth/ldap-um/groups/it policies=kv-it,kv-user-template
-# vault write auth/ldap-um/groups/security policies=db-full-read,kv-user-template
-# # Following two lines are tests by pp.
-# # pe "vault write auth/ldap-um/groups/hr policies=db-hr,transit-hr,kv-user-template"
-# # pe "vault write auth/ldap-um/groups/engineering policies=db-engineering,kv-user-template"
-
-# # MemberOf configs
-# green "Setup MemberOf group logins for LDAP.   Need to use the entire DN for the group here as these are in the user's attributes"
-# echo
-# #pe "vault write auth/ldap-mo/groups/cn=hr,ou=um_group,dc=ourcorp,dc=com policies=db-hr,transit-hr,kv-user-template"
-# #pe "vault write auth/ldap-mo/groups/cn=engineering,ou=um_group,dc=ourcorp,dc=com policies=db-engineering,kv-user-template"
-# vault write auth/ldap-mo/groups/hr policies=db-hr,transit-hr,kv-user-template
-# vault write auth/ldap-mo/groups/engineering policies=db-engineering,kv-user-template
-
-# #-------------------------------------------------------------------------------
-
-
-
-
+#-------------------------------------------------------------------------------
 
 tput clear
 cyan "#-------------------------------------------------------------------------------
