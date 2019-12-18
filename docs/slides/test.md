@@ -81,6 +81,14 @@ This workshop should take roughly three hours to complete.
 
 **Here is our agenda for today's training. The format is simple, you'll hear a lecture and view slides on each topic, then participate in a hands-on lab about that topic. We'll alternate between lecture and lab, with a couple of breaks thrown in.**
 
+---
+name: intro-to-terraform-demo
+class: title
+# Chapter 1
+## Introduction to Terraform
+
+???
+We use the word chapter here, because the training should feel like a story unfolding. The instructor's job is to guide the learners through this interactive story.
 
 
 # 
