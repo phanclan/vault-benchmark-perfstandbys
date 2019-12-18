@@ -55,6 +55,8 @@ export AWS_SESSION_TOKEN=<your_token>
     - NOTE: Do not add quotes around true and false when setting `elb_internal` and `public_ip`.
     - The `owner` and `ttl` variables are intended for use by HashiCorp employees and will be ignored for customers.  You can set `owner` to your name or email.
 
+---
+
 ## Deployment
 To actually deploy with Terraform, simply run the following two commands:
 
@@ -77,25 +79,36 @@ vault_security_group = sg-0a4c0e2f499e2e0cf
 
 You will be able to use the Vault ELB URL after Vault is initialized which you will do as follows:
 
-1. In the AWS Console, find and select your Vault instances and pick one.
+1. In the **AWS Console**, find and select your Vault instances and pick one.
 1. Click the **Connect** button for your selected Vault instance to find the command you can use to ssh to the instance.
 1. From a directory containing your private SSH key, run that ssh command.
-```
-aws --region us-west-2 \
-ec2 describe-instances --filter Name=tag-key,Values=aws:autoscaling:groupName \
---query 'Reservations[*].Instances[*].{Instance:InstanceId,AZ:Placement.AvailabilityZone,Name:Tags[?Key==`Name`]|[0].Value,PIP:PublicIpAddress}' \
---output text | grep pphan | tee /tmp/describe-instances.txt
 
+Alternatively...
+1. Find the public IP of a Vault instance via CLI.
+    aws --region us-west-2 \
+    ec2 describe-instances --filter Name=tag-key,Values=aws:autoscaling:groupName \
+    --query 'Reservations[*].Instances[*].{Instance:InstanceId,AZ:Placement.AvailabilityZone,Name:Tags[?Key==`Name`]|[0].Value,PIP:PublicIpAddress}' \
+    --output text | grep pphan | tee /tmp/describe-instances.txt
+    - Sample Output
+```
 us-west-2a	i-09c3966f19182ccaf	pphan-benchmark-consul	34.210.58.127
 us-west-2b	i-0eefe1616ca431997	pphan-benchmark-consul	52.12.105.181
 us-west-2b	i-04883a05926eb4f89	pphan-benchmark-vault	34.221.221.30
 us-west-2c	i-09ee3f9e1642847be	pphan-benchmark-consul	34.213.76.192
-
-ssh ubuntu@34.221.221.30
-export VAULT_ADDR=http://$(grep vault /tmp/describe-instances.txt | awk '{print $NF}'):8200
 ```
-1. On the Vault server, run the following commands:
+2. SSH to Vault Public IP
+```
+ssh ubuntu@34.221.221.30
+# or 
+ssh ubuntu@$(grep vault /tmp/describe-instances.txt | grep -iv "None" | awk '{print $NF}')
+```
+3. Run the following command.
+```
+export VAULT_ADDR=http://$(grep vault /tmp/describe-instances.txt | grep -iv "None" | awk '{print $NF}'):8200
+export CONSUL_HTTP_ADDR=$(terraform output | grep consul_ui | awk '{print $NF}')
+```
 
+1. On the Vault server, run the following commands:
 ```
 #export VAULT_ADDR=http://127.0.0.1:8200
 #vault operator init -key-shares=1 -key-threshold=1 > /tmp/vault.init

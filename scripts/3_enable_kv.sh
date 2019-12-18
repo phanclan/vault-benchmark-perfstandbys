@@ -228,6 +228,15 @@ p "Press Enter to continue"
 # echo ""
 # pe "vault kv list labsecrets" 
 
+
+# DELETE KEYS
+# ALLOW DELETION
+# vault write /<mount_path>/keys/<key>/config deletion_allowed=true
+# VERIFY YOU CAN DELETE KEY
+# vault read /<mount_path>/keys/<key>
+# DELETE KEY
+# vault delete /<mount_path>/keys/<key>
+
 echo ""
 white "This concludes the static secrets engine component of the demo."
 p "Press Enter to continue"

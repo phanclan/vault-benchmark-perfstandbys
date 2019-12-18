@@ -48,14 +48,21 @@ jq -r ".unseal_keys_b64[0]" /tmp/vault.init | consul kv put service/vault/recove
 jq -r ".root_token" /tmp/vault.init | consul kv put service/vault/root-token -
 curl -X PUT -d '{"key": "'"$(consul kv get service/vault/recovery-key)"'"}' \
     ${VAULT_ADDR}/v1/sys/unseal
+export VAULT_TOKEN=$(consul kv get service/vault/root-token)
+curl -H "X-Vault-Token: $VAULT_TOKEN" -X PUT -d @../license/licensepayload.json $VAULT_ADDR/v1/sys/license
+
+cyan "#-------------------------------------------------------------------------------
+# CREATE AUDIT LOG AND DISPLAY
+#-------------------------------------------------------------------------------\n"
+set +e
+vault audit enable file file_path=./tmp/audit-1.log log_raw=true
+set -e
 
 tput clear
 cyan "#-------------------------------------------------------------------------------
 #  3_enable_kv.sh
 #-------------------------------------------------------------------------------\n"
 green "#--- Enable a KV V2 Secret engine at the path 'labsecrets' and kv-blog"
-export VAULT_TOKEN=$(consul kv get service/vault/root-token)
-curl -H "X-Vault-Token: $VAULT_TOKEN" -X PUT -d @../license/licensepayload.json $VAULT_ADDR/v1/sys/license
 export KV_PATH=labsecrets
 set +e
 vault secrets enable -path=labsecrets -version=2 kv > /dev/null 2>&1
@@ -70,7 +77,7 @@ curl -s \
     -H "Content-Type: application/json" \
     -X POST \
     -d '{ "data": { "gvoiceapikey": "PassTheHash!" } }' \
-    http://127.0.0.1:${VAULT_PORT}/v1/${KV_PATH}/data/apikeys/googlevoice | jq 
+    ${VAULT_ADDR}/v1/${KV_PATH}/data/apikeys/googlevoice | jq 
 green '#--- POST SECRET: MULTIPLE FIELDS'
 vault kv put labsecrets/webapp username="beaker" password="meepmeepmeep"
 green "#--- RETRIEVE SECRET:"
@@ -377,7 +384,7 @@ An example role could be a simple as only allowing access to certain secrets.
 
 EXAMPLE POLICY:
 ---------------"
-cat vault/files/base_example.hcl
+# cat vault/files/base_example.hcl
 
 green "Load the policy into Vault\n"
 vault policy write base ./vault/files/base.hcl
@@ -402,24 +409,24 @@ vault policy read base
 
 # KV Policies
 green "Create KV policy for IT access"
-vault policy write kv-it policies/kv-it-policy.hcl
+vault policy write kv-it ./vault/policies/kv-it-policy.hcl
 
 # DB Policies
 green "Create DB policies for access."
-cat policies/db-full-read-policy.hcl
-vault policy write db-full-read policies/db-full-read-policy.hcl
-cat policies/db-engineering-policy.hcl
-vault policy write db-engineering policies/db-engineering-policy.hcl
-cat policies/db-hr-policy.hcl
-vault policy write db-hr policies/db-hr-policy.hcl
+cat ./vault/policies/db-full-read-policy.hcl
+vault policy write db-full-read ./vault/policies/db-full-read-policy.hcl
+cat ./vault/policies/db-engineering-policy.hcl
+vault policy write db-engineering ./vault/policies/db-engineering-policy.hcl
+cat ./vault/policies/db-hr-policy.hcl
+vault policy write db-hr ./vault/policies/db-hr-policy.hcl
 
 # Transit Policies
 green 'Create DB transit policies for HR.'
-cat policies/transit-hr-policy.hcl
-vault policy write transit-hr policies/transit-hr-policy.hcl
+cat ./vault/policies/transit-hr-policy.hcl
+vault policy write transit-hr ./vault/policies/transit-hr-policy.hcl
 
 green "#--- Admin Policies"
-vault policy write admin policies/admin-policy.hcl
+vault policy write admin ./vault/policies/admin-policy.hcl
 
 green "#--- Create admin user and store in consul"
 vault token create -policy=admin -field=token | consul kv put service/vault/admin-token -
@@ -431,27 +438,27 @@ vault token create -policy=admin -field=token | consul kv put service/vault/admi
 
 
 tput clear
-cyan "#-------------------------------------------------------------------------------
-#--- Running: Associating Policies with Authentication Methods
-#-------------------------------------------------------------------------------\n"
-# Unique Member configs
-green "Setup Unique Member group logins for LDAP.   These can use alias names when logging in"
-echo
-vault write auth/ldap-um/groups/it policies=kv-it,kv-user-template
-vault write auth/ldap-um/groups/security policies=db-full-read,kv-user-template
-# Following two lines are tests by pp.
-# pe "vault write auth/ldap-um/groups/hr policies=db-hr,transit-hr,kv-user-template"
-# pe "vault write auth/ldap-um/groups/engineering policies=db-engineering,kv-user-template"
+# cyan "#-------------------------------------------------------------------------------
+# #--- Running: Associating Policies with Authentication Methods
+# #-------------------------------------------------------------------------------\n"
+# # Unique Member configs
+# green "Setup Unique Member group logins for LDAP.   These can use alias names when logging in"
+# echo
+# vault write auth/ldap-um/groups/it policies=kv-it,kv-user-template
+# vault write auth/ldap-um/groups/security policies=db-full-read,kv-user-template
+# # Following two lines are tests by pp.
+# # pe "vault write auth/ldap-um/groups/hr policies=db-hr,transit-hr,kv-user-template"
+# # pe "vault write auth/ldap-um/groups/engineering policies=db-engineering,kv-user-template"
 
-# MemberOf configs
-green "Setup MemberOf group logins for LDAP.   Need to use the entire DN for the group here as these are in the user's attributes"
-echo
-#pe "vault write auth/ldap-mo/groups/cn=hr,ou=um_group,dc=ourcorp,dc=com policies=db-hr,transit-hr,kv-user-template"
-#pe "vault write auth/ldap-mo/groups/cn=engineering,ou=um_group,dc=ourcorp,dc=com policies=db-engineering,kv-user-template"
-vault write auth/ldap-mo/groups/hr policies=db-hr,transit-hr,kv-user-template
-vault write auth/ldap-mo/groups/engineering policies=db-engineering,kv-user-template
+# # MemberOf configs
+# green "Setup MemberOf group logins for LDAP.   Need to use the entire DN for the group here as these are in the user's attributes"
+# echo
+# #pe "vault write auth/ldap-mo/groups/cn=hr,ou=um_group,dc=ourcorp,dc=com policies=db-hr,transit-hr,kv-user-template"
+# #pe "vault write auth/ldap-mo/groups/cn=engineering,ou=um_group,dc=ourcorp,dc=com policies=db-engineering,kv-user-template"
+# vault write auth/ldap-mo/groups/hr policies=db-hr,transit-hr,kv-user-template
+# vault write auth/ldap-mo/groups/engineering policies=db-engineering,kv-user-template
 
-#-------------------------------------------------------------------------------
+# #-------------------------------------------------------------------------------
 
 
 
