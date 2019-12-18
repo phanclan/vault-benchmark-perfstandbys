@@ -134,7 +134,7 @@ class: compact
 
 ---
 
-```
+```tex
 export AWS_ACCESS_KEY_ID=<your_aws_key>
 export AWS_SECRET_ACCESS_KEY=<your_aws_secret_key>
 export AWS_DEFAULT_REGION=us-east-1
@@ -174,7 +174,7 @@ When the second command asks you if you want to proceed, type "`yes`" to confirm
 
 You should get outputs at the end of the apply showing something like the following:
 
-```
+```tex
 Outputs:
 consul_address = benchmark-consul-elb-387787750.us-east-1.elb.amazonaws.com
 vault_address = benchmark-vault-elb-783003639.us-east-1.elb.amazonaws.com
