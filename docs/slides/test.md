@@ -1,3 +1,50 @@
+name: Vault-Benchmark-Performance-Standbys
+class: center
+count: false
+
+# Vault Benchmark Performance Standbys
+## Test performance on Vault
+
+???
+<!---
+Notes
+This slide presentation is stored as Markdown code, specifically using the RemarkJS engine to render it. All standard markdown tags are supported, and you can also use some HTML within this document.
+
+If you need to change the look and feel of the slide deck just use the `style.css` and `remark_settings.js` files to suit your needs. The content in this file is picked up by `index.html` when the page is loaded.
+
+HTML comments like this one will show up in the source code, but not in the slides or speaker notes.
+--->
+Welcome to the beginner's guide to Terraform on Azure. This slide deck is written entirely in Markdown language, which means you can make edits or additions, then submit a pull request to add your changes to the master copy. To make edits to the slide deck simply fork this repository, edit the Markdown files, and submit a pull request with your changes.
+
+The Markdown content is contained in the docs/ subdirectories.
+
+Here are some helpful keyboard shortcuts for the instructor or participant:
+
+⬆ ⬇ ⬅ ➡ - Navigate back and forth
+P         - Toggle presenter view
+C         - Pop an external window for presentation
+
+Instructor notes are included in plain text, narrative parts are in **bold**. You can use the narrative quotes or change them to suit your own presentation style.
+
+---
+layout: true
+
+.footer[
+- Copyright © 2019 HashiCorp
+- ![:scale 100%](https://hashicorp.github.io/field-workshops-assets/assets/logos/HashiCorp_Icon_Black.svg)
+]
+
+---
+name: Link-to-Slide-Deck
+# The Slide Deck
+<br><br><br>
+Follow along on your own computer at this link:
+
+# https://git.io/JeuCI
+
+
+
+# 
 # Deploy Vault to AWS with Consul Storage Backend
 
 This folder contains a Terraform module for deploying Vault to AWS (within a VPC) along with Consul as the storage backend. It can be used as-is or can be modified to work in your scenario, but should serve as a strong starting point for deploying Vault. It can be used with Ubuntu 16.04 or RHEL 7.5.
