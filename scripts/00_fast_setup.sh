@@ -236,8 +236,22 @@ vault write auth/ldap-um/config \
     groupattr="${UM_GROUP_ATTR}" \
     insecure_tls=true
 
+p
 
 green "Configure MemberOf group lookups"
+
+echo vault write auth/ldap-mo/config \
+    url="${LDAP_URL}" \
+    binddn="${BIND_DN}" \
+    bindpass="${BIND_PW}" \
+    userdn="${USER_DN}" \
+    userattr="${USER_ATTR}" \
+    groupdn="${USER_DN}" \
+    groupfilter="${MO_GROUP_FILTER}" \
+    groupattr="${MO_GROUP_ATTR}" \
+    insecure_tls=true
+
+
 vault write auth/ldap-mo/config \
     url="${LDAP_URL}" \
     binddn="${BIND_DN}" \
