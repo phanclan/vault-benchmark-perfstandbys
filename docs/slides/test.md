@@ -125,7 +125,8 @@ Note that if using the HTTP download links for the evaulation binaries of Vault 
 **The licenses must be applied within 30 minutes after starting the servers**. If you don't do this, you will need to restart them and then apply the licenses within 30 minutes.
 
 ---
-
+name: Preparation
+class: compact
 ## Preparation
 1. Download [terraform](https://www.terraform.io/downloads.html) and extract the terraform binary to some directory in your path.
 1. Clone this repository to some directory on your laptop
