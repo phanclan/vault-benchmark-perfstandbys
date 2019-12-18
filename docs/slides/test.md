@@ -134,7 +134,7 @@ class: compact
 
 ---
 
-```tex
+```shell
 export AWS_ACCESS_KEY_ID=<your_aws_key>
 export AWS_SECRET_ACCESS_KEY=<your_aws_secret_key>
 export AWS_DEFAULT_REGION=us-east-1
