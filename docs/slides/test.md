@@ -128,7 +128,7 @@ Note that if using the HTTP download links for the evaulation binaries of Vault 
 name: Preparation
 class: compact
 ## Preparation
-1. Download [terraform](https://www.terraform.io/downloads.html) and extract the terraform binary to some directory in your path.
+1. Download [terraform](https://www.terraform.io/downloads.html) and extract the terraform .small[binary] to some directory in your path.
 1. Clone this repository to some directory on your laptop
 1. On a Linux or Mac system, export your AWS keys and AWS default region as variables. On Windows, you would use `set` instead of `export`. You can also `export AWS_SESSION_TOKEN` if you need to use an MFA token to provision resources in AWS.
 
