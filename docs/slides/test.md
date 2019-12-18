@@ -163,6 +163,7 @@ export AWS_SESSION_TOKEN=<your_token>
 ---
 
 ## Deployment
+
 To actually deploy with Terraform, simply run the following two commands:
 
 ``` shell
