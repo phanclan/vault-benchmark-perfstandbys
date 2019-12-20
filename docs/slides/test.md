@@ -44,7 +44,7 @@ Follow along on your own computer at this link:
 
 ---
 name: Introductions
-# Introductions
+### Introductions
 * Your Name
 * Job Title
 * Automation Experience
