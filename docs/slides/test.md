@@ -373,6 +373,7 @@ Here are the steps to resize your vault server.
 ---
 
 4. Run the following commands:
+.small[
 ``` shell
 tee test.sh <<"EOF"
 #!/bin/bash -x
@@ -404,7 +405,7 @@ vault operator unseal jxWdVApsw6FHCTfx5PwG0nn7v/rrEpk1uv0XYyF5xOs=
 vault audit enable file file_path=/tmp/audit.log log_raw=true
 ./test.sh
 ```
-
+]
 --- 
 
 # Sample Results
