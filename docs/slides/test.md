@@ -373,7 +373,6 @@ Here are the steps to resize your vault server.
 ---
 
 4. Run the following commands:
-.small[
 ``` shell
 tee test.sh <<"EOF"
 #!/bin/bash -x
@@ -405,7 +404,7 @@ vault operator unseal jxWdVApsw6FHCTfx5PwG0nn7v/rrEpk1uv0XYyF5xOs=
 vault audit enable file file_path=/tmp/audit.log log_raw=true
 ./test.sh
 ```
-]
+
 --- 
 
 # Sample Results
@@ -433,6 +432,8 @@ Requests/sec:    195.44
 Transfer/sec:      5.25MB
 ```
 
+---
+
 ## Results: Vault 1-node t3.xlarge; Consul 3-node t3-small; Audit On
 
 ```
@@ -455,6 +456,8 @@ Running 30s test @ http://localhost:8200/v1/transit/encrypt/test
 Requests/sec:    377.23
 Transfer/sec:     10.13MB
 ```
+
+---
 
 ## Results: Vault 1-node c5.xlarge; Consul 3-node t3-small; Audit On
 ```
@@ -479,6 +482,8 @@ Requests/sec:    422.92
 Transfer/sec:     11.36MB
 ```
 
+---
+
 ## Results: Vault 1-node c5.2xlarge with Consul 3-node t3-small; Auditing Off
 ```
 $ wrk -t2 -c8 -d30s -H "X-Vault-Token: ${VAULT_TOKEN}" -s single-key-post.lua http://localhost:8200/v1/transit/encrypt/test
@@ -492,6 +497,8 @@ Requests/sec:  26736.87
 Transfer/sec:      9.64MB
 ```
 
+---
+
 ## Results on Vault 1-node c5.2xlarge with Consul 3-node t3-small; Auditing On
 ```
 $ wrk -t2 -c8 -d30s -H "X-Vault-Token: ${VAULT_TOKEN}" -s single-key-post.lua http://localhost:8200/v1/transit/encrypt/test
@@ -504,6 +511,8 @@ Running 30s test @ http://localhost:8200/v1/transit/encrypt/test
 Requests/sec:  20418.74
 Transfer/sec:      7.36MB
 ```
+
+---
 
 ## Sample Response from Audit Log with Raw Output
 ```
