@@ -37,7 +37,9 @@ class: col-2
 
 I try to build as much as I can into my gold images and using Packer. This provides the following benefits:
 - Consistent builds
+
 --
 - Faster deploy times
+
 --
 - Consistent images across various clouds
