@@ -408,7 +408,7 @@ vault audit enable file file_path=/tmp/audit.log log_raw=true
 ```
 
 --- 
-
+class: compact, fit-h1
 # Sample Results
 
 ## Results on Vault 1-node t3.large with Consul 3-node t3-small
@@ -436,7 +436,7 @@ Transfer/sec:      5.25MB
 
 ---
 
-class:compact
+class: compact, fit-h1
 ## Results: Vault 1-node t3.xlarge; Consul 3-node t3-small; Audit On
 
 ``` shell
@@ -489,8 +489,8 @@ Transfer/sec:     11.36MB
 
 ---
 
-class: compact
-## Results: Vault 1-node c5.2xlarge with Consul 3-node t3-small; Auditing Off
+class: compact, fit-h1
+# Results: Vault 1-node c5.2xlarge with Consul 3-node t3-small; Auditing Off
 ``` shell
 $ wrk -t2 -c8 -d30s -H "X-Vault-Token: ${VAULT_TOKEN}" -s single-key-post.lua http://localhost:8200/v1/transit/encrypt/test
 Running 30s test @ http://localhost:8200/v1/transit/encrypt/test
@@ -504,6 +504,7 @@ Transfer/sec:      9.64MB
 ```
 
 ---
+class: compact, fit-h1
 
 ## Results on Vault 1-node c5.2xlarge with Consul 3-node t3-small; Auditing On
 ```
