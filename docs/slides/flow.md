@@ -32,7 +32,7 @@ Some text
 
 ---
 name: packer
-class: col-2
+<!-- class: col-2 -->
 # Packer
 
 I try to build as much as I can into my gold images and using Packer. This provides the following benefits:
