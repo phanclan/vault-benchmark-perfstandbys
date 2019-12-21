@@ -56,7 +56,6 @@ test
 
 ---
 name: packer
-<!-- class: col-2 -->
 # Packer
 [the components](#components)
 
