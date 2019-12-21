@@ -37,12 +37,22 @@ Some text
 ---
 name: getting-started
 # Getting Started
-- Set your variables in `scripts/env.sh`
-- Run `00_fast_setup.sh`.
+- Set your variables in `terraform.tfvars`
+- Run `tf init` and `tf apply`
 - Go to websites
   - http://consul.pphan.hashidemos.io:8500
   - http://vault-0.pphan.hashidemos.io:8200
 
+---
+name: vault-configuration
+# Vault Configuration
+- Set your variables in `scripts/env.sh`
+- Run `00_fast_setup.sh`
+
+``` shell
+test
+*highlight
+```
 
 ---
 name: packer
