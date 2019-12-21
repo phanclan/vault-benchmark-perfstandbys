@@ -413,7 +413,7 @@ vault audit enable file file_path=/tmp/audit.log log_raw=true
 
 ## Results on Vault 1-node t3.large with Consul 3-node t3-small
 
-```
+``` shell
 # postbatch160.lua on Fri Dec 13 05:14:31 UTC 2019
 Running 2m test @ http://localhost:8200/v1/transit/encrypt/test
   2 threads and 8 connections
@@ -436,9 +436,10 @@ Transfer/sec:      5.25MB
 
 ---
 
+class:compact
 ## Results: Vault 1-node t3.xlarge; Consul 3-node t3-small; Audit On
 
-```
+``` shell
 # postbatch160.lua on Fri Dec 13 04:33:38 UTC 2019
 Running 30s test @ http://localhost:8200/v1/transit/encrypt/test
   2 threads and 8 connections
@@ -461,8 +462,10 @@ Transfer/sec:     10.13MB
 
 ---
 
+class: compact
+
 ## Results: Vault 1-node c5.xlarge; Consul 3-node t3-small; Audit On
-```
+``` shell
 # postbatch160.lua on Fri Dec 13 04:05:34 UTC 2019
 Running 30s test @ http://localhost:8200/v1/transit/encrypt/test
   2 threads and 8 connections
@@ -486,8 +489,9 @@ Transfer/sec:     11.36MB
 
 ---
 
+class: compact
 ## Results: Vault 1-node c5.2xlarge with Consul 3-node t3-small; Auditing Off
-```
+``` shell
 $ wrk -t2 -c8 -d30s -H "X-Vault-Token: ${VAULT_TOKEN}" -s single-key-post.lua http://localhost:8200/v1/transit/encrypt/test
 Running 30s test @ http://localhost:8200/v1/transit/encrypt/test
   2 threads and 8 connections
