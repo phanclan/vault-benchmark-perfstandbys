@@ -5,6 +5,7 @@ background-image: url(https://story.xaprb.com/slides/adirondack/leo-serrat-53392
 ### Peter Phan, pphan@hashicorp.com
 
 ---
+name: components
 # Components
 
 This demo uses multiple HashiCorp products.
@@ -37,6 +38,7 @@ Some text
 name: packer
 <!-- class: col-2 -->
 # Packer
+[the components](#components)
 
 I try to build as much as I can into my gold images and using Packer. This provides the following benefits:
 - Consistent builds
