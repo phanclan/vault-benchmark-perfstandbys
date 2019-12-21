@@ -12,10 +12,16 @@ This demo uses multiple HashiCorp products.
 
 ---
 name: diagram
-# Diagram
 class: img-caption
+# Diagram
 name: Diagram
+
+---
+name: img-right
+class: img-right
 ![Yosemite](https://story.xaprb.com/slides/adirondack/leo-serrat-533922-unsplash.jpg)
+
+Some text
 
 ---
 name: packer
