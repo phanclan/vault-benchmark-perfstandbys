@@ -134,6 +134,7 @@ class: compact
 
 ---
 
+class: compact
 ```shell
 export AWS_ACCESS_KEY_ID=<your_aws_key>
 export AWS_SECRET_ACCESS_KEY=<your_aws_secret_key>
@@ -372,6 +373,7 @@ Here are the steps to resize your vault server.
 
 ---
 
+class: compact
 4. Run the following commands:
 ``` shell
 tee test.sh <<"EOF"
