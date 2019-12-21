@@ -61,3 +61,19 @@ output "vault_elb_security_group" {
 # output "primary_server_public_ips" {
 #   value = [module.nomadconsul.primary_server_public_ips]
 # }
+
+output "hashi-servers" {
+  value = aws_route53_record.servers.*.fqdn
+}
+
+output "hashi-workers" {
+  value = aws_route53_record.workers.*.fqdn
+}
+
+output "hashi-vault" {
+  value = aws_route53_record.hashi-vault.*.fqdn
+}
+
+output "hashi-bastion" {
+  value = aws_route53_record.hashi-bastion.fqdn
+}

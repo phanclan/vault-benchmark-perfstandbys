@@ -29,23 +29,23 @@
 resource "aws_route53_record" "vault" {
   zone_id = var.zone_id
   # name    = "vault.${var.namespace}"
-  name    = "vault"
+  name = "vault"
   # type    = "CNAME"
   # ttl     = "300" 
   # records = [aws_elb.vault.dns_name]
   # records = [aws_elb.vault.zone_id]
-  type    = "A"
+  type = "A"
   alias {
     name                   = aws_elb.vault.dns_name
     zone_id                = aws_elb.vault.zone_id
     evaluate_target_health = true
-  }  
+  }
 }
 resource "aws_route53_record" "consul" {
   zone_id = var.zone_id
   #  name    = "consul.${var.namespace}"
-  name    = "consul"
-  type    = "A"
+  name = "consul"
+  type = "A"
   alias {
     name                   = aws_elb.consul.dns_name
     zone_id                = aws_elb.consul.zone_id
@@ -72,3 +72,42 @@ resource "aws_route53_record" "consul" {
 #   records = ["${element(aws_instance.workers.*.public_dns, count.index)}"]
 #   ttl     = "300"
 # }
+
+resource "aws_route53_record" "servers" {
+  count   = 0
+  zone_id = var.zone_id
+  # name    = "server-${count.index}.${var.namespace}"
+  name    = "server-${count.index}"
+  type    = "CNAME"
+  records = ["${element(aws_instance.servers.*.public_dns, count.index)}"]
+  ttl     = "300"
+}
+
+resource "aws_route53_record" "workers" {
+  count   = var.worker_nodes
+  zone_id = var.zone_id
+  # name    = "server-${count.index}.${var.namespace}"
+  name    = "worker-${count.index}"
+  type    = "CNAME"
+  records = ["${element(aws_instance.workers.*.public_dns, count.index)}"]
+  ttl     = "300"
+}
+
+resource "aws_route53_record" "hashi-vault" {
+  count   = var.vault_nodes
+  zone_id = var.zone_id
+  # name    = "server-${count.index}.${var.namespace}"
+  name    = "vault-${count.index}"
+  type    = "CNAME"
+  records = ["${element(aws_instance.vault.*.public_dns, count.index)}"]
+  ttl     = "300"
+}
+
+resource "aws_route53_record" "hashi-bastion" {
+  zone_id = var.zone_id
+  # name    = "server-${count.index}.${var.namespace}"
+  name    = "bastion"
+  type    = "CNAME"
+  records = [module.bastion.bastion_pub_dns]
+  ttl     = "300"
+}

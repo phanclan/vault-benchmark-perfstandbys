@@ -98,19 +98,30 @@ us-west-2b	i-0eefe1616ca431997	pphan-benchmark-consul	52.12.105.181
 us-west-2b	i-04883a05926eb4f89	pphan-benchmark-vault	34.221.221.30
 us-west-2c	i-09ee3f9e1642847be	pphan-benchmark-consul	34.213.76.192
 ```
-2. SSH to Vault Public IP
+2. Run the following command.
+``` shell
+export VAULT_ADDR=http://$(grep vault /tmp/describe-instances.txt | grep -iv "None" | awk '{print $NF}'):8200
+export CONSUL_HTTP_ADDR=$(terraform output | grep consul_ui | awk '{print $NF}')
+```
+3. Remove entries from known_hosts
+``` shell
+sed -i.bak '/pphan.hashidemos.io/d' ~/.ssh/known_hosts | tail 
+```
+4. SSH to Vault Public IP
 ```
 ssh ubuntu@34.221.221.30
 # or 
 ssh ubuntu@$(grep vault /tmp/describe-instances.txt | grep -iv "None" | awk '{print $NF}')
 ```
-3. Run the following command.
+
+5. Start postgres and openldap containers.
 ```
-export VAULT_ADDR=http://$(grep vault /tmp/describe-instances.txt | grep -iv "None" | awk '{print $NF}'):8200
-export CONSUL_HTTP_ADDR=$(terraform output | grep consul_ui | awk '{print $NF}')
+git clone https://github.com/phanclan/vault-benchmark-perfstandbys.git
+cd vault-benchmark-perfstandbys
+docker-compose up -d openldap postgres
 ```
 
-1. On the Vault server, run the following commands:
+6. On the Vault server, run the following commands:
 ```
 #export VAULT_ADDR=http://127.0.0.1:8200
 #vault operator init -key-shares=1 -key-threshold=1 > /tmp/vault.init

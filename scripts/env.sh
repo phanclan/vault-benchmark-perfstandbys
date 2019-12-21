@@ -12,14 +12,25 @@ case ${OSTYPE} in
 esac
 export IP_ADDRESS
 
-# pp Added VAULT_PORT variable and included it in VAULT_ADDR variable
-export VAULT_PORT=${VAULT_PORT:-10101}
-export VAULT_ADDR=http://127.0.0.1:${VAULT_PORT}
-# export VAULT_ADDR="http://${IP_ADDRESS}:8200"
-# pp Added this to pull value from consul. If no value in consul then assign notsosecure.
+#------------------------------------------------------------------------------
+# VARIABLES THAT NEED TO BE CHANGED FOR YOUR ENVIRONMENT
+#------------------------------------------------------------------------------
+# FOR CLOUD ENVIRONMENT
+export VAULT_ADDR=http://vault-0.pphan.hashidemos.io:8200
+export CONSUL_HTTP_ADDR=http://consul.pphan.hashidemos.io:8500
+# Pull value from consul. If no value in consul then assign notsosecure.
 export VAULT_TOKEN=$(consul kv get service/vault/root-token)
 export VAULT_TOKEN=${VAULT_TOKEN:-"notsosecure"}
+
+# pp Added VAULT_PORT variable and included it in VAULT_ADDR variable
+# export VAULT_PORT=${VAULT_PORT:-10101}
+# export VAULT_ADDR=http://127.0.0.1:${VAULT_PORT}
+
+# export VAULT_ADDR="http://${IP_ADDRESS}:8200"
+
 # export VAULT_TOKEN=${VAULT_ROOT_TOKEN:-"notsosecure"}
+# export CONSUL_HTTP_ADDR=http://127.0.0.1:10111
+
 
 # Dev server environment variables
 # export VAULT_DEV_LISTEN_ADDRESS="${IP_ADDRESS}:8200"

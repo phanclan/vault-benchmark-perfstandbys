@@ -35,6 +35,16 @@ class: img-right
 Some text
 
 ---
+name: getting-started
+# Getting Started
+- Set your variables in `scripts/env.sh`
+- Run `00_fast_setup.sh`.
+- Go to websites
+  - http://consul.pphan.hashidemos.io:8500
+  - http://vault-0.pphan.hashidemos.io:8200
+
+
+---
 name: packer
 <!-- class: col-2 -->
 # Packer

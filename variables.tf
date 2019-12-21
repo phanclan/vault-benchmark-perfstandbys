@@ -24,7 +24,7 @@ listener "tcp" {
   address     = "0.0.0.0:8200"
   tls_disable = 1
 }
-  storage "consul" {
+storage "consul" {
   address = "127.0.0.1:8500"
   path    = "vault/"
 }
@@ -32,6 +32,7 @@ ui=true
 EOF
 }
 
+# Moving the configuration directly into script
 variable "consul_server_config" {
   description = "Configuration (text) for Consul"
   default     = <<EOF
@@ -56,6 +57,7 @@ variable "consul_server_config" {
 EOF
 }
 
+# not using this variable. Copied the config directly into script.
 variable "consul_client_config" {
   description = "Configuration (text) for Consul"
   default     = <<EOF
@@ -76,6 +78,9 @@ variable "consul_client_config" {
 }
 EOF
 }
+
+variable "vault_license" {}
+
 
 //-------------------------------------------------------------------
 // AWS settings
@@ -142,6 +147,10 @@ variable "consul_nodes" {
   description = "number of Consul instances"
 }
 
+variable "worker_nodes" {
+  description = "number of Consul instances"
+}
+
 variable "subnets" {
   description = "list of subnets to launch Vault within"
 }
@@ -201,3 +210,8 @@ variable "ebs_optimized" {
   default = false
 }
 
+variable "ingress_cidr_blocks" {
+  type        = list(string)
+  description = "for security group rules"
+  default     = []
+}
