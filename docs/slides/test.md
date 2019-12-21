@@ -507,7 +507,7 @@ Transfer/sec:      9.64MB
 class: compact, fit-h1
 
 # Results on Vault 1-node c5.2xlarge with Consul 3-node t3-small; Auditing On
-```
+``` shell
 $ wrk -t2 -c8 -d30s -H "X-Vault-Token: ${VAULT_TOKEN}" -s single-key-post.lua http://localhost:8200/v1/transit/encrypt/test
 Running 30s test @ http://localhost:8200/v1/transit/encrypt/test
   2 threads and 8 connections

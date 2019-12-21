@@ -1,3 +1,6 @@
+class: title, smokescreen, shelf, no-footer
+background-image: url(https://story.xaprb.com/slides/adirondack/leo-serrat-533922-unsplash.jpg)
+
 # Walkthrough of demo
 ### Peter Phan, pphan@hashicorp.com
 
