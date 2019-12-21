@@ -520,8 +520,9 @@ Transfer/sec:      7.36MB
 
 ---
 
+class: compact
 ## Sample Response from Audit Log with Raw Output
-```
+``` shell
 sudo tail -n 50 /tmp/audit.log | jq
 {
   "time": "2019-12-13T02:12:13.917000292Z",
