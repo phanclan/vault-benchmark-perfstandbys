@@ -462,9 +462,9 @@ Transfer/sec:     10.13MB
 
 ---
 
-class: compact
+class: compact, fit-h1
 
-## Results: Vault 1-node c5.xlarge; Consul 3-node t3-small; Audit On
+# Results: Vault 1-node c5.xlarge; Consul 3-node t3-small; Audit On
 ``` shell
 # postbatch160.lua on Fri Dec 13 04:05:34 UTC 2019
 Running 30s test @ http://localhost:8200/v1/transit/encrypt/test
@@ -506,7 +506,7 @@ Transfer/sec:      9.64MB
 ---
 class: compact, fit-h1
 
-## Results on Vault 1-node c5.2xlarge with Consul 3-node t3-small; Auditing On
+# Results on Vault 1-node c5.2xlarge with Consul 3-node t3-small; Auditing On
 ```
 $ wrk -t2 -c8 -d30s -H "X-Vault-Token: ${VAULT_TOKEN}" -s single-key-post.lua http://localhost:8200/v1/transit/encrypt/test
 Running 30s test @ http://localhost:8200/v1/transit/encrypt/test
@@ -521,8 +521,8 @@ Transfer/sec:      7.36MB
 
 ---
 
-class: compact
-## Sample Response from Audit Log with Raw Output
+class: compact, fit-h1
+# Sample Response from Audit Log with Raw Output
 ``` shell
 sudo tail -n 50 /tmp/audit.log | jq
 {
