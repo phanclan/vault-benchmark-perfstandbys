@@ -1,17 +1,28 @@
-# Follow Up Email  
+class: title,smokescreen,shelf,no-footer
+background-image: url(https://story.xaprb.com/slides/adirondack/leo-serrat-533922-unsplash.jpg)
 
-## **I. MATERIALS:**  
+# Follow Up Reading  
+### Peter Phan, pphan@hashicorp.com
 
-* **1)** Terraform Remote State (sharing information between projects/Workspaces):  
+---
+# MATERIALS
+
+* Terraform Remote State (sharing information between projects/Workspaces):  
     * Docs: [<u>https://www.terraform.io/docs/providers/terraform/d/remote_state.html][1]</u>  
 
-## **<u>II. RECAP:**</u>  
+---
+class: title,smokescreen,shelf,no-footer
+background-image: url(https://story.xaprb.com/slides/adirondack/leo-serrat-533922-unsplash.jpg)
 
-* **1) General Overview/Workflow:**  
+# RECAP
+
+---
+
+# General Overview/Workflow 
     * With the additional collaboration and governance features available in Terraform Enterprise, you're able to create a centralized workflow for your deployments, giving you the ability to tie plans/applies to changes made within Version Control (more info [<u>here][2]</u>), or use the [<u>API][3]</u> to incorporate triggers within your CI/CD pipeline.  
     * Additionally, TFE can help you create more of a Producers/Consumers model by enabling your teams to create Modules and surface them to other teams for consumption within your own Private Module Registry (info [<u>here][4]</u>).  
     * For Security, you can take advantage of the granular [<u>RBAC][5]</u> controls available, [<u>Sensitive Credential][6]</u> management, State File management (encrypted, restricted, etc.), and Sentinel, our policy-as-code tool that enables you to set guardrails around your deployments.  
-* **2) Feature Review**  
+# Feature Review
     * **_RBAC:_** Within Terraform Enterprise, you are able to assign users to different Teams, each of which can be given access to specific Workspaces, with appropriate levels of permission within them.  
     * **_STATE FILES:_** Within those Workspaces, State Files are managed for you, ensuring that they are non-corruptible and encrypted, to help protect the integrity of your deployments and provide an audit trail of changes made to your infrastructure over time.  
     * **_VARIABLES:_** Sensitive Variables, such as Cloud API Credentials, are likewise stored within Terraform Enterprise (encrypted at-rest, with write-only functionality), which allows you to avoid secret sprawl by removing the need to have such information living on Developers' machines or hard-coded elsewhere in your pipeline.  
