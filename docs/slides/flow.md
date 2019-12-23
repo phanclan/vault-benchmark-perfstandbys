@@ -67,6 +67,7 @@ ssh ubuntu@bastion.pphan.hashidemos.io
 cd /tmp/vault-benchmark-perfstandbys/
 #--> Stop and start container
 docker-compose down; docker-compose up -d postgres
+```
 
 ``` shell
 test
