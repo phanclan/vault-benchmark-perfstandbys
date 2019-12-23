@@ -66,13 +66,9 @@ ssh ubuntu@bastion.pphan.hashidemos.io
 #--> Go to vault repo that you cloned
 cd /tmp/vault-benchmark-perfstandbys/
 #--> Stop and start container
-docker-compose down; docker-compose up -d postgres
+*docker-compose down; docker-compose up -d postgres
 ```
-
-``` shell
-test
-*highlight
-```
+---
 
 - Lab Only Parameters
   - `VAULT_SKIP_VERIFY`: Do not verify Vault's presented certificate before communicating with it.
