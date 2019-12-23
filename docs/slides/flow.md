@@ -70,7 +70,7 @@ test
 ---
 name: vault-sample-configuration
 class: compact, col-2
-### Vault Sample Configuration
+# Vault Sample Configuration
 code doesn't work well with two columns
 ``` go
 cluster_name = "${namespace}-demostack"
