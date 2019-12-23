@@ -54,6 +54,8 @@ name: vault-configuration
 - Run `00_fast_setup.sh`
 - Get vault admin token. 
   - http://consul.pphan.hashidemos.io:8500/ui/dc1/kv/service/vault/admin-token/edit
+- Log in to Vault UI with admin token
+  - http://vault-0.pphan.hashidemos.io:8200/ui/
 
 ``` shell
 test
