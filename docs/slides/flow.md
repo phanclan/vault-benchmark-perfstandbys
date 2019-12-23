@@ -50,6 +50,7 @@ notes
 
 ---
 name: vault-configuration
+class: compact,col-2
 # Vault Configuration
 - Set your variables in `scripts/env.sh`
 - Run `00_fast_setup.sh`
