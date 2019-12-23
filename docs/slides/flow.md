@@ -19,6 +19,7 @@ layout: true
 
 .footer[
 - Copyright © 2019 HashiCorp
+- [the components](#components)
 - ![logo](https://hashicorp.github.io/field-workshops-assets/assets/logos/HashiCorp_Icon_Black.svg)
 ]
 
