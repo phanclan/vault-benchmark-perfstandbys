@@ -28,6 +28,10 @@ storage "consul" {
   address = "127.0.0.1:8500"
   path    = "vault/"
 }
+telemetry {
+  prometheus_retention_time = "30s",
+  disable_hostname = true
+}
 ui=true
 EOF
 }

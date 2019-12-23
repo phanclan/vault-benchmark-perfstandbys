@@ -54,6 +54,39 @@ test
 *highlight
 ```
 
+- Lab Only Parameters
+  - `VAULT_SKIP_VERIFY`: Do not verify Vault's presented certificate before communicating with it.
+
+---
+name: vault-sample-configuration
+class: compact
+
+``` go
+cluster_name = "${namespace}-demostack"
+storage "consul" {
+  path = "vault/"
+  service = "vault"
+}
+listener "tcp" {
+  address       = "0.0.0.0:8200"
+  tls_cert_file = "/etc/vault.d/tls/vault.crt"
+  tls_key_file  = "/etc/ssl/certs/me.key"
+   tls-skip-verify = true
+}
+seal "awskms" {
+  region = "${region}"
+  kms_key_id = "${kmskey}"
+}
+telemetry {
+  prometheus_retention_time = "30s",
+  disable_hostname = true
+}
+api_addr = "https://$(public_ip):8200"
+disable_mlock = true
+ui = true
+```
+
+
 ---
 name: packer
 # Packer
