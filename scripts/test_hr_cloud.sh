@@ -1,12 +1,15 @@
-shopt -s expand_aliases
 . env.sh
+shopt -s expand_aliases
 
-export VAULT_ADDR=http://$(grep vault /tmp/describe-instances.txt | awk '{print $NF}'):8200
+# export VAULT_ADDR=http://$(grep vault /tmp/describe-instances.txt | awk '{print $NF}'):8200
 cd ..
-export CONSUL_HTTP_ADDR=$(terraform output | grep consul_ui | awk '{print $NF}')
+# export CONSUL_HTTP_ADDR=$(terraform output | grep consul_ui | awk '{print $NF}')
 echo $VAULT_ADDR
 echo $CONSUL_HTTP_ADDR
-export PGHOST=127.0.0.1
+# export PGHOST=127.0.0.1
+# LDAP_HOST="10.10.1.79"
+PGHOST="bastion.pphan.hashidemos.io"
+
 
 tput clear
 cyan "#-------------------------------------------------------------------------------

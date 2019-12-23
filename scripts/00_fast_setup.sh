@@ -4,6 +4,8 @@ cd -
 set -e
 shopt -s expand_aliases
 alias dc="docker-compose"
+LDAP_HOST="10.10.1.79"
+PGHOST="10.10.1.79"
 
 # export VAULT_TOKEN=${VAULT_TOKEN:-'root'}
 
@@ -18,7 +20,7 @@ alias dc="docker-compose"
 echo $VAULT_ADDR
 echo $CONSUL_HTTP_ADDR
 echo $VAULT_TOKEN
-export LDAP_HOST=openldap
+# export LDAP_HOST=openldap
 p
 
 #-------------------------------------------------------------------------------
@@ -420,12 +422,22 @@ green "#--- Enable Database Secret engine."
 vault secrets enable -path=${DB_PATH} database
 set -e
 green "#--- Configure plugin and connection info that Vault uses to connect to database."
+echo vault write ${DB_PATH}/config/${PGDATABASE} \
+    plugin_name=postgresql-database-plugin \
+    allowed_roles=* \
+    connection_url="postgresql://{{username}}:{{password}}@${PGHOST}:${PGPORT}/${PGDATABASE}?sslmode=disable" \
+    username="${VAULT_ADMIN_USER}" \
+    password="${VAULT_ADMIN_PW}"
+
+
 vault write ${DB_PATH}/config/${PGDATABASE} \
     plugin_name=postgresql-database-plugin \
     allowed_roles=* \
-    connection_url="postgresql://{{username}}:{{password}}@127.0.0.1:${PGPORT}/${PGDATABASE}?sslmode=disable" \
+    connection_url="postgresql://{{username}}:{{password}}@${PGHOST}:${PGPORT}/${PGDATABASE}?sslmode=disable" \
     username="${VAULT_ADMIN_USER}" \
     password="${VAULT_ADMIN_PW}"
+
+p "Press Enter to continue"
 
 green "Rotate the credentials for ${VAULT_ADMIN_USER} so no human has access to them anymore"
 white "vault write -force ${DB_PATH}/rotate-root/${PGDATABASE}"
@@ -503,7 +515,7 @@ The configuration options are categorized and detailed below."
 
 green "Configure Unique Member group lookups"
 # Using group of unique names lookups
-export LDAP_URL="ldap://127.0.0.1"
+export LDAP_URL="ldap://${LDAP_HOST}"
 echo vault write auth/ldap-um/config \
     url="${LDAP_URL}" \
     binddn="${BIND_DN}" \
@@ -526,7 +538,7 @@ vault write auth/ldap-um/config \
     groupattr="${UM_GROUP_ATTR}" \
     insecure_tls=true
 
-p
+p "Press Enter to continue"
 
 green "Configure MemberOf group lookups"
 
