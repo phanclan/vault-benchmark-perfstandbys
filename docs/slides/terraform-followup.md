@@ -40,7 +40,7 @@ background-image: url(https://story.xaprb.com/slides/adirondack/leo-serrat-53392
   * **_SENTINEL:_** Sentinel, our Policy-as-Code tool, allows you to apply additional guardrails around your deployments (ex. mandatory machine tagging, machine size limitations, security group enforcement, module version enforcement, etc.).  
 
 ---
-class: col-2
+class: col-2,compact
 # 3) Modules (Self-Service Infrastructure)
 * **_PRIVATE MODULE REGISTRY_**: As your adoption and usage of Terraform increases, we recommend decomposing any monolithic configurations into Modules which focus on smaller pieces of your deployments, as this enables you to easily reuse them in future projects.  To highlight this feature, we covered the Private Module Registry within TerraformEnterprise, as it allows your team to build Modules that are specific to your organization (and engender best practices for your deployments), and make those available to your team for consumption in a simple and easy to use manner.  
 * **_CONFIGURATION DESIGN TOOL_**:  
