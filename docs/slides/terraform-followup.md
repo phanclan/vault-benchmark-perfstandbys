@@ -43,16 +43,22 @@ background-image: url(https://story.xaprb.com/slides/adirondack/leo-serrat-53392
 class: col-2,compact
 # 3) Modules (Self-Service Infrastructure)
 * **_PRIVATE MODULE REGISTRY_**: As your adoption and usage of Terraform increases, we recommend decomposing any monolithic configurations into Modules which focus on smaller pieces of your deployments, as this enables you to easily reuse them in future projects.  To highlight this feature, we covered the Private Module Registry within TerraformEnterprise, as it allows your team to build Modules that are specific to your organization (and engender best practices for your deployments), and make those available to your team for consumption in a simple and easy to use manner.  
+
+---
+
 * **_CONFIGURATION DESIGN TOOL_**:  
   * In order to reduce the barrier to adoption and enable all of your team members to start using Terraform in their projects, we covered the Configuration Design Tool that's available within Terraform Enterprise.  This tool gives your team the ability to select in a menu-style fashion which modules are needed for a given project and, after values are submitted for any optional or required inputs that are solicited, produces a preconfigured block of Terraform code that can be added to a repository.  As noted in the meeting, this tool helps your team adopt a more efficient (and secure) Producer-Consumer model so that all members can enjoy the benefits of using Terraform, regardless of his/her level of proficiency.  Further, all code generated through this tool will still go through the same centralized workflow for all deployments, guaranteeing consistency, visibility, and the same level of security (through TFE's Sensitive Variable management, Sentinel Policy enforcement, and RBAC system).  
 
 ---
 
-# Plans/Applies**  
+# Plans/Applies
   * There are a number of different methods available to interface with Terraform Enterprise to manage your plans/applies so you can use the tool within your desired workflow (ex. VCS vs CI/CD):  
-      * - VCS/UI: [<u>https://www.terraform.io/docs/enterprise/run/ui.html][7]</u>  
-      * - API: [<u>https://www.terraform.io/docs/enterprise/run/api.html][8]</u>  
-      * - CLI: [<u>https://www.terraform.io/docs/enterprise/run/cli.html][9]</u>  
+    * VCS/UI: [<u>https://www.terraform.io/docs/enterprise/run/ui.html][7]</u>
+    * API: [<u>https://www.terraform.io/docs/enterprise/run/api.html][8]</u>  
+    * CLI: [<u>https://www.terraform.io/docs/enterprise/run/cli.html][9]</u>  
+
+---
+
 * Sample Terraform Enterprise Installation  
     * Source  
         * [github.com/hashicorp/private-terraform-enterprise/tree/automated-aws-pes-installation][10]  
