@@ -360,6 +360,7 @@ vault write sys/policies/egp/validate-aws-keys \
 cyan "#-------------------------------------------------------------------------------
 #--- Running: Associating Policies with Authentication Methods
 #-------------------------------------------------------------------------------\n"
+set +e
 # Unique Member configs
 green "Setup Unique Member group logins for LDAP.   These can use alias names when logging in"
 echo
@@ -373,7 +374,7 @@ echo
 #pe "vault write auth/ldap-mo/groups/cn=engineering,ou=um_group,dc=ourcorp,dc=com policies=db-engineering,kv-user-template"
 vault write auth/ldap-mo/groups/hr policies=db-hr,transit-hr,kv-user-template
 vault write auth/ldap-mo/groups/engineering policies=db-engineering,kv-user-template
-
+set -e
 #-------------------------------------------------------------------------------
 
 cyan "#-------------------------------------------------------------------------------
