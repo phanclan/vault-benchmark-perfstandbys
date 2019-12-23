@@ -1,4 +1,6 @@
+cd ./scripts
 . env.sh
+cd -
 set -e
 shopt -s expand_aliases
 alias dc="docker-compose"

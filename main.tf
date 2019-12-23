@@ -29,6 +29,8 @@ data "template_file" "install_vault" {
     consul_config       = var.consul_client_config
     tag_value           = var.auto_join_tag
     VAULT_LICENSE       = var.vault_license
+    vault_license       = var.vault_license
+    vault_license2      = "test"
     VAULT_ADDR          = "http://127.0.0.1:8200"
   }
 }

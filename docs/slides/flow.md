@@ -43,11 +43,17 @@ name: getting-started
   - http://consul.pphan.hashidemos.io:8500
   - http://vault-0.pphan.hashidemos.io:8200
 
+???
+
+notes
+
 ---
 name: vault-configuration
 # Vault Configuration
 - Set your variables in `scripts/env.sh`
 - Run `00_fast_setup.sh`
+- Get vault admin token. 
+  - http://consul.pphan.hashidemos.io:8500/ui/dc1/kv/service/vault/admin-token/edit
 
 ``` shell
 test
