@@ -69,7 +69,8 @@ test
 
 ---
 name: vault-sample-configuration
-class: compact
+class: compact, col-2
+### Vault Sample Configuration
 
 ``` go
 cluster_name = "${namespace}-demostack"
