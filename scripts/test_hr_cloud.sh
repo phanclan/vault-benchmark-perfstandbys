@@ -1,8 +1,9 @@
+cd ./scripts
 . env.sh
 shopt -s expand_aliases
 
 # export VAULT_ADDR=http://$(grep vault /tmp/describe-instances.txt | awk '{print $NF}'):8200
-cd ..
+# cd ..
 # export CONSUL_HTTP_ADDR=$(terraform output | grep consul_ui | awk '{print $NF}')
 echo $VAULT_ADDR
 echo $CONSUL_HTTP_ADDR

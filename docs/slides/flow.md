@@ -58,7 +58,14 @@ name: vault-configuration
 - Log in to Vault UI with admin token
   - http://vault-0.pphan.hashidemos.io:8200/ui/
 - Test ldap login, db, and transit.
-  - ./scripts/test_hr_cloud.sh
+  - `./scripts/test_hr_cloud.sh`
+- NOTE: If you want to run this script again, need to reload postgres container.
+``` shell
+ssh ubuntu@bastion.pphan.hashidemos.io
+#--> Go to vault repo that you cloned
+cd /tmp/vault-benchmark-perfstandbys/
+#--> Stop and start container
+docker-compose down; docker-compose up -d postgres
 
 ``` shell
 test
