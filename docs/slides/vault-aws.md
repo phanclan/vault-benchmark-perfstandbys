@@ -1,0 +1,79 @@
+class: title, smokescreen, shelf, no-footer
+background-image: url(https://story.xaprb.com/slides/adirondack/leo-serrat-533922-unsplash.jpg)
+
+# VAULT AWS DEMO
+### Peter Phan, pphan@hashicorp.com
+
+---
+layout: true
+
+.footer[
+- Copyright © 2019 HashiCorp
+- [the components](#components)
+- ![logo](https://hashicorp.github.io/field-workshops-assets/assets/logos/HashiCorp_Icon_Black.svg)
+]
+
+---
+name: getting-started
+# Getting Started
+This script creates leases in AWS.
+- Lease length is 2min.
+- Set your variables in `terraform.tfvars`
+- Run `tf init` and `tf apply`
+- Go to websites
+  - http://consul.pphan.hashidemos.io:8500
+  - http://vault-0.pphan.hashidemos.io:8200
+
+???
+
+notes
+
+
+---
+name: img-right
+class: img-right
+![Yosemite](https://story.xaprb.com/slides/adirondack/leo-serrat-533922-unsplash.jpg)
+
+Some text
+
+---
+name: vault-aws-configuration
+class: compact,col-2
+# Vault Configuration
+- Set your variables in `scripts/env.sh`
+- Run `00_fast_setup.sh`
+- Get vault admin token. 
+  - http://consul.pphan.hashidemos.io:8500/ui/dc1/kv/service/vault/admin-token/edit
+- Log in to Vault UI with admin token
+  - http://vault-0.pphan.hashidemos.io:8200/ui/
+- Test ldap login, db, and transit.
+  - `./scripts/test_hr_cloud.sh`
+- NOTE: If you want to run this script again, need to reload postgres container.
+``` shell
+ssh ubuntu@bastion.pphan.hashidemos.io
+#--> Go to vault repo that you cloned
+cd /tmp/vault-benchmark-perfstandbys/
+#--> Stop and start container
+*docker-compose down; docker-compose up -d postgres
+```
+
+---
+name: vault-aws-run
+class: compact,col-2
+# Vault Configuration
+- Set your variables in `scripts/env.sh`
+- Run `17-aws.sh`
+- Get vault admin token. 
+  - http://consul.pphan.hashidemos.io:8500/ui/dc1/kv/service/vault/admin-token/edit
+- Log in to Vault UI with admin token
+  - http://vault-0.pphan.hashidemos.io:8200/ui/
+- Test ldap login, db, and transit.
+  - `./scripts/test_hr_cloud.sh`
+- NOTE: If you want to run this script again, need to reload postgres container.
+``` shell
+ssh ubuntu@bastion.pphan.hashidemos.io
+#--> Go to vault repo that you cloned
+cd /tmp/vault-benchmark-perfstandbys/
+#--> Stop and start container
+*docker-compose down; docker-compose up -d postgres
+```
