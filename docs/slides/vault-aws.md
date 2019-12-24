@@ -37,30 +37,9 @@ class: img-right
 Some text
 
 ---
-name: vault-aws-configuration
-class: compact,col-2
-# Vault Configuration
-- Set your variables in `scripts/env.sh`
-- Run `00_fast_setup.sh`
-- Get vault admin token. 
-  - http://consul.pphan.hashidemos.io:8500/ui/dc1/kv/service/vault/admin-token/edit
-- Log in to Vault UI with admin token
-  - http://vault-0.pphan.hashidemos.io:8200/ui/
-- Test ldap login, db, and transit.
-  - `./scripts/test_hr_cloud.sh`
-- NOTE: If you want to run this script again, need to reload postgres container.
-``` shell
-ssh ubuntu@bastion.pphan.hashidemos.io
-#--> Go to vault repo that you cloned
-cd /tmp/vault-benchmark-perfstandbys/
-#--> Stop and start container
-*docker-compose down; docker-compose up -d postgres
-```
-
----
 name: vault-aws-run
 class: compact,col-2
-# Vault Configuration
+# Vault AWS Configuration
 - Set your variables in `scripts/env.sh`
 - Run `17-aws.sh`
 - Get vault admin token. 
@@ -73,7 +52,38 @@ class: compact,col-2
 ``` shell
 ssh ubuntu@bastion.pphan.hashidemos.io
 #--> Go to vault repo that you cloned
-cd /tmp/vault-benchmark-perfstandbys/
-#--> Stop and start container
-*docker-compose down; docker-compose up -d postgres
+vault write aws/config/root \
+    access_key=$ACCESS_KEY_ID \
+    secret_key=$SECRET_ACCESS_KEY
+```
+- Replace `access_key` and `secret_key` with your keys.\n"
+
+---
+name: vault-aws-run
+class: compact,col-2
+
+# CREATE VAULT AWS ROLE
+
+Configure a Vault role that maps to a set of permissions in AWS as well as an AWS credential type. 
+When users generate credentials, they are generated against this role. An example:'
+``` shell
+vault write aws/roles/phan-s3-ec2-all-role \
+    credential_type=iam_user \
+    policy_document=-<<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "ec2:*",
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": "s3:*",
+      "Resource": "*"
+    }
+  ]
+}
+EOF
 ```
