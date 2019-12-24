@@ -1,21 +1,32 @@
 #!/bin/bash
+cd ./scripts
+. env.sh
 # set -e
 
-# This is for the time to wait when using demo_magic.sh
-if [[ -z ${DEMO_WAIT} ]];then
-  DEMO_WAIT=0
-fi
+open https://phanclan.github.io/vault-benchmark-perfstandbys/slides/vault-aws.html
 
-# Demo magic gives wrappers for running commands in demo mode.   Also good for learning via CLI.
-. demo-magic.sh -d -p -w ${DEMO_WAIT}
+#-------------------------------------------------------------------------------
+#--- This block allows us to start dev instance of vault if it is not running.
+#-------------------------------------------------------------------------------
+# if ! VAULT_ADDR=http://127.0.0.1:8200 vault status > /dev/null; then
+# green "Start Vault dev"
+# export VAULT_ADDR=http://127.0.0.1:8200
+# export VAULT_TOKEN=root
+# pe "vault server -dev -dev-root-token-id=$VAULT_TOKEN -dev-listen-address=0.0.0.0:8200 > /tmp/vault.log 2>&1 &"
+# pe "vault login root"
+# green "Enable audit device, so you can examine logs later"
+# pe "vault audit enable file file_path=/tmp/audit.log log_raw=true"
+#-------------------------------------------------------------------------------
+
+# fi
 
 cyan "Running: $0: Enable AWS Dynamic Secrets"
 echo
 
 tput clear
-cyan "##########################################################################################
-# Enable AWS Dynamic Secrets
-##########################################################################################\n"
+cyan "#-------------------------------------------------------------------------------
+# ENABLE AWS DYNAMIC SECRETS
+#-------------------------------------------------------------------------------\n"
 echo
 
 cyan "#-------------------------------------------------------------------------------
@@ -72,24 +83,12 @@ cyan "#-------------------------------------------------------------------------
 # Step 2: Enable AWS Dynamic Secrets
 #-------------------------------------------------------------------------------\n"
 echo
-export VAULT_ADDR=http://127.0.0.1:8200
-export VAULT_TOKEN=root
 
-#--- This block allows us to start dev instance of vault if it is not running.
-if ! VAULT_ADDR=http://127.0.0.1:8200 vault status > /dev/null; then
-green "Start Vault dev"
-pe "vault server -dev -dev-root-token-id=$VAULT_TOKEN -dev-listen-address=0.0.0.0:8200 > /tmp/vault.log 2>&1 &"
-pe "vault login root"
-
-green "Enable audit device, so you can examine logs later"
-pe "vault audit enable file file_path=/tmp/audit.log log_raw=true"
-fi
-#-------------------------------------------------------------------------------
 
 green "#-------------------------------------------------------------------------------
 # Enable AWS Dynamic Secrets on Vault
 #-------------------------------------------------------------------------------"
-export VAULT_TOKEN=$(grep 'Initial Root Token:' /tmp/shamir-1.txt | awk '{print $NF}')
+# export VAULT_TOKEN=$(grep 'Initial Root Token:' /tmp/shamir-1.txt | awk '{print $NF}')
 pe "vault secrets enable -path=aws aws"
 
 echo
@@ -193,12 +192,12 @@ you may need to add a delay of 5-10 seconds (or more) after
 fetching credentials before they can be used successfully.'
 p "Press Enter to continue"
 
-green "#--- Generate accounts from Performance Secondary"
-for i in {1..3}; do
-    vault2 read aws/creds/phan-s3-ec2-all-role | tee /tmp/phan-s3-ec2-all-role.txt
-    echo ""
-done
-p "Press Enter to continue"
+# green "#--- Generate accounts from Performance Secondary"
+# for i in {1..3}; do
+#     vault2 read aws/creds/phan-s3-ec2-all-role | tee /tmp/phan-s3-ec2-all-role.txt
+#     echo ""
+# done
+# p "Press Enter to continue"
 
 
 tput clear
@@ -208,6 +207,7 @@ cyan "#-------------------------------------------------------------------------
 echo
 cyan 'What if these credentials were leaked? We can revoke the credentials.'
 export AWS_LEASE_ID=$(grep "lease_id" /tmp/phan-s3-ec2-all-role.txt | awk '{print $NF}')
+pe "echo $AWS_LEASE_ID"
 pe "vault lease revoke $AWS_LEASE_ID"
 
 yellow "The AWS IAM user account is no longer there"
@@ -223,19 +223,19 @@ cyan "#-------------------------------------------------------------------------
 echo
 
 green "#--- Create lease"
-pe 'curl -s -H "X-Vault-Token:$VAULT_TOKEN" -X PUT http://127.0.0.1:8200/v1/aws/creds/phan-s3-ec2-all-role | jq "." | tee /tmp/phan-s3-ec2-all-role.txt'
+pe 'curl -s -H "X-Vault-Token:$VAULT_TOKEN" -X PUT $VAULT_ADDR/v1/aws/creds/phan-s3-ec2-all-role | jq "." | tee /tmp/phan-s3-ec2-all-role.txt'
 pe 'export LEASE_ID=$(jq -r ".lease_id" < /tmp/phan-s3-ec2-all-role.txt)'
 
 green "#--- List leases"
-pe 'curl -s -H "X-Vault-Token:$VAULT_TOKEN" -X LIST http://127.0.0.1:8200/v1/sys/leases/lookup/aws/creds/phan-s3-ec2-all-role | jq "." '
+pe 'curl -s -H "X-Vault-Token:$VAULT_TOKEN" -X LIST $VAULT_ADDR/v1/sys/leases/lookup/aws/creds/phan-s3-ec2-all-role | jq "." '
 
 echo
 green "#--- Renew leases"
-pe 'curl -s -H "X-Vault-Token:$VAULT_TOKEN" -X PUT http://127.0.0.1:8200/v1/sys/leases/renew/$LEASE_ID | jq "."'
+pe 'curl -s -H "X-Vault-Token:$VAULT_TOKEN" -X PUT $VAULT_ADDR/v1/sys/leases/renew/$LEASE_ID | jq "."'
 
 echo
 green "#--- Revoke leases"
-pe 'curl -s -H "X-Vault-Token:$VAULT_TOKEN" -X PUT http://127.0.0.1:8200/v1/sys/leases/revoke/$LEASE_ID | jq "."'
+pe 'curl -s -H "X-Vault-Token:$VAULT_TOKEN" -X PUT $VAULT_ADDR/v1/sys/leases/revoke/$LEASE_ID | jq "."'
 
 echo ""
 white "This concludes the AWS dynamic secrets engine component of the demo."
