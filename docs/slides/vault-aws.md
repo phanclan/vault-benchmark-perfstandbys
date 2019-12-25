@@ -74,12 +74,12 @@ name: aws-sample-policy
 class: compact, col-2
 
 # Sample Policy:
-
 - Paste the policy below. Be sure to overwrite the current contents.
 - Name the policy "`hashicorp-vault-lab`"
   - Make sure to replace your `<Account ID>` in the Resource. 
   - When Vault dynamically creates the users, the username starts with the “`vault-`” prefix.
-  - The account number can be found in AWS Support Dashboard:'
+  - The account number can be found in AWS Support Dashboard:
+
 ``` json
 {
     "Version": "2012-10-17",
