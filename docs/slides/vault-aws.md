@@ -60,6 +60,7 @@ vault write aws/config/root \
 
 ---
 name: vault-aws-account
+class: compact
 # CONFIGURE AWS ACCOUNT TO USE SECRETS
 
 - Go to IAM Management Console: https://console.aws.amazon.com/iam/home#/users. 
@@ -67,13 +68,18 @@ name: vault-aws-account
 - Give it **Programmatic Access only**.
 - Select `Attach existing policies directly`.
 - Click **Create policy**. Select **JSON** tab.
+
+---
+name: aws-sample-policy
+class: compact, col-2
+
+# Sample Policy:
+
 - Paste the policy below. Be sure to overwrite the current contents.
 - Name the policy "`hashicorp-vault-lab`"
   - Make sure to replace your `<Account ID>` in the Resource. 
   - When Vault dynamically creates the users, the username starts with the “`vault-`” prefix.
   - The account number can be found in AWS Support Dashboard:'
-
-Sample Policy:
 ``` json
 {
     "Version": "2012-10-17",
