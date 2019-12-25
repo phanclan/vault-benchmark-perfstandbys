@@ -1,8 +1,9 @@
+#!/bin/bash
 cd ./scripts
 . env.sh
 cd -
-set -e
-shopt -s expand_aliases
+# set -e
+# shopt -s expand_aliases
 alias dc="docker-compose"
 LDAP_HOST="10.10.1.79"
 PGHOST="10.10.1.79"

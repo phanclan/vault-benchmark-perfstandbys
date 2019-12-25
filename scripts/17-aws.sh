@@ -23,7 +23,7 @@ echo
 # fi
 #-------------------------------------------------------------------------------
 
-tput clear
+# tput clear
 cyan "#-------------------------------------------------------------------------------
 # ENABLE AWS DYNAMIC SECRETS
 #-------------------------------------------------------------------------------\n"
@@ -171,6 +171,8 @@ for i in $(seq 1 $AWSCREDS); do
 done
 
 p "Press Enter to continue"
+
+green 'Display the created credentials.'
 cat /tmp/phan-s3-ec2-all-role.txt
 
 yellow 'Note the lease_id. You will need that value to revoke the credentials.'
@@ -197,7 +199,7 @@ cyan "#-------------------------------------------------------------------------
 #-------------------------------------------------------------------------------\n"
 
 cyan 'What if these credentials were leaked? We can revoke the credentials.'
-export AWS_LEASE_ID=$(grep "lease_id" /tmp/phan-s3-ec2-all-role.txt | awk '{print $NF}')
+export AWS_LEASE_ID=$(grep "lease_id" /tmp/phan-s3-ec2-all-role.txt | awk '{print $NF}' | head -n 1)
 pe "echo $AWS_LEASE_ID"
 pe "vault lease revoke $AWS_LEASE_ID"
 
@@ -221,14 +223,14 @@ green "#--> List leases"
 pe 'curl -s -H "X-Vault-Token:$VAULT_TOKEN" -X LIST $VAULT_ADDR/v1/sys/leases/lookup/aws/creds/phan-s3-ec2-all-role | jq "." '
 
 echo
-green "#--- Renew leases"
+green "#--> Renew leases"
 pe 'curl -s -H "X-Vault-Token:$VAULT_TOKEN" -X PUT $VAULT_ADDR/v1/sys/leases/renew/$LEASE_ID | jq "."'
 
 echo
-green "#--- Revoke leases"
+green "#--> Revoke leases"
 pe 'curl -s -H "X-Vault-Token:$VAULT_TOKEN" -X PUT $VAULT_ADDR/v1/sys/leases/revoke/$LEASE_ID | jq "."'
 
-echo ""
+echo
 white "This concludes the AWS dynamic secrets engine component of the demo."
 p "Press any key to return to menu..."
 
