@@ -87,7 +87,7 @@ name: steps
 
 ---
 class:compact, col-2
-# Step 1: Enable Telemetry on Nomad Servers and Clients**  
+# Step 1: Enable Telemetry on Nomad Servers and Clients 
   
 Add the stanza below in your Nomad client and server configuration files. If you have used the provided repo in this guide to set up a Nomad cluster, the configuration file will be /etc/nomad.d/nomad.hcl. After making this change, restart the Nomad service on each server and client node.  
   
@@ -561,9 +561,9 @@ https://www.nomadproject.io/assets/images/alertmanager-webui-612ce20c.png
   
   
 ---
-# Next Steps**  
+# Next Steps
   
-## Read more about Prometheus [<u>Alertmanager][46]</u> and how to configure it to send out notifications to a [<u>receiver][47]</u> of your choice.  
+Read more about Prometheus [<u>Alertmanager][46]</u> and how to configure it to send out notifications to a [<u>receiver][47]</u> of your choice.  
   
   
 [1]: https://www.nomadproject.io/guides/operations/monitoring-and-alerting/prometheus-metrics.html#reference-material  
