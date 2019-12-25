@@ -59,13 +59,60 @@ vault write aws/config/root \
 - Replace `access_key` and `secret_key` with your keys.\n"
 
 ---
+name: vault-aws-account
+# CONFIGURE AWS ACCOUNT TO USE SECRETS
+
+- Go to IAM Management Console: https://console.aws.amazon.com/iam/home#/users. 
+- Create a new User. Click **Add user**.
+- Give it **Programmatic Access only**.
+- Select `Attach existing policies directly`.
+- Click **Create policy**. Select **JSON** tab.
+- Paste the policy below. Be sure to overwrite the current contents.
+- Name the policy "`hashicorp-vault-lab`"
+  - Make sure to replace your `<Account ID>` in the Resource. 
+  - When Vault dynamically creates the users, the username starts with the “`vault-`” prefix.
+  - The account number can be found in AWS Support Dashboard:'
+
+Sample Policy:
+``` json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "iam:AttachUserPolicy",
+                "iam:CreateAccessKey",
+                "iam:CreateUser",
+                "iam:DeleteAccessKey",
+                "iam:DeleteUser",
+                "iam:DeleteUserPolicy",
+                "iam:DetachUserPolicy",
+                "iam:ListAccessKeys",
+                "iam:ListAttachedUserPolicies",
+                "iam:ListGroupsForUser",
+                "iam:ListUserPolicies",
+                "iam:PutUserPolicy",
+                "iam:RemoveUserFromGroup"
+            ],
+            "Resource": [
+                "arn:aws:iam::<ACCOUNT_ID>:user/phan-vault-*"
+                "arn:aws:iam::<ACCOUNT_ID>:group/*"
+            ]
+        }
+    ]
+}
+```
+
+---
 name: vault-aws-run
 class: compact,col-2
 
 # CREATE VAULT AWS ROLE
 
 Configure a Vault role that maps to a set of permissions in AWS as well as an AWS credential type. 
-When users generate credentials, they are generated against this role. An example:'
+When users generate credentials, they are generated against this role. An example:
+
 ``` shell
 vault write aws/roles/phan-s3-ec2-all-role \
     credential_type=iam_user \

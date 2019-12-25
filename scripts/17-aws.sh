@@ -1,9 +1,13 @@
 #!/bin/bash
+# uncomment if running in directory parent to scripts
 cd ./scripts
 . env.sh
 # set -e
 
-open https://phanclan.github.io/vault-benchmark-perfstandbys/slides/vault-aws.html
+cyan "Running: $0: Enable AWS Dynamic Secrets"
+echo
+
+# open https://phanclan.github.io/vault-benchmark-perfstandbys/slides/vault-aws.html
 
 #-------------------------------------------------------------------------------
 #--- This block allows us to start dev instance of vault if it is not running.
@@ -16,12 +20,8 @@ open https://phanclan.github.io/vault-benchmark-perfstandbys/slides/vault-aws.ht
 # pe "vault login root"
 # green "Enable audit device, so you can examine logs later"
 # pe "vault audit enable file file_path=/tmp/audit.log log_raw=true"
-#-------------------------------------------------------------------------------
-
 # fi
-
-cyan "Running: $0: Enable AWS Dynamic Secrets"
-echo
+#-------------------------------------------------------------------------------
 
 tput clear
 cyan "#-------------------------------------------------------------------------------
@@ -79,20 +79,20 @@ white '{
 p "Press Enter to continue"
 
 green "#-------------------------------------------------------------------------------
-# Enable AWS Dynamic Secrets on Vault
+# ENABLE AWS DYNAMIC SECRETS ON VAULT
 #-------------------------------------------------------------------------------"
 # export VAULT_TOKEN=$(grep 'Initial Root Token:' /tmp/shamir-1.txt | awk '{print $NF}')
 pe "vault secrets enable -path=aws aws"
 
 echo
-green "#--- Tune the default lease for the AWS secrets engine to 2 minutes."
+green "#--> Tune the default lease TTL for the AWS secrets engine to 2 minutes."
 pe "vault secrets tune -default-lease-ttl=2m aws/"
 
-cyan "Configure the credentials that Vault uses to communicate with AWS to generate the IAM credentials:"
-green "Example configuration. Replace “access_key” and “secret_key” with your keys.\n"
+green "#--> Configure the credentials used to communicate with AWS to generate the IAM credentials:"
+yellow "Example configuration. Replace “access_key” and “secret_key” with your keys.\n"
 
-white "vault write aws/config/root \
-    access_key=<ACCESS_KEY_ID> \
+white "vault write aws/config/root \\
+    access_key=<ACCESS_KEY_ID> \\
     secret_key=<SECRET_ACCESS_KEY>
 "
 export ACCESS_KEY_ID=$(awk '/vault-lab/ && $0 != "" { getline ; print $NF}' ~/.aws/credentials)
@@ -112,7 +112,6 @@ cyan "#-------------------------------------------------------------------------
 # CREATE VAULT AWS ROLE
 #-------------------------------------------------------------------------------\n"
 
-echo
 cyan 'Configure a Vault role that maps to a set of permissions in AWS as well as an AWS credential type. 
 When users generate credentials, they are generated against this role. An example:'
 
@@ -134,7 +133,7 @@ vault write aws/roles/phan-s3-ec2-all-role \
 EOF
 '
 echo
-p "Press Enter to continue"
+# p "Press Enter to continue"
 
 vault write aws/roles/phan-s3-ec2-all-role \
     credential_type=iam_user \
@@ -155,7 +154,7 @@ vault write aws/roles/phan-s3-ec2-all-role \
   ]
 }
 EOF
-read
+p "Press Enter to continue"
 
 tput clear
 cyan "#-------------------------------------------------------------------------------
@@ -165,14 +164,14 @@ cyan "#-------------------------------------------------------------------------
 cyan 'Generate a new credential by reading from the "/creds" endpoint with the name of the role:'
 echo "How many AWS users do you want to create (enter a number):"
 read AWSCREDS
+rm /tmp/phan-s3-ec2-all-role.txt
 for i in $(seq 1 $AWSCREDS); do
-    pe "vault read aws/creds/phan-s3-ec2-all-role | tee /tmp/phan-s3-ec2-all-role.txt"
-    # vault read db-blog/creds/mother-hr-full-10s
+    vault read aws/creds/phan-s3-ec2-all-role | tee -a /tmp/phan-s3-ec2-all-role.txt
     echo ""
 done
 
 p "Press Enter to continue"
-# pe "cat /tmp/phan-s3-ec2-all-role.txt"
+cat /tmp/phan-s3-ec2-all-role.txt
 
 yellow 'Note the lease_id. You will need that value to revoke the credentials.'
 echo
@@ -192,12 +191,11 @@ p "Press Enter to continue"
 # done
 # p "Press Enter to continue"
 
-
 tput clear
 cyan "#-------------------------------------------------------------------------------
 # Revoking the secret
 #-------------------------------------------------------------------------------\n"
-echo
+
 cyan 'What if these credentials were leaked? We can revoke the credentials.'
 export AWS_LEASE_ID=$(grep "lease_id" /tmp/phan-s3-ec2-all-role.txt | awk '{print $NF}')
 pe "echo $AWS_LEASE_ID"
@@ -215,11 +213,11 @@ cyan "#-------------------------------------------------------------------------
 #------------------------------------------------------------------------------\n"
 echo
 
-green "#--- Create lease"
+green "#--> Create lease"
 pe 'curl -s -H "X-Vault-Token:$VAULT_TOKEN" -X PUT $VAULT_ADDR/v1/aws/creds/phan-s3-ec2-all-role | jq "." | tee /tmp/phan-s3-ec2-all-role.txt'
 pe 'export LEASE_ID=$(jq -r ".lease_id" < /tmp/phan-s3-ec2-all-role.txt)'
 
-green "#--- List leases"
+green "#--> List leases"
 pe 'curl -s -H "X-Vault-Token:$VAULT_TOKEN" -X LIST $VAULT_ADDR/v1/sys/leases/lookup/aws/creds/phan-s3-ec2-all-role | jq "." '
 
 echo
