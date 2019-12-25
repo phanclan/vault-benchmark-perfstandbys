@@ -1,9 +1,7 @@
 class: title, smokescreen, shelf, no-footer
 background-image: url(https://story.xaprb.com/slides/adirondack/leo-serrat-533922-unsplash.jpg)
 
-# Monitoring  
- 
-# **Using Prometheus to Monitor Nomad Metrics**  
+# Monitoring: Using Prometheus to Monitor Nomad Metrics
 ### Peter Phan, pphan@hashicorp.com
 
 ---
@@ -91,7 +89,7 @@ name: steps
 class:compact, col-2
 # Step 1: Enable Telemetry on Nomad Servers and Clients**  
   
-## Add the stanza below in your Nomad client and server configuration files. If you have used the provided repo in this guide to set up a Nomad cluster, the configuration file will be /etc/nomad.d/nomad.hcl. After making this change, restart the Nomad service on each server and client node.  
+Add the stanza below in your Nomad client and server configuration files. If you have used the provided repo in this guide to set up a Nomad cluster, the configuration file will be /etc/nomad.d/nomad.hcl. After making this change, restart the Nomad service on each server and client node.  
   
 ``` go  
 telemetry {  
@@ -256,12 +254,11 @@ The [<u>volumes][34]</u> option allows us to take the configuration file we dyna
 ---
 class:compact, col-2
 
-# Step 5: Run the Prometheus Job**  
+# Step 5: Run the Prometheus Job
+
+We can now register our job for Prometheus:  
   
-## We can now register our job for Prometheus:  
-  
-## ```shell  
-  
+```shell    
 $ nomad job run prometheus.nomad  
 ==> Monitoring evaluation "4e6b7127"  
     Evaluation triggered by job "prometheus"  
@@ -271,29 +268,31 @@ $ nomad job run prometheus.nomad
 ==> Evaluation "4e6b7127" finished with status "complete"   
 ```  
   
-## Prometheus is now deployed. You can visit any of your client nodes at port 9999 to visit the web interface. There is only one instance of Prometheus running in the Nomad cluster, but you are automatically routed to it regardless of which node you visit because fabio is deployed and running on the cluster as well.  
+Prometheus is now deployed. You can visit any of your client nodes at port 9999 to visit the web interface. There is only one instance of Prometheus running in the Nomad cluster, but you are automatically routed to it regardless of which node you visit because fabio is deployed and running on the cluster as well.  
   
-## At the top menu bar, click on Status and then Targets. You should see all of your Nomad nodes (servers and clients) show up as targets. Please note that the IP addresses will be different in your cluster.  
+At the top menu bar, click on Status and then Targets. You should see all of your Nomad nodes (servers and clients) show up as targets. Please note that the IP addresses will be different in your cluster.  
   
-## https://www.nomadproject.io/assets/images/prometheus-targets-e2a7832d.png  
+https://www.nomadproject.io/assets/images/prometheus-targets-e2a7832d.png  
   
-## …  
   
-## Let's use Prometheus to query how many jobs are running in our Nomad cluster. On the main page, type nomad_nomad_job_summary_running into the query section. You can also select the query from the drop-down list.  
   
-## https://www.nomadproject.io/assets/images/running-jobs-564b55df.png  
+Let's use Prometheus to query how many jobs are running in our Nomad cluster. On the main page, type nomad_nomad_job_summary_running into the query section. You can also select the query from the drop-down list.  
   
-## …  
+https://www.nomadproject.io/assets/images/running-jobs-564b55df.png  
   
-## You can see that the value of our fabio job is 3 since it is using the [<u>system][36]</u> scheduler type. This makes sense because we are running three Nomad clients in our demo cluster. The value of our Prometheus job, on the other hand, is 1 since we have only deployed one instance of it. To see the description of other metrics, visit the [<u>telemetry][37]</u> section.  
   
-## [**<u>»**][38]**</u> Step 6: Deploy Alertmanager**  
   
-## Now that we have enabled Prometheus to collect metrics from our cluster and see the state of our jobs, let's deploy [<u>Alertmanager][39]</u>. Keep in mind that Prometheus sends alerts to Alertmanager. It is then Alertmanager's job to send out the notifications on those alerts to any designated [<u>receiver][40]</u>.  
+You can see that the value of our fabio job is 3 since it is using the [<u>system][36]</u> scheduler type. This makes sense because we are running three Nomad clients in our demo cluster. The value of our Prometheus job, on the other hand, is 1 since we have only deployed one instance of it. To see the description of other metrics, visit the [<u>telemetry][37]</u> section.  
   
-## Create a job for Alertmanager and named it alertmanager.nomad  
+---
+class:compact, col-2
+# Step 6: Deploy Alertmanager
+
+Now that we have enabled Prometheus to collect metrics from our cluster and see the state of our jobs, let's deploy [<u>Alertmanager][39]</u>. Keep in mind that Prometheus sends alerts to Alertmanager. It is then Alertmanager's job to send out the notifications on those alerts to any designated [<u>receiver][40]</u>.  
   
-## ```go  
+Create a job for Alertmanager and named it alertmanager.nomad  
+  
+```go  
   
 job "alertmanager" {  
   datacenters = ["dc1"]  
@@ -342,14 +341,16 @@ job "alertmanager" {
 }  
 ```  
   
-## [**<u>»**][41]**</u> Step 7: Configure Prometheus to Integrate with Alertmanager**  
+---
+class:compact, col-2
+
+# Step 7: Configure Prometheus to Integrate with Alertmanager
   
-## Now that we have deployed Alertmanager, let's slightly modify our Prometheus job configuration to allow it to recognize and send alerts to it. Note that there are some rules in the configuration that refer a to a web server we will deploy soon.  
+Now that we have deployed Alertmanager, let's slightly modify our Prometheus job configuration to allow it to recognize and send alerts to it. Note that there are some rules in the configuration that refer a to a web server we will deploy soon.  
   
-## Below is the same Prometheus configuration we detailed above, but we have added some sections that hook Prometheus into the Alertmanager and set up some Alerting rules.  
+Below is the same Prometheus configuration we detailed above, but we have added some sections that hook Prometheus into the Alertmanager and set up some Alerting rules.  
   
-## ```go  
-  
+```go    
 job "prometheus" {  
   datacenters = ["dc1"]  
   type = "service"  
@@ -470,18 +471,20 @@ EOH
 }  
 ```  
   
-## Notice we have added a few important sections to this job file:  
+Notice we have added a few important sections to this job file:  
   
-* •	We added another template stanza that defines an [<u>alerting rule][42]</u> for our web server. Namely, Prometheus will send out an alert if it detects the webserver service has disappeared.  
-* •	We added an alerting block to our Prometheus configuration as well as a rule_files block to make Prometheus aware of Alertmanager as well as the rule we have defined.  
-* •	We are now also scraping Alertmanager along with our web server.  
+* We added another template stanza that defines an [<u>alerting rule][42]</u> for our web server. Namely, Prometheus will send out an alert if it detects the webserver service has disappeared.  
+* We added an alerting block to our Prometheus configuration as well as a rule_files block to make Prometheus aware of Alertmanager as well as the rule we have defined.  
+* We are now also scraping Alertmanager along with our web server.  
   
-## [**<u>»**][43]**</u> Step 8: Deploy Web Server**  
+---
+class:compact, col-2
+
+# Step 8: Deploy Web Server
+
+Create a job for our web server and name it webserver.nomad  
   
-## Create a job for our web server and name it webserver.nomad  
-  
-## ```  
-  
+```go
 job "webserver" {  
   datacenters = ["dc1"]  
   
@@ -522,40 +525,43 @@ job "webserver" {
 }  
 ```  
   
-## At this point, re-run your Prometheus job. After a few seconds, you will see the web server and Alertmanager appear in your list of targets.  
+At this point, re-run your Prometheus job. After a few seconds, you will see the web server and Alertmanager appear in your list of targets.  
   
-## https://www.nomadproject.io/assets/images/new-targets-7e2bcd93.png  
+https://www.nomadproject.io/assets/images/new-targets-7e2bcd93.png  
   
-## …  
   
-## You should also be able to go to the Alerts section of the Prometheus web interface and see the alert that we have configured. No alerts are active because our web server is up and running.  
   
-## https://www.nomadproject.io/assets/images/alerts-ee875c5e.png  
+You should also be able to go to the Alerts section of the Prometheus web interface and see the alert that we have configured. No alerts are active because our web server is up and running.  
   
-## …  
+https://www.nomadproject.io/assets/images/alerts-ee875c5e.png  
   
-## [**<u>»**][44]**</u> Step 9: Stop the Web Server**  
   
-## Run nomad stop webserver to stop our webserver. After a few seconds, you will see that we have an active alert in the Alerts section of the web interface.  
   
-## https://www.nomadproject.io/assets/images/active-alert-cfcc7e45.png  
+---
+class:compact, col-2
+
+# Step 9: Stop the Web Server
+
+Run nomad stop webserver to stop our webserver. After a few seconds, you will see that we have an active alert in the Alerts section of the web interface.  
   
-## …  
+https://www.nomadproject.io/assets/images/active-alert-cfcc7e45.png  
   
-## We can now go to the Alertmanager web interface to see that Alertmanager has received this alert as well. Since Alertmanager has been configured behind fabio, go to the IP address of any of your client nodes at port 9999 and use /alertmanager as the route. An example is shown below:  
   
-## ```go  
   
+We can now go to the Alertmanager web interface to see that Alertmanager has received this alert as well. Since Alertmanager has been configured behind fabio, go to the IP address of any of your client nodes at port 9999 and use /alertmanager as the route. An example is shown below:  
+  
+```go    
 < client node IP >:9999/alertmanager  
 ```  
   
-## You should see that Alertmanager has received the alert.  
+You should see that Alertmanager has received the alert.  
   
-## https://www.nomadproject.io/assets/images/alertmanager-webui-612ce20c.png  
+https://www.nomadproject.io/assets/images/alertmanager-webui-612ce20c.png  
   
-## …  
   
-## [**<u>»**][45]**</u> Next Steps**  
+  
+---
+# Next Steps**  
   
 ## Read more about Prometheus [<u>Alertmanager][46]</u> and how to configure it to send out notifications to a [<u>receiver][47]</u> of your choice.  
   
