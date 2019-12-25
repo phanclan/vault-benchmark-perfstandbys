@@ -102,8 +102,8 @@ class: compact, col-2
                 "iam:RemoveUserFromGroup"
             ],
             "Resource": [
-                "arn:aws:iam::<ACCOUNT_ID>:user/phan-vault-*"
-                "arn:aws:iam::<ACCOUNT_ID>:group/*"
+*                "arn:aws:iam::<ACCOUNT_ID>:user/phan-vault-*"
+*                "arn:aws:iam::<ACCOUNT_ID>:group/*"
             ]
         }
     ]
