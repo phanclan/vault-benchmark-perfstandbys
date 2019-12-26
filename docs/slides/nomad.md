@@ -151,7 +151,7 @@ class:compact, col-2
 We can now register our fabio job:  
   
 ```shell    
-$ nomad job run fabio.nomad  
+*$ nomad job run fabio.nomad  
 ==> Monitoring evaluation "7b96701e"  
     Evaluation triggered by job "fabio"  
     Allocation "d0e34682" created: node "28d7f859", group "fabio"  
@@ -163,8 +163,8 @@ $ nomad job run fabio.nomad
   
 At this point, you should be able to visit any one of your client nodes at port `9998` and see the web interface for fabio. 
 - The routing table will be empty since we have not yet deployed anything that fabio can route to. 
-- Accordingly, if you visit any of the client nodes at port 9999 at this point, you will get a 404 HTTP response. 
-  - That will change soon.  
+- Accordingly, if you visit any of the client nodes at port `9999` at this point, you will get a `404` HTTP response. 
+- That will change soon.  
 
 ---
 class:compact, col-2
@@ -190,6 +190,8 @@ job "prometheus" {
       size = 300  
     }  
 ```
+
+---
 
 ```go
     task "prometheus" {  
@@ -219,7 +221,12 @@ scrape_configs:
     metrics_path: /v1/metrics  
     params:  
       format: ['prometheus']  
-EOH  
+EOH
+```
+
+---
+
+```go
       }  
       driver = "docker"  
       config {  
