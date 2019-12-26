@@ -278,21 +278,23 @@ $ nomad job run prometheus.nomad
 ==> Evaluation "4e6b7127" finished with status "complete"   
 ```  
   
-Prometheus is now deployed. You can visit any of your client nodes at port 9999 to visit the web interface. There is only one instance of Prometheus running in the Nomad cluster, but you are automatically routed to it regardless of which node you visit because fabio is deployed and running on the cluster as well.  
+Prometheus is now deployed. 
+- You can visit any of your client nodes at port 9999 to visit the web interface. 
+- There is only one instance of Prometheus running in the Nomad cluster, but you are automatically routed to it regardless of which node you visit because fabio is deployed and running on the cluster as well.  
   
-At the top menu bar, click on Status and then Targets. You should see all of your Nomad nodes (servers and clients) show up as targets. Please note that the IP addresses will be different in your cluster.  
+At the top menu bar, click on **Status** and then **Targets**. You should see all of your Nomad nodes (servers and clients) show up as targets. Please note that the IP addresses will be different in your cluster.  
   
 https://www.nomadproject.io/assets/images/prometheus-targets-e2a7832d.png  
   
   
   
-Let's use Prometheus to query how many jobs are running in our Nomad cluster. On the main page, type nomad_nomad_job_summary_running into the query section. You can also select the query from the drop-down list.  
+Let's use Prometheus to query how many jobs are running in our Nomad cluster. On the main page, type `nomad_nomad_job_summary_running` into the query section. You can also select the query from the drop-down list.  
   
 https://www.nomadproject.io/assets/images/running-jobs-564b55df.png  
   
   
   
-You can see that the value of our fabio job is 3 since it is using the [<u>system][36]</u> scheduler type. This makes sense because we are running three Nomad clients in our demo cluster. The value of our Prometheus job, on the other hand, is 1 since we have only deployed one instance of it. To see the description of other metrics, visit the [<u>telemetry][37]</u> section.  
+You can see that the value of our fabio job is `3` since it is using the [<u>**system**][36]</u> scheduler type. This makes sense because we are running three Nomad clients in our demo cluster. The value of our Prometheus job, on the other hand, is `1` since we have only deployed one instance of it. To see the description of other metrics, visit the [<u>telemetry][37]</u> section.  
   
 ---
 class:compact, col-2
