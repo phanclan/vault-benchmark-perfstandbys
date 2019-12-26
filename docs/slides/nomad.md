@@ -106,12 +106,12 @@ class:compact, col-2
 
 # Step 2: Create a Job for Fabio
   
-Create a job for Fabio and name it fabio.nomad  
+Create a job for Fabio and name it `fabio.nomad`  
   
 ```go    
 job "fabio" {  
   datacenters = ["dc1"]  
-  type = "system"  
+*  type = "system"  
   
   group "fabio" {  
     task "fabio" {  
@@ -139,7 +139,9 @@ job "fabio" {
 }  
 ```  
   
-## To learn more about fabio and the options used in this job file, see [<u>Load Balancing with Fabio][27]</u>. For the purpose of this guide, it is important to note that the type option is set to [<u>system][28]</u> so that fabio will be deployed on all client nodes. We have also set network_mode to host so that fabio will be able to use Consul for service discovery.  
+To learn more about fabio and the options used in this job file, see [<u>Load Balancing with Fabio][27]</u>. 
+- For the purpose of this guide, it is important to note that the `type` option is set to [<u>`system`][28]</u> so that fabio will be deployed on all client nodes. 
+- We have also set `network_mode` to `host` so that fabio will be able to use Consul for service discovery.  
   
 ---
 class:compact, col-2
@@ -159,14 +161,17 @@ $ nomad job run fabio.nomad
 ==> Evaluation "7b96701e" finished with status "complete"  
 ```  
   
-At this point, you should be able to visit any one of your client nodes at port 9998 and see the web interface for fabio. The routing table will be empty since we have not yet deployed anything that fabio can route to. Accordingly, if you visit any of the client nodes at port 9999 at this point, you will get a 404 HTTP response. That will change soon.  
+At this point, you should be able to visit any one of your client nodes at port `9998` and see the web interface for fabio. 
+- The routing table will be empty since we have not yet deployed anything that fabio can route to. 
+- Accordingly, if you visit any of the client nodes at port 9999 at this point, you will get a 404 HTTP response. 
+  - That will change soon.  
 
 ---
 class:compact, col-2
 
 # Step 4: Create a Job for Prometheus
   
-Create a job for Prometheus and name it prometheus.nomad  
+Create a job for Prometheus and name it `prometheus.nomad`  
   
 ``` go    
 job "prometheus" {  
@@ -184,9 +189,11 @@ job "prometheus" {
     ephemeral_disk {  
       size = 300  
     }  
-  
+```
+
+```go
     task "prometheus" {  
-      template {  
+*      template {  
         change_mode = "noop"  
         destination = "local/prometheus.yml"  
         data = <<EOH  
@@ -247,9 +254,12 @@ EOH
 }  
 ```
   
-Notice we are using the [<u>template][31]</u> stanza to create a Prometheus configuration using [<u>environment][32]</u> variables. In this case, we are using the environment variable NOMAD_IP_prometheus_ui in the [<u>consul_sd_configs][33]</u> section to ensure Prometheus can use Consul to detect and scrape targets. This works in our example because Consul is installed alongside Nomad. Additionally, we benefit from this configuration by avoiding the need to hard-code IP addresses. If you did not use the repo provided in this guide to create a Nomad cluster, be sure to point your Prometheus configuration to a Consul server you have set up.  
+Notice we are using the [<u>`template`][31]</u> stanza to create a Prometheus configuration using [<u>environment][32]</u> variables. 
+- In this case, we are using the environment variable `NOMAD_IP_prometheus_ui` in the [<u>`consul_sd_configs`][33]</u> section to ensure Prometheus can use Consul to detect and scrape targets. This works in our example because Consul is installed alongside Nomad. 
+- Additionally, we benefit from this configuration by avoiding the need to hard-code IP addresses. 
+- If you did not use the repo provided in this guide to create a Nomad cluster, be sure to point your Prometheus configuration to a Consul server you have set up.  
   
-The [<u>volumes][34]</u> option allows us to take the configuration file we dynamically created and place it in our Prometheus container.  
+The [<u>`volumes`][34]</u> option allows us to take the configuration file we dynamically created and place it in our Prometheus container.  
   
 ---
 class:compact, col-2
