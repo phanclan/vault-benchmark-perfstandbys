@@ -377,7 +377,8 @@ class:compact, col-2
 
 # Step 7: Configure Prometheus to Integrate with Alertmanager
   
-Now that we have deployed Alertmanager, let's slightly modify our Prometheus job configuration to allow it to recognize and send alerts to it. Note that there are some rules in the configuration that refer a to a web server we will deploy soon.  
+Now that we have deployed Alertmanager, let's slightly modify our Prometheus job configuration to allow it to recognize and send alerts to it. 
+- Note that there are some rules in the configuration that refer a to a web server we will deploy soon.  
   
 Below is the same Prometheus configuration we detailed above, but we have added some sections that hook Prometheus into the Alertmanager and set up some Alerting rules.  
   
@@ -397,7 +398,11 @@ job "prometheus" {
     ephemeral_disk {  
       size = 300  
     }  
-  
+```
+
+---
+
+``` go
     task "prometheus" {  
       template {  
         change_mode = "noop"  
@@ -425,7 +430,11 @@ EOH
 global:  
   scrape_interval:     5s  
   evaluation_interval: 5s  
-  
+```
+
+---
+
+``` go
 alerting:  
   alertmanagers:  
   - consul_sd_configs:  
@@ -504,8 +513,8 @@ EOH
   
 Notice we have added a few important sections to this job file:  
   
-* We added another template stanza that defines an [<u>alerting rule][42]</u> for our web server. Namely, Prometheus will send out an alert if it detects the webserver service has disappeared.  
-* We added an alerting block to our Prometheus configuration as well as a rule_files block to make Prometheus aware of Alertmanager as well as the rule we have defined.  
+* We added another template stanza that defines an [<u>alerting rule][42]</u> for our web server. Namely, Prometheus will send out an alert if it detects the `webserver` service has disappeared.  
+* We added an `alerting` block to our Prometheus configuration as well as a `rule_files` block to make Prometheus aware of Alertmanager as well as the rule we have defined.  
 * We are now also scraping Alertmanager along with our web server.  
   
 ---
@@ -513,7 +522,7 @@ class:compact, col-2
 
 # Step 8: Deploy Web Server
 
-Create a job for our web server and name it webserver.nomad  
+Create a job for our web server and name it `webserver.nomad`  
   
 ```go
 job "webserver" {  
@@ -534,7 +543,9 @@ job "webserver" {
           port  "http"{}  
         }  
       }  
-  
+```
+
+```go
       service {  
         name = "webserver"  
         port = "http"  
@@ -555,14 +566,18 @@ job "webserver" {
   }  
 }  
 ```  
-  
+
+---
+
+# continued
+
 At this point, re-run your Prometheus job. After a few seconds, you will see the web server and Alertmanager appear in your list of targets.  
   
 https://www.nomadproject.io/assets/images/new-targets-7e2bcd93.png  
   
   
   
-You should also be able to go to the Alerts section of the Prometheus web interface and see the alert that we have configured. No alerts are active because our web server is up and running.  
+You should also be able to go to the **Alerts** section of the Prometheus web interface and see the alert that we have configured. No alerts are active because our web server is up and running.  
   
 https://www.nomadproject.io/assets/images/alerts-ee875c5e.png  
   
@@ -573,18 +588,20 @@ class:compact, col-2
 
 # Step 9: Stop the Web Server
 
-Run nomad stop webserver to stop our webserver. After a few seconds, you will see that we have an active alert in the Alerts section of the web interface.  
+Run `nomad stop webserver` to stop our webserver. After a few seconds, you will see that we have an active alert in the **Alerts** section of the web interface.  
   
 https://www.nomadproject.io/assets/images/active-alert-cfcc7e45.png  
   
   
   
-We can now go to the Alertmanager web interface to see that Alertmanager has received this alert as well. Since Alertmanager has been configured behind fabio, go to the IP address of any of your client nodes at port 9999 and use /alertmanager as the route. An example is shown below:  
+We can now go to the Alertmanager web interface to see that Alertmanager has received this alert as well. Since Alertmanager has been configured behind fabio, go to the IP address of any of your client nodes at port `9999` and use `/alertmanager` as the route. An example is shown below:  
   
 ```go    
 < client node IP >:9999/alertmanager  
 ```  
-  
+
+---
+# continued
 You should see that Alertmanager has received the alert.  
   
 https://www.nomadproject.io/assets/images/alertmanager-webui-612ce20c.png  
