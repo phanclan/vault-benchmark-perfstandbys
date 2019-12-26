@@ -94,7 +94,8 @@ class: title
 class:compact, col-2
 # Step 1: Enable Telemetry on Nomad Servers and Clients 
   
-Add the stanza below in your Nomad client and server configuration files. If you have used the provided repo in this guide to set up a Nomad cluster, the configuration file will be /etc/nomad.d/nomad.hcl. After making this change, restart the Nomad service on each server and client node.  
+Add the stanza below in your Nomad client and server configuration files. 
+- If you have used the provided repo in this guide to set up a Nomad cluster, the configuration file will be `/etc/nomad.d/nomad.hcl`. 
   
 ``` go  
 telemetry {  
@@ -105,6 +106,8 @@ telemetry {
   publish_node_metrics = true  
 }  
 ```  
+
+- After making this change, restart the Nomad service on each server and client node.  
 
 ---
 class:compact, col-2
@@ -583,8 +586,9 @@ job "webserver" {
 ```  
 
 ---
+class:compact
 
-# continued
+# ...continued
 
 At this point, re-run your Prometheus job. After a few seconds, you will see the web server and Alertmanager appear in your list of targets.  
   
