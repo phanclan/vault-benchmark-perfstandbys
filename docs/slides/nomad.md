@@ -2,7 +2,7 @@ class: title, smokescreen, shelf, no-footer
 background-image: url(https://story.xaprb.com/slides/adirondack/leo-serrat-533922-unsplash.jpg)
 
 # Monitoring: Using Prometheus to Monitor Nomad Metrics
-### Peter Phan, pphan@hashicorp.com
+## Peter Phan, pphan@hashicorp.com
 
 ---
 layout: true
@@ -67,22 +67,27 @@ name:reference-material
 name:challenge
 # Challenge
 
-Think of a scenario where a Nomad operator needs to deploy Prometheus to collect metrics from a Nomad cluster. The operator must enable telemetry on the Nomad servers and clients as well as configure Prometheus to use Consul for service discovery. The operator must also configure Prometheus Alertmanager so notifications can be sent out to a specified [<u>receiver][18]</u>.  
+Think of a scenario where a Nomad operator needs to deploy Prometheus to collect metrics from a Nomad cluster. 
+- The operator must enable telemetry on the Nomad servers and clients as well as configure Prometheus to use Consul for service discovery. 
+- The operator must also configure Prometheus Alertmanager so notifications can be sent out to a specified [<u>receiver][18]</u>.  
 
 ---
 # Solution
   
-Deploy Prometheus with a configuration that accounts for a highly dynamic environment. Integrate service discovery into the configuration file to avoid using hard-coded IP addresses. Place the Prometheus deployment behind [<u>fabio][20]</u> (this will allow easy access to the Prometheus web interface by allowing the Nomad operator to hit any of the client nodes at the / path.  
+Deploy Prometheus with a configuration that accounts for a highly dynamic environment. 
+- Integrate service discovery into the configuration file to avoid using hard-coded IP addresses. 
+- Place the Prometheus deployment behind [<u>fabio][20]</u> (this will allow easy access to the Prometheus web interface by allowing the Nomad operator to hit any of the client nodes at the / path.  
 
 ---
 # Prerequisites
 
 To perform the tasks described in this guide, you need to have a Nomad environment with Consul installed. You can use this [<u>repo][22]</u> to easily provision a sandbox environment. This guide will assume a cluster with one server node and three client nodes.  
   
-## **Please Note:** This guide is for demo purposes and is only using a single server node. In a production cluster, 3 or 5 server nodes are recommended. The alerting rules defined in this guide are for instructional purposes. Please refer to [<u>Alerting Rules][23]</u> for more information.  
+**Please Note:** This guide is for demo purposes and is only using a single server node. In a production cluster, 3 or 5 server nodes are recommended. The alerting rules defined in this guide are for instructional purposes. Please refer to [<u>Alerting Rules][23]</u> for more information.  
 
 ---
 name: steps
+class: title
 # Steps  
 
 ---
