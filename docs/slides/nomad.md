@@ -608,8 +608,12 @@ class:compact, col-2
 # Step 9: Stop the Web Server
 
 Run `nomad stop webserver` to stop our webserver. After a few seconds, you will see that we have an active alert in the **Alerts** section of the web interface.  
-  
+![][1]
+
+[1]: https://www.nomadproject.io/assets/images/running-jobs-564b55df.png
 https://www.nomadproject.io/assets/images/active-alert-cfcc7e45.png  
+
+![logo](https://hashicorp.github.io/field-workshops-assets/assets/logos/HashiCorp_Icon_Black.svg)
   
   
   
