@@ -192,6 +192,7 @@ job "prometheus" {
 ```
 
 ---
+class:compact
 
 ```go
     task "prometheus" {  
@@ -225,6 +226,7 @@ EOH
 ```
 
 ---
+class:compact
 
 ```go
       }  
@@ -290,24 +292,30 @@ Prometheus is now deployed.
 - There is only one instance of Prometheus running in the Nomad cluster, but you are automatically routed to it regardless of which node you visit because fabio is deployed and running on the cluster as well.  
 
 ---
-
+class: compact
 # continued
 
-At the top menu bar, click on **Status** and then **Targets**. You should see all of your Nomad nodes (servers and clients) show up as targets. Please note that the IP addresses will be different in your cluster.  
+At the top menu bar, click on **Status** and then **Targets**. 
+- You should see all of your Nomad nodes (servers and clients) show up as targets. 
+- Please note that the IP addresses will be different in your cluster.  
   
 https://www.nomadproject.io/assets/images/prometheus-targets-e2a7832d.png  
   
   
 ---
-
+class: compact
 # continued
-Let's use Prometheus to query how many jobs are running in our Nomad cluster. On the main page, type `nomad_nomad_job_summary_running` into the query section. You can also select the query from the drop-down list.  
+Let's use Prometheus to query how many jobs are running in our Nomad cluster. 
+- On the main page, type `nomad_nomad_job_summary_running` into the query section. 
+- You can also select the query from the drop-down list.  
   
 https://www.nomadproject.io/assets/images/running-jobs-564b55df.png  
   
   
   
-You can see that the value of our fabio job is `3` since it is using the [<u>**system**][36]</u> scheduler type. This makes sense because we are running three Nomad clients in our demo cluster. The value of our Prometheus job, on the other hand, is `1` since we have only deployed one instance of it. To see the description of other metrics, visit the [<u>telemetry][37]</u> section.  
+You can see that the value of our fabio job is `3` since it is using the [<u>**system**][36]</u> scheduler type. This makes sense because we are running three Nomad clients in our demo cluster. 
+- The value of our Prometheus job, on the other hand, is `1` since we have only deployed one instance of it. 
+- To see the description of other metrics, visit the [<u>telemetry][37]</u> section.  
   
 ---
 class:compact, col-2
@@ -317,7 +325,7 @@ Now that we have enabled Prometheus to collect metrics from our cluster and see 
 - Keep in mind that Prometheus sends alerts to Alertmanager. 
 - It is then Alertmanager's job to send out the notifications on those alerts to any designated [<u>**receiver**][40]</u>.  
   
-Create a job for Alertmanager and named it `alertmanager.nomad`  
+Create a job for Alertmanager and name it `alertmanager.nomad`  
   
 ```go  
   
@@ -339,6 +347,7 @@ job "alertmanager" {
 ```
 
 ---
+class:compact
 
 ``` go
     task "alertmanager" {  
@@ -401,7 +410,7 @@ job "prometheus" {
 ```
 
 ---
-
+class:compact
 ``` go
     task "prometheus" {  
       template {  
@@ -433,6 +442,7 @@ global:
 ```
 
 ---
+class:compact
 
 ``` go
 alerting:  
