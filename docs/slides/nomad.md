@@ -286,15 +286,21 @@ $ nomad job run prometheus.nomad
 ```  
   
 Prometheus is now deployed. 
-- You can visit any of your client nodes at port 9999 to visit the web interface. 
+- You can visit any of your client nodes at port `9999` to visit the web interface. 
 - There is only one instance of Prometheus running in the Nomad cluster, but you are automatically routed to it regardless of which node you visit because fabio is deployed and running on the cluster as well.  
-  
+
+---
+
+# continued
+
 At the top menu bar, click on **Status** and then **Targets**. You should see all of your Nomad nodes (servers and clients) show up as targets. Please note that the IP addresses will be different in your cluster.  
   
 https://www.nomadproject.io/assets/images/prometheus-targets-e2a7832d.png  
   
   
-  
+---
+
+# continued
 Let's use Prometheus to query how many jobs are running in our Nomad cluster. On the main page, type `nomad_nomad_job_summary_running` into the query section. You can also select the query from the drop-down list.  
   
 https://www.nomadproject.io/assets/images/running-jobs-564b55df.png  
@@ -307,9 +313,11 @@ You can see that the value of our fabio job is `3` since it is using the [<u>**s
 class:compact, col-2
 # Step 6: Deploy Alertmanager
 
-Now that we have enabled Prometheus to collect metrics from our cluster and see the state of our jobs, let's deploy [<u>Alertmanager][39]</u>. Keep in mind that Prometheus sends alerts to Alertmanager. It is then Alertmanager's job to send out the notifications on those alerts to any designated [<u>receiver][40]</u>.  
+Now that we have enabled Prometheus to collect metrics from our cluster and see the state of our jobs, let's deploy [<u>**Alertmanager**][39]</u>. 
+- Keep in mind that Prometheus sends alerts to Alertmanager. 
+- It is then Alertmanager's job to send out the notifications on those alerts to any designated [<u>**receiver**][40]</u>.  
   
-Create a job for Alertmanager and named it alertmanager.nomad  
+Create a job for Alertmanager and named it `alertmanager.nomad`  
   
 ```go  
   
@@ -328,7 +336,11 @@ job "alertmanager" {
     ephemeral_disk {  
       size = 300  
     }  
-  
+```
+
+---
+
+``` go
     task "alertmanager" {  
       driver = "docker"  
       config {  
