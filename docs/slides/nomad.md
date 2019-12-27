@@ -607,11 +607,14 @@ class:compact, col-2
 
 # Step 9: Stop the Web Server
 
-Run `nomad stop webserver` to stop our webserver. After a few seconds, you will see that we have an active alert in the **Alerts** section of the web interface.  
+Run `nomad stop webserver` to stop our webserver. 
+- After a few seconds, you will see that we have an active alert in the **Alerts** section of the web interface.  
 
 ![active-alert-cfcc7e45.png](https://www.nomadproject.io/assets/images/active-alert-cfcc7e45.png)
   
-We can now go to the Alertmanager web interface to see that Alertmanager has received this alert as well. Since Alertmanager has been configured behind fabio, go to the IP address of any of your client nodes at port `9999` and use `/alertmanager` as the route. An example is shown below:  
+We can now go to the Alertmanager web interface to see that Alertmanager has received this alert as well. 
+- Since Alertmanager has been configured behind fabio, go to the IP address of any of your client nodes at port `9999` and use `/alertmanager` as the route. 
+- An example is shown below:  
   
 ```go    
 < client node IP >:9999/alertmanager  
@@ -621,7 +624,7 @@ We can now go to the Alertmanager web interface to see that Alertmanager has rec
 # continued
 You should see that Alertmanager has received the alert.  
   
-https://www.nomadproject.io/assets/images/alertmanager-webui-612ce20c.png  
+![alertmanager-webui-612ce20c.png](https://www.nomadproject.io/assets/images/alertmanager-webui-612ce20c.png ) 
   
   
   
