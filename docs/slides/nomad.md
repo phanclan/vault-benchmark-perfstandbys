@@ -117,6 +117,8 @@ class:compact, col-2
 # Step 2: Create a Job for Fabio
   
 Create a job for Fabio and name it `fabio.nomad`  
+  - Note that the `type` option is set to [<u>`system`][28]</u> so that fabio will be deployed on all client nodes. 
+  - We have also set `network_mode` to `host` so that fabio will be able to use Consul for service discovery.  
   
 ```go    
 job "fabio" {  
@@ -148,17 +150,16 @@ job "fabio" {
   }  
 }  
 ```  
-  
+
+???
 To learn more about fabio and the options used in this job file, see [<u>Load Balancing with Fabio][27]</u>. 
-- For the purpose of this guide, it is important to note that the `type` option is set to [<u>`system`][28]</u> so that fabio will be deployed on all client nodes. 
-- We have also set `network_mode` to `host` so that fabio will be able to use Consul for service discovery.  
   
 ---
 class:compact, col-2
 
 # Step 3: Run the Fabio Job
   
-We can now register our fabio job:  
+Register our fabio job:  
   
 ```shell    
 *$ nomad job run fabio.nomad  
@@ -171,7 +172,7 @@ We can now register our fabio job:
 ==> Evaluation "7b96701e" finished with status "complete"  
 ```  
   
-At this point, you should be able to visit any one of your client nodes at port `9998` and see the web interface for fabio. 
+You should be able to visit any one of your client nodes at port `9998` and see the web interface for fabio. 
 - The routing table will be empty since we have not yet deployed anything that fabio can route to. 
 - Accordingly, if you visit any of the client nodes at port `9999` at this point, you will get a `404` HTTP response. 
 - That will change soon.  
@@ -203,7 +204,7 @@ job "prometheus" {
 
 ---
 class:compact
-
+# ...continued
 ```go
     task "prometheus" {  
 *      template {  
@@ -237,7 +238,7 @@ EOH
 
 ---
 class:compact, col-2
-
+# ...continued
 ```go
       }  
       driver = "docker"  
@@ -288,7 +289,7 @@ class:compact, col-2
 We can now register our job for Prometheus:  
   
 ```shell    
-$ nomad job run prometheus.nomad  
+*$ nomad job run prometheus.nomad  
 ==> Monitoring evaluation "4e6b7127"  
     Evaluation triggered by job "prometheus"  
     Evaluation within deployment: "d3a651a7"  
@@ -302,7 +303,7 @@ Prometheus is now deployed.
 - There is only one instance of Prometheus running in the Nomad cluster, but you are automatically routed to it regardless of which node you visit because fabio is deployed and running on the cluster as well.  
 
 ---
-class: compact
+class: compact, img-right
 # continued
 
 At the top menu bar, click on **Status** and then **Targets**. 
