@@ -313,7 +313,7 @@ At the top menu bar, click on **Status** and then **Targets**.
 - Please note that the IP addresses will be different in your cluster.  
   
 ---
-class: img-right
+class: compact, col-2
 # continued
 ![running-jobs](https://www.nomadproject.io/assets/images/running-jobs-564b55df.png)
 
