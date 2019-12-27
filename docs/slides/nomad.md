@@ -28,14 +28,14 @@ layout: true
 This guide explains how to configure [<u>Prometheus][8]</u> to integrate with a Nomad cluster and Prometheus [<u>Alertmanager][9]</u>. While this guide introduces the basics of enabling [<u>telemetry][10]</u> and alerting, a Nomad operator can go much further by customizing dashboards and integrating different [<u>receivers][11]</u> for alerts.  
 
 ---
-name:reference-material
+name: reference-material
 # Reference Material
   
 * [<u>Configuring Prometheus][13]</u>  
 * [<u>Telemetry Stanza in Nomad Agent Configuration][14]</u>  
 * [<u>Alerting Overview][15]</u>  
 
----  
+---
 name: estimated-time-to-complete
 # Estimated Time to Complete
   
