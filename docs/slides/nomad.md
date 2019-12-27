@@ -88,6 +88,8 @@ To perform the tasks described in this guide, you need to have a Nomad environme
 ---
 name: steps
 class: title
+background-image: url(vault-background.png)
+
 # Steps  
 
 ---
