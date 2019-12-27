@@ -306,12 +306,11 @@ Prometheus is now deployed.
 class: compact, img-right
 # continued
 
+![prometheus-targets](https://www.nomadproject.io/assets/images/prometheus-targets-e2a7832d.png)  
+
 At the top menu bar, click on **Status** and then **Targets**. 
 - You should see all of your Nomad nodes (servers and clients) show up as targets. 
 - Please note that the IP addresses will be different in your cluster.  
-  
-![prometheus-targets](https://www.nomadproject.io/assets/images/prometheus-targets-e2a7832d.png)  
-  
   
 ---
 class: img-right
