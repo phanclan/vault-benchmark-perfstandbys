@@ -609,12 +609,7 @@ class:compact, col-2
 
 Run `nomad stop webserver` to stop our webserver. After a few seconds, you will see that we have an active alert in the **Alerts** section of the web interface.  
 
-![something](https://www.nomadproject.io/assets/images/active-alert-cfcc7e45.png  )
-
-
-![logo](https://hashicorp.github.io/field-workshops-assets/assets/logos/HashiCorp_Icon_Black.svg)
-  
-  
+![active-alert-cfcc7e45.png](https://www.nomadproject.io/assets/images/active-alert-cfcc7e45.png)
   
 We can now go to the Alertmanager web interface to see that Alertmanager has received this alert as well. Since Alertmanager has been configured behind fabio, go to the IP address of any of your client nodes at port `9999` and use `/alertmanager` as the route. An example is shown below:  
   
