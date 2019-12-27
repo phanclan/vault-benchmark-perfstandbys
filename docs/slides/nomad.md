@@ -303,24 +303,24 @@ Prometheus is now deployed.
 - There is only one instance of Prometheus running in the Nomad cluster, but you are automatically routed to it regardless of which node you visit because fabio is deployed and running on the cluster as well.  
 
 ---
-class: compact, img-right
+class: compact, col-2
 # continued
-
-![prometheus-targets](https://www.nomadproject.io/assets/images/prometheus-targets-e2a7832d.png)  
 
 At the top menu bar, click on **Status** and then **Targets**. 
 - You should see all of your Nomad nodes (servers and clients) show up as targets. 
 - Please note that the IP addresses will be different in your cluster.  
+![prometheus-targets](https://www.nomadproject.io/assets/images/prometheus-targets-e2a7832d.png)  
   
 ---
 class: compact, col-2
 # continued
-![running-jobs](https://www.nomadproject.io/assets/images/running-jobs-564b55df.png)
 
 Let's use Prometheus to query how many jobs are running in our Nomad cluster. 
 - On the main page, type `nomad_nomad_job_summary_running` into the query section. 
 - You can also select the query from the drop-down list.  
   
+![running-jobs](https://www.nomadproject.io/assets/images/running-jobs-564b55df.png)
+
 You can see that the value of our fabio job is `3` since it is using the [<u>**system**][36]</u> scheduler type. This makes sense because we are running three Nomad clients in our demo cluster. 
 - The value of our Prometheus job, on the other hand, is `1` since we have only deployed one instance of it. 
 - To see the description of other metrics, visit the [<u>telemetry][37]</u> section.  
