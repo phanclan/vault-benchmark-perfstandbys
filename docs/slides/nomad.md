@@ -1,5 +1,5 @@
 class: title, smokescreen, shelf, no-footer
-background-image: url(https://story.xaprb.com/slides/adirondack/leo-serrat-533922-unsplash.jpg)
+background-image: url(tech-background-01.png)
 
 # Monitoring: Using Prometheus to Monitor Nomad Metrics
 ## Peter Phan, pphan@hashicorp.com
@@ -14,29 +14,6 @@ layout: true
 ]
 
 ---
-name: getting-started
-# Getting Started
-This script creates leases in AWS.
-- Lease length is 2min.
-- Set your variables in `terraform.tfvars`
-- Run `tf init` and `tf apply`
-- Go to websites
-  - http://consul.pphan.hashidemos.io:8500
-  - http://vault-0.pphan.hashidemos.io:8200
-
-???
-
-notes
-
-
----
-name: img-right
-class: img-right
-![Yosemite](https://story.xaprb.com/slides/adirondack/leo-serrat-533922-unsplash.jpg)
-
-Some text
-
----
   
 # Jump to Section  
   
@@ -48,7 +25,7 @@ Some text
 * [<u>» Steps][6]</u>  
 * [<u>» Next Steps][7]</u>  
   
-# This guide explains how to configure [<u>Prometheus][8]</u> to integrate with a Nomad cluster and Prometheus [<u>Alertmanager][9]</u>. While this guide introduces the basics of enabling [<u>telemetry][10]</u> and alerting, a Nomad operator can go much further by customizing dashboards and integrating different [<u>receivers][11]</u> for alerts.  
+This guide explains how to configure [<u>Prometheus][8]</u> to integrate with a Nomad cluster and Prometheus [<u>Alertmanager][9]</u>. While this guide introduces the basics of enabling [<u>telemetry][10]</u> and alerting, a Nomad operator can go much further by customizing dashboards and integrating different [<u>receivers][11]</u> for alerts.  
 
 ---
 name:reference-material
@@ -59,12 +36,13 @@ name:reference-material
 * [<u>Alerting Overview][15]</u>  
 
 ---  
+name: estimated-time-to-complete
 # Estimated Time to Complete
   
 25 minutes  
 
 ---
-name:challenge
+name: challenge
 # Challenge
 
 Think of a scenario where a Nomad operator needs to deploy Prometheus to collect metrics from a Nomad cluster. 
@@ -72,6 +50,7 @@ Think of a scenario where a Nomad operator needs to deploy Prometheus to collect
 - The operator must also configure Prometheus Alertmanager so notifications can be sent out to a specified [<u>receiver][18]</u>.  
 
 ---
+name: solution
 # Solution
   
 Deploy Prometheus with a configuration that accounts for a highly dynamic environment. 
@@ -81,9 +60,14 @@ Deploy Prometheus with a configuration that accounts for a highly dynamic enviro
 ---
 # Prerequisites
 
-To perform the tasks described in this guide, you need to have a Nomad environment with Consul installed. You can use this [<u>repo][22]</u> to easily provision a sandbox environment. This guide will assume a cluster with one server node and three client nodes.  
+To perform the tasks described in this guide, you need to have a Nomad environment with Consul installed. 
+- You can use this [<u>repo][22]</u> to easily provision a sandbox environment. 
+- This guide will assume a cluster with one server node and three client nodes.  
   
-**Please Note:** This guide is for demo purposes and is only using a single server node. In a production cluster, 3 or 5 server nodes are recommended. The alerting rules defined in this guide are for instructional purposes. Please refer to [<u>Alerting Rules][23]</u> for more information.  
+**Please Note:** This guide is for demo purposes and is only using a single server node. 
+- In a production cluster, 3 or 5 server nodes are recommended. 
+- The alerting rules defined in this guide are for instructional purposes. 
+- Please refer to [<u>Alerting Rules][23]</u> for more information.  
 
 ---
 name: steps
@@ -93,7 +77,7 @@ background-image: url(tech-background-01.png)
 # Steps  
 
 ---
-class:compact, col-2
+class: compact, col-2
 # Step 1: Enable Telemetry on Nomad Servers and Clients 
   
 Add the stanza below in your Nomad client and server configuration files. 
