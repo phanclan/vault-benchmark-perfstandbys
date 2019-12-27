@@ -314,7 +314,6 @@ At the top menu bar, click on **Status** and then **Targets**.
 ---
 class: compact, col-2
 # continued
-
 Let's use Prometheus to query how many jobs are running in our Nomad cluster. 
 - On the main page, type `nomad_nomad_job_summary_running` into the query section. 
 - You can also select the query from the drop-down list.  
