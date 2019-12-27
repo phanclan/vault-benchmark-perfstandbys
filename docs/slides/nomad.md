@@ -236,7 +236,7 @@ EOH
 ```
 
 ---
-class:compact
+class:compact, col-2
 
 ```go
       }  
@@ -309,7 +309,7 @@ At the top menu bar, click on **Status** and then **Targets**.
 - You should see all of your Nomad nodes (servers and clients) show up as targets. 
 - Please note that the IP addresses will be different in your cluster.  
   
-https://www.nomadproject.io/assets/images/prometheus-targets-e2a7832d.png  
+![prometheus-targets](https://www.nomadproject.io/assets/images/prometheus-targets-e2a7832d.png)  
   
   
 ---
@@ -319,10 +319,8 @@ Let's use Prometheus to query how many jobs are running in our Nomad cluster.
 - On the main page, type `nomad_nomad_job_summary_running` into the query section. 
 - You can also select the query from the drop-down list.  
   
-https://www.nomadproject.io/assets/images/running-jobs-564b55df.png  
-  
-  
-  
+![running-jobs](https://www.nomadproject.io/assets/images/running-jobs-564b55df.png)
+
 You can see that the value of our fabio job is `3` since it is using the [<u>**system**][36]</u> scheduler type. This makes sense because we are running three Nomad clients in our demo cluster. 
 - The value of our Prometheus job, on the other hand, is `1` since we have only deployed one instance of it. 
 - To see the description of other metrics, visit the [<u>telemetry][37]</u> section.  
@@ -358,6 +356,7 @@ job "alertmanager" {
 
 ---
 class:compact
+# ...continued
 
 ``` go
     task "alertmanager" {  
@@ -421,6 +420,7 @@ job "prometheus" {
 
 ---
 class:compact
+# ...continued
 ``` go
     task "prometheus" {  
       template {  
@@ -453,7 +453,7 @@ global:
 
 ---
 class:compact
-
+# ...continued
 ``` go
 alerting:  
   alertmanagers:  
@@ -467,17 +467,15 @@ rule_files:
 scrape_configs:  
   
   - job_name: 'alertmanager'  
-  
     consul_sd_configs:  
     - server: '{{ env "NOMAD_IP_prometheus_ui" }}:8500'  
       services: ['alertmanager']  
   
-  - job_name: 'nomad_metrics'  
-  
+  - job_name: 'nomad_metrics'    
     consul_sd_configs:  
     - server: '{{ env "NOMAD_IP_prometheus_ui" }}:8500'  
       services: ['nomad-client', 'nomad']  
-  
+
     relabel_configs:  
     - source_labels: ['__meta_consul_tags']  
       regex: '(.*)http(.*)'  
@@ -488,8 +486,7 @@ scrape_configs:
     params:  
       format: ['prometheus']  
   
-  - job_name: 'webserver'  
-  
+  - job_name: 'webserver'    
     consul_sd_configs:  
     - server: '{{ env "NOMAD_IP_prometheus_ui" }}:8500'  
       services: ['webserver']  
@@ -530,7 +527,10 @@ EOH
   }  
 }  
 ```  
-  
+
+---
+class:compact, col-2
+
 Notice we have added a few important sections to this job file:  
   
 * We added another template stanza that defines an [<u>alerting rule][42]</u> for our web server. Namely, Prometheus will send out an alert if it detects the `webserver` service has disappeared.  
@@ -594,15 +594,11 @@ class:compact
 
 At this point, re-run your Prometheus job. After a few seconds, you will see the web server and Alertmanager appear in your list of targets.  
   
-https://www.nomadproject.io/assets/images/new-targets-7e2bcd93.png  
-  
-  
+![new-targets](https://www.nomadproject.io/assets/images/new-targets-7e2bcd93.png)
   
 You should also be able to go to the **Alerts** section of the Prometheus web interface and see the alert that we have configured. No alerts are active because our web server is up and running.  
   
-https://www.nomadproject.io/assets/images/alerts-ee875c5e.png  
-  
-  
+![alerts](https://www.nomadproject.io/assets/images/alerts-ee875c5e.png)
   
 ---
 class:compact, col-2
