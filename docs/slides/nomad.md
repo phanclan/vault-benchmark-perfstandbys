@@ -1,8 +1,8 @@
 class: title, smokescreen, shelf, no-footer
 background-image: url(tech-background-01.png)
 
-# Monitoring: Using Prometheus to Monitor Nomad Metrics
-## Peter Phan, pphan@hashicorp.com
+## Monitoring: Using Prometheus to Monitor Nomad Metrics
+### Peter Phan, pphan@hashicorp.com
 
 ---
 layout: true
