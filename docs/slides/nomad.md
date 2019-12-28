@@ -15,6 +15,9 @@ layout: true
 ]
 
 ---
+class: img-right-full
+
+![start](images/jukan-tateisi-bJhT_8nbUA0-unsplash.jpg)
 
 # Jump to Section
 
