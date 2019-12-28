@@ -19,7 +19,7 @@ class: img-right-full
 
 ![start](images/jukan-tateisi-bJhT_8nbUA0-unsplash.jpg)
 
-# Jump to Section
+# Getting Started
 
 - [<u>Reference Material ][1]</u>
 - [<u>Estimated Time to Complete][2]</u>
@@ -29,7 +29,10 @@ class: img-right-full
 - [<u>Steps][6]</u>
 - [<u>Next Steps][7]</u>
 
-This guide explains how to configure [<u>Prometheus][8]</u> to integrate with a Nomad cluster and Prometheus [<u>Alertmanager][9]</u>. While this guide introduces the basics of enabling [<u>telemetry][10]</u> and alerting, a Nomad operator can go much further by customizing dashboards and integrating different [<u>receivers][11]</u> for alerts.
+This guide explains how to configure [<u>Prometheus][8]</u> to integrate with a Nomad cluster and Prometheus [<u>Alertmanager][9]</u>. 
+
+???
+While this guide introduces the basics of enabling [<u>telemetry][10]</u> and alerting, a Nomad operator can go much further by customizing dashboards and integrating different [<u>receivers][11]</u> for alerts.
 
 ---
 name: reference-material
