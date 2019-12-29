@@ -187,6 +187,7 @@ background-image: url(tech-background-01.png)
 ## Peter Phan, pphan@hashicorp.com
 
 ---
+class: compact
 
 # Nomad Reference Architecture
 
@@ -206,6 +207,7 @@ This document describes deploying a Nomad cluster in combination with, or with a
 
 ---
 name: reference-architecture
+class: compact
 
 # Reference Architecture
 
@@ -235,7 +237,7 @@ Nomad to Consul connectivity is over HTTP and should be secured with TLS as well
 ---
 name: deployment-topology-within-a-single-region
 
-# Deployment Topology within a Single Region**
+# Deployment Topology within a Single Region
 
 A single Nomad cluster is recommended for applications deployed in the same region.
 
@@ -243,6 +245,8 @@ Each cluster is expected to have either three or five servers. This strikes a ba
 
 The time taken by a new server to join an existing large cluster may increase as the size of the cluster increases.
 
+---
+class: compact
 ## Reference Diagram
 
 ![](https://www.nomadproject.io/assets/images/nomad_reference_diagram-72c969e0.png)
