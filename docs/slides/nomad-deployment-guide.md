@@ -249,7 +249,7 @@ name: acl-configuration
 
 # ACL configuration
 
-The [Access Control][51] guide provides instructions on configuring and enabling ACLs.
+The [Access Control][<https://www.nomadproject.io/guides/security/acl.html]> guide provides instructions on configuring and enabling ACLs.
 
 ---
 name: tls-configuration
@@ -258,7 +258,7 @@ name: tls-configuration
 
 Securing Nomad's cluster communication with mutual TLS (mTLS) is recommended for production deployments and can even ease operations by preventing mistakes and misconfigurations. Nomad clients and servers should not be publicly accessible without mTLS enabled.
 
-The [Securing Nomad with TLS][53] guide provides instructions on configuring and enabling TLS.
+The [Securing Nomad with TLS][<https://www.nomadproject.io/guides/security/securing-nomad.html]> guide provides instructions on configuring and enabling TLS.
 
 ---
 name: start-nomad
@@ -280,8 +280,8 @@ name: next-steps
 
 # Next Steps
 
-- Read [Outage Recovery][56] to learn the steps required to recover from a Nomad cluster outage.
-- Read [Autopilot][57] to learn about features in Nomad 0.8 to allow for automatic operator-friendly management of Nomad servers.
+- Read [Outage Recovery][<https://www.nomadproject.io/guides/operations/outage.html]> to learn the steps required to recover from a Nomad cluster outage.
+- Read [Autopilot][<https://www.nomadproject.io/guides/operations/autopilot.html]> to learn about features in Nomad 0.8 to allow for automatic operator-friendly management of Nomad servers.
 
 [1]: https://www.nomadproject.io/guides/install/production/reference-architecture.html
 [2]: https://www.nomadproject.io/guides/install/production/deployment-guide.html#reference-material
@@ -325,7 +325,3 @@ name: next-steps
 [46]: https://www.nomadproject.io/docs/configuration/server.html#bootstrap_expect
 [48]: https://www.nomadproject.io/docs/configuration/client.html#enabled
 [49]: https://www.nomadproject.io/docs/configuration/client.html#options-parameters
-[51]: https://www.nomadproject.io/guides/security/acl.html
-[53]: https://www.nomadproject.io/guides/security/securing-nomad.html
-[56]: https://www.nomadproject.io/guides/operations/outage.html
-[57]: https://www.nomadproject.io/guides/operations/autopilot.html
