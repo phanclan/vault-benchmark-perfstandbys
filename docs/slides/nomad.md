@@ -247,6 +247,7 @@ The time taken by a new server to join an existing large cluster may increase as
 
 ---
 class: compact
+
 ## Reference Diagram
 
 ![](https://www.nomadproject.io/assets/images/nomad_reference_diagram-72c969e0.png)
@@ -255,7 +256,7 @@ class: compact
 name: deployment-topology-across-multiple-regions
 class: compact
 
-# Deployment Topology across Multiple Regions**
+# Deployment Topology across Multiple Regions
 
 By deploying Nomad server clusters in multiple regions, the user is able to interact with the Nomad servers by targeting any region from any Nomad server even if that server resides in a separate region.
 - However, most data is not replicated between regions as they are fully independent clusters.
@@ -267,6 +268,8 @@ Nomad server clusters in different datacenters can be federated using WAN links.
 
 Additional documentation is available to learn more about [Nomad server federation][19].
 
+---
+
 [**»**][20]** Network Connectivity Details**
 
 …
@@ -277,9 +280,13 @@ Nomad client clusters require the ability to receive traffic as noted above in t
 
 Additional documentation is available to learn more about [Nomad networking][21].
 
+---
+
 [**»**][22]** Deployment System Requirements**
 
 Nomad server agents are responsible for maintaining the cluster state, responding to RPC queries (read operations), and for processing all write operations. Given that Nomad server agents do most of the heavy lifting, server sizing is critical for the overall performance efficiency and health of the Nomad cluster.
+
+---
 
 [**»**][23]** Nomad Servers**
 
@@ -321,6 +328,8 @@ Large
 
 **GCE:** n1-standard-16, n1-standard-32
 
+---
+
 [**»**][24]** Hardware Sizing Considerations**
 
 - The small size would be appropriate for most initial production deployments, or for development/testing environments.
@@ -330,11 +339,15 @@ Large
 
 Nomad clients can be setup with specialized workloads as well. For example, if workloads require GPU processing, a Nomad datacenter can be created to serve those GPU specific jobs and joined to a Nomad server cluster. For more information on specialized workloads, see the documentation on [job constraints][25] to target specific client nodes.
 
+---
+
 [**»**][26]** High Availability**
 
 A Nomad server cluster is the highly-available unit of deployment within a single datacenter. A recommended approach is to deploy a three or five node Nomad server cluster. With this configuration, during a Nomad server outage, failover is handled immediately without human intervention.
 
 When setting up high availability across regions, multiple Nomad server clusters are deployed and connected via WAN gossip. Nomad clusters in regions are fully independent from each other and do not share jobs, clients, or state. Data residing in a single region-specific cluster is not replicated to other clusters in other regions.
+
+---
 
 [**»**][27]** Failure Scenarios**
 
@@ -344,17 +357,25 @@ Typical distribution in a cloud environment is to spread Nomad server nodes into
 
 Additional documentation is available to learn more about [cluster sizing and failure tolerances][28] as well as [outage recovery][29].
 
+---
+
 [**»**][30]** Availability Zone Failure**
 
 In the event of a single AZ failure, only a single Nomad server will be affected which would not impact job scheduling as long as there is still a Raft quorum (i.e. 2 available servers in a 3 server cluster, 3 available servers in a 5 server cluster, etc.). There are two scenarios that could occur should an AZ fail in a multiple AZ setup: leader loss or follower loss.
+
+---
 
 [**»**][31]** Leader Server Loss**
 
 If the AZ containing the Nomad leader server fails, the remaining quorum members would elect a new leader. The new leader then begins to accept new log entries and replicates these entries to the remaining followers.
 
+---
+
 [**»**][32]** Follower Server Loss**
 
 If the AZ containing a Nomad follower server fails, there is no immediate impact to the Nomad leader server or cluster operations. However, there still must be a Raft quorum in order to properly manage a future failure of the Nomad leader server.
+
+---
 
 [**»**][33]** Region Failure**
 
