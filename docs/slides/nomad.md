@@ -151,25 +151,30 @@ When a client agent is first started, it fingerprints the host machine to identi
 
 While a client is running, it is performing heartbeating with servers to maintain liveness. If the heartbeats fail, the servers assume the client node has failed, and stop assigning new tasks while migrating existing tasks. It is impossible to distinguish between a network failure and an agent crash, so both cases are handled the same. Once the network recovers or a crashed agent restarts the node status will be updated and normal operation resumed.
 
+---
+class: compact
+
 To prevent an accumulation of nodes in a terminal state, Nomad does periodic garbage collection of nodes. By default, if a node is in a failed or 'down' state for over 24 hours it will be garbage collected from the system.
 
-Servers are slightly more complex as they perform additional functions. They participate in a [<u>gossip protocol][8]</u> both to cluster within a region and to support multi-region configurations. When a server is first started, it does not know the address of other servers in the cluster. To discover its peers, it must _join_ the cluster. This is done with the [<u>server join command][9]</u> or by providing the proper configuration on start. Once a node joins, this information is gossiped to the entire cluster, meaning all nodes will eventually be aware of each other.
+Servers are slightly more complex as they perform additional functions. They participate in a [<u>gossip protocol][8]</u> both to cluster within a region and to support multi-region configurations. When a server is first started, it does not know the address of other servers in the cluster. To discover its peers, it must _join_ the cluster. This is done with the [<u>`server join` command][9]</u> or by providing the proper configuration on start. Once a node joins, this information is gossiped to the entire cluster, meaning all nodes will eventually be aware of each other.
 
 When a server _leaves_, it specifies its intent to do so, and the cluster marks that node as having _left_. If the server has _left_, replication to it will stop and it is removed from the consensus peer set. If the server has _failed_, replication will attempt to make progress to recover from a software or network failure.
 
 ---
 name: permissions
 
-# [**<u>»**][10]**</u> Permissions**
+# Permissions
 
-Nomad servers should be run with the lowest possible permissions. Nomad clients must be run as root due to the OS isolation mechanisms that require root privileges. In all cases, it is recommended you create a nomad user with the minimal set of required privileges.
+Nomad servers should be run with the lowest possible permissions.
+
+- Nomad clients must be run as root due to the OS isolation mechanisms that require root privileges.
+- In all cases, it is recommended you create a nomad user with the minimal set of required privileges.
 
 
 [6]: https://www.nomadproject.io/docs/drivers/index.html
 [7]: https://www.consul.io/
 [8]: https://www.nomadproject.io/docs/internals/gossip.html
 [9]: https://www.nomadproject.io/docs/commands/server/join.html
-[10]: https://www.nomadproject.io/guides/install/production/nomad-agent.html#permissions
 
 
 ---
