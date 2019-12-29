@@ -153,43 +153,46 @@ Some configuration settings are common to both server and client Nomad agents, w
 - [Configure a Nomad client][39]
 
 ---
+name: common-configuration
 class: compact
 
-# [40]** Common configuration**
+# Common configuration
 
-Create a configuration file at /etc/nomad.d/nomad.hcl:
+Create a configuration file at `/etc/nomad.d/nomad.hcl`:
 
 ```shell
 sudo mkdir --parents /etc/nomad.d
 sudo chmod 700 /etc/nomad.d
 sudo touch /etc/nomad.d/nomad.hcl
+```
 
-Add this configuration to the nomad.hcl configuration file:
+Add this configuration to the `nomad.hcl` configuration file:
 
-**Note:** Replace the datacenter parameter value with the identifier you will use for the datacenter this Nomad cluster is deployed in.
+- **Note:** Replace the `datacenter` parameter value with the identifier you will use for the datacenter this Nomad cluster is deployed in.
 
 ```go
 datacenter = "dc1"
 data_dir = "/opt/nomad"
 ```
 
-- [datacenter][41] - The datacenter in which the agent is running.
-- [data_dir][42] - The data directory for the agent to store state.
+- [`datacenter`][41] - The datacenter in which the agent is running.
+- [`data_dir`][42] - The data directory for the agent to store state.
 
 ---
+name: server-configuration
 class: compact
 
-#[43]** Server configuration**
+# Server configuration
 
-Create a configuration file at /etc/nomad.d/server.hcl:
+Create a configuration file at `/etc/nomad.d/server.hcl`:
 
 ```shell
 sudo touch /etc/nomad.d/server.hcl
 ```
 
-Add this configuration to the server.hcl configuration file:
+Add this configuration to the `server.hcl` configuration file:
 
-**NOTE** Replace the bootstrap_expect value with the number of Nomad servers you will use; three or five [is recommended][44].
+- **NOTE** Replace the `bootstrap_expect` value with the number of Nomad servers you will use; three or five [is recommended][44].
 
 ```go
 server {
@@ -198,39 +201,41 @@ server {
 }
 ```
 
-- [server][45] - Specifies if this agent should run in server mode. All other server options depend on this value being set.
-- [bootstrap_expect][46] - The number of expected servers in the cluster. Either this value should not be provided or the value must agree with other servers in the cluster.
+- [`server`][45] - Specifies if this agent should run in server mode. All other server options depend on this value being set.
+- [`bootstrap_expect`][46] - The number of expected servers in the cluster. Either this value should not be provided or the value must agree with other servers in the cluster.
 
 ---
+name: client-configuration
 class: compact
 
-# [47]** Client configuration**
+# Client configuration
 
-Create a configuration file at /etc/nomad.d/client.hcl:
+Create a configuration file at `/etc/nomad.d/client.hcl`:
 
 ```shell
 sudo touch /etc/nomad.d/client.hcl
 ```
 
-Add this configuration to the client.hcl configuration file:
+Add this configuration to the `client.hcl` configuration file:
+
 ```go
 client {
   enabled = true
 }
 ```
 
-- [client][48] - Specifies if this agent should run in client mode. All other client options depend on this value being set.
-
-**NOTE** The [options][49] parameter can be used to enable or disable specific configurations on Nomad clients, unique to your use case requirements.
+- [`client`][48] - Specifies if this agent should run in client mode. All other client options depend on this value being set.
+- **NOTE** The [options][49] parameter can be used to enable or disable specific configurations on Nomad clients, unique to your use case requirements.
 
 ---
+name: acl-configuration
 
-#[50]** ACL configuration**
+# ACL configuration
 
 The [Access Control][51] guide provides instructions on configuring and enabling ACLs.
 
 ---
-#[52]** TLS configuration**
+# [52]** TLS configuration**
 
 Securing Nomad's cluster communication with mutual TLS (mTLS) is recommended for production deployments and can even ease operations by preventing mistakes and misconfigurations. Nomad clients and servers should not be publicly accessible without mTLS enabled.
 
@@ -249,7 +254,7 @@ sudo systemctl start nomad
 sudo systemctl status nomad
 ```
 
-#[55]** Next Steps**
+# [55]** Next Steps**
 
 - Read [Outage Recovery][56] to learn the steps required to recover from a Nomad cluster outage.
 - Read [Autopilot][57] to learn about features in Nomad 0.8 to allow for automatic operator-friendly management of Nomad servers.
@@ -293,17 +298,13 @@ sudo systemctl status nomad
 [37]: https://www.nomadproject.io/guides/install/production/deployment-guide.html#common-configuration
 [38]: https://www.nomadproject.io/guides/install/production/deployment-guide.html#server-configuration
 [39]: https://www.nomadproject.io/guides/install/production/deployment-guide.html#client-configuration
-[40]: https://www.nomadproject.io/guides/install/production/deployment-guide.html#common-configuration
 [41]: https://www.nomadproject.io/docs/configuration/index.html#datacenter
 [42]: https://www.nomadproject.io/docs/configuration/index.html#data_dir
-[43]: https://www.nomadproject.io/guides/install/production/deployment-guide.html#server-configuration
 [44]: https://www.nomadproject.io/docs/internals/consensus.html#deployment-table
 [45]: https://www.nomadproject.io/docs/configuration/server.html#enabled
 [46]: https://www.nomadproject.io/docs/configuration/server.html#bootstrap_expect
-[47]: https://www.nomadproject.io/guides/install/production/deployment-guide.html#client-configuration
 [48]: https://www.nomadproject.io/docs/configuration/client.html#enabled
 [49]: https://www.nomadproject.io/docs/configuration/client.html#options-parameters
-[50]: https://www.nomadproject.io/guides/install/production/deployment-guide.html#acl-configuration
 [51]: https://www.nomadproject.io/guides/security/acl.html
 [52]: https://www.nomadproject.io/guides/install/production/deployment-guide.html#tls-configuration
 [53]: https://www.nomadproject.io/guides/security/securing-nomad.html
