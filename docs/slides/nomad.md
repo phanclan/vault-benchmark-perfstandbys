@@ -143,7 +143,11 @@ class: compact
 
 Every agent in the Nomad cluster goes through a lifecycle. Understanding this lifecycle is useful for building a mental model of an agent's interactions with a cluster and how the cluster treats a node.
 
-When a client agent is first started, it fingerprints the host machine to identify its attributes, capabilities, and [<u>task drivers][6]</u>. These are reported to the servers during an initial registration. The addresses of known servers are provided to the agent via configuration, potentially using DNS for resolution. Using [<u>Consul][7]</u> provides a way to avoid hard coding addresses and resolving them on demand.
+When a client agent is first started, it fingerprints the host machine to identify its attributes, capabilities, and [task drivers][6].
+
+- These are reported to the servers during an initial registration.
+- The addresses of known servers are provided to the agent via configuration, potentially using DNS for resolution.
+- Using [Consul][7] provides a way to avoid hard coding addresses and resolving them on demand.
 
 While a client is running, it is performing heartbeating with servers to maintain liveness. If the heartbeats fail, the servers assume the client node has failed, and stop assigning new tasks while migrating existing tasks. It is impossible to distinguish between a network failure and an agent crash, so both cases are handled the same. Once the network recovers or a crashed agent restarts the node status will be updated and normal operation resumed.
 
