@@ -116,19 +116,26 @@ There are several important messages that nomad agent outputs:
 
 ---
 name: stopping-an-agent
+class: compact
 
 # Stopping an Agent
 
-An agent can be stopped in two ways: gracefully or forcefully. By default, any signal to an agent (interrupt, terminate, kill) will cause the agent to forcefully stop. Graceful termination can be configured by either setting leave_on_interrupt or leave_on_terminate to respond to the respective signals.
+An agent can be stopped in two ways: gracefully or forcefully.
 
-When gracefully exiting, clients will update their status to terminal on the servers so that tasks can be migrated to healthy agents. 
+- By default, any signal to an agent (interrupt, terminate, kill) will cause the agent to forcefully stop.
+- Graceful termination can be configured by either setting leave_on_interrupt or leave_on_terminate to respond to the respective signals.
+
+When gracefully exiting, clients will update their status to terminal on the servers so that tasks can be migrated to healthy agents.
+
 - Servers will notify their intention to leave the cluster which allows them to leave the [<u>consensus](https://www.nomadproject.io/docs/internals/consensus.html)</u> peer set.
 
-It is especially important that a server node be allowed to leave gracefully so that there will be a minimal impact on availability as the server leaves the consensus peer set. 
+It is especially important that a server node be allowed to leave gracefully so that there will be a minimal impact on availability as the server leaves the consensus peer set.
+
 - If a server does not gracefully leave, and will not return into service, the [<u>server force-leave command](https://www.nomadproject.io/docs/commands/server/force-leave.html  )</u> should be used to eject it from the consensus peer set.
 
 ---
 name: lifecycle
+class: compact
 
 # Lifecycle
 
@@ -144,7 +151,10 @@ Servers are slightly more complex as they perform additional functions. They par
 
 When a server _leaves_, it specifies its intent to do so, and the cluster marks that node as having _left_. If the server has _left_, replication to it will stop and it is removed from the consensus peer set. If the server has _failed_, replication will attempt to make progress to recover from a software or network failure.
 
-[**<u>»**][10]**</u> Permissions**
+---
+name: permissions
+
+# [**<u>»**][10]**</u> Permissions**
 
 Nomad servers should be run with the lowest possible permissions. Nomad clients must be run as root due to the OS isolation mechanisms that require root privileges. In all cases, it is recommended you create a nomad user with the minimal set of required privileges.
 
