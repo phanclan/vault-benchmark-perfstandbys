@@ -149,6 +149,9 @@ When a client agent is first started, it fingerprints the host machine to identi
 - The addresses of known servers are provided to the agent via configuration, potentially using DNS for resolution.
 - Using [Consul][7] provides a way to avoid hard coding addresses and resolving them on demand.
 
+---
+class: compact
+
 While a client is running, it is performing heartbeating with servers to maintain liveness. If the heartbeats fail, the servers assume the client node has failed, and stop assigning new tasks while migrating existing tasks. It is impossible to distinguish between a network failure and an agent crash, so both cases are handled the same. Once the network recovers or a crashed agent restarts the node status will be updated and normal operation resumed.
 
 ---
@@ -156,7 +159,7 @@ class: compact
 
 To prevent an accumulation of nodes in a terminal state, Nomad does periodic garbage collection of nodes. By default, if a node is in a failed or 'down' state for over 24 hours it will be garbage collected from the system.
 
-Servers are slightly more complex as they perform additional functions. They participate in a [<u>gossip protocol][8]</u> both to cluster within a region and to support multi-region configurations. When a server is first started, it does not know the address of other servers in the cluster. To discover its peers, it must _join_ the cluster. This is done with the [<u>`server join` command][9]</u> or by providing the proper configuration on start. Once a node joins, this information is gossiped to the entire cluster, meaning all nodes will eventually be aware of each other.
+Servers are slightly more complex as they perform additional functions. They participate in a [gossip protocol][8] both to cluster within a region and to support multi-region configurations. When a server is first started, it does not know the address of other servers in the cluster. To discover its peers, it must _join_ the cluster. This is done with the [`server join`][9] command or by providing the proper configuration on start. Once a node joins, this information is gossiped to the entire cluster, meaning all nodes will eventually be aware of each other.
 
 When a server _leaves_, it specifies its intent to do so, and the cluster marks that node as having _left_. If the server has _left_, replication to it will stop and it is removed from the consensus peer set. If the server has _failed_, replication will attempt to make progress to recover from a software or network failure.
 
@@ -170,123 +173,224 @@ Nomad servers should be run with the lowest possible permissions.
 - Nomad clients must be run as root due to the OS isolation mechanisms that require root privileges.
 - In all cases, it is recommended you create a nomad user with the minimal set of required privileges.
 
-
 [6]: https://www.nomadproject.io/docs/drivers/index.html
 [7]: https://www.consul.io/
 [8]: https://www.nomadproject.io/docs/internals/gossip.html
 [9]: https://www.nomadproject.io/docs/commands/server/join.html
 
-
 ---
-
-# Prerequisites
-
-To perform the tasks described in this guide, you need to have a Nomad environment with Consul installed.
-
-- You can use this [<u>repo][22]</u> to easily provision a sandbox environment.
-- This guide will assume a cluster with one server node and three client nodes.
-
-**Please Note:** This guide is for demo purposes and is only using a single server node.
-
-- In a production cluster, 3 or 5 server nodes are recommended.
-- The alerting rules defined in this guide are for instructional purposes.
-- Please refer to [<u>Alerting Rules][23]</u> for more information.
-
----
-name: steps
-class: title
+class: title, smokescreen, shelf, no-footer
 background-image: url(tech-background-01.png)
 
-# Steps
+# Reference Architecture
+
+## Peter Phan, pphan@hashicorp.com
 
 ---
-class: compact, col-2
-# Step 1: Enable Telemetry on Nomad Servers and Clients 
 
-Add the stanza below in your Nomad client and server configuration files.
+# Nomad Reference Architecture
 
-- If you have used the provided repo in this guide to set up a Nomad cluster, the configuration file will be `/etc/nomad.d/nomad.hcl`.
+This document provides recommended practices and a reference architecture for HashiCorp Nomad production deployments. This reference architecture conveys a general architecture that should be adapted to accommodate the specific needs of each implementation.
 
-``` go
-telemetry {
-  collection_interval = "1s"
-  disable_hostname = true
-  prometheus_metrics = true
-  publish_allocation_metrics = true
-  publish_node_metrics = true
-}
-```
+The following topics are addressed:
 
-- After making this change, restart the Nomad service on each server and client node.
+- [Reference Architecture][1]
+- [Deployment Topology within a Single Region][2]
+- [Deployment Topology across Multiple Regions][3]
+- [Network Connectivity Details][4]
+- [Deployment System Requirements][5]
+- [High Availability][6]
+- [Failure Scenarios][7]
+
+This document describes deploying a Nomad cluster in combination with, or with access to, a [Consul cluster][8]. We recommend the use of Consul with Nomad to provide automatic clustering, service discovery, health checking and dynamic configuration.
 
 ---
-class:compact, col-2
+name: reference-architecture
 
-# Step 2: Create a Job for Fabio
+# Reference Architecture
 
-Create a job for Fabio and name it `fabio.nomad`
+A Nomad cluster typically comprises three or five servers (but no more than seven) and a number of client agents.
 
-- Note that the `type` option is set to [<u>`system`][28]</u> so that fabio will be deployed on all client nodes. 
-- We have also set `network_mode` to `host` so that fabio will be able to use Consul for service discovery.
+- Nomad differs slightly from Consul in that it divides infrastructure into regions which are served by one Nomad server cluster, but can manage multiple datacenters or availability zones. 
+- For example, a _US Region_ can include datacenters _us-east-1_ and _us-west-2_.
 
-```go
-job "fabio" {
-  datacenters = ["dc1"]
-*  type = "system"
+In a Nomad multi-region architecture, communication happens via [WAN gossip][10].
 
-  group "fabio" {
-    task "fabio" {
-      driver = "docker"
-      config {
-        image = "fabiolb/fabio"
-        network_mode = "host"
-      }
+- Additionally, Nomad can integrate easily with Consul to provide features such as automatic clustering, service discovery, and dynamic configurations.
+- Thus we recommend you use Consul in your Nomad deployment to simplify the deployment.
 
-      resources {
-        cpu    = 100
-        memory = 64
-        network {
-          mbits = 20
-          port "lb" {
-            static = 9999
-          }
-          port "ui" {
-            static = 9998
-          }
-        }
-      }
-    }
-  }
-}
-```
+In cloud environments, a single cluster may be deployed across multiple availability zones.
 
-???
-To learn more about fabio and the options used in this job file, see [<u>Load Balancing with Fabio][27]</u>.
+- For example, in AWS each Nomad server can be deployed to an associated EC2 instance, and those EC2 instances distributed across multiple AZs.
+- Similarly, Nomad server clusters can be deployed to multiple cloud regions to allow for region level HA scenarios.
 
 ---
-class:compact, col-2
 
-# Step 3: Run the Fabio Job
+For more information on Nomad server cluster design, see the [cluster requirements documentation][11].
 
-Register our fabio job:
+The design shared in this document is the recommended architecture for production environments, as it provides flexibility and resilience. Nomad utilizes an existing Consul server cluster; however, the deployment design of the Consul server cluster is outside the scope of this document.
 
-```shell
-*$ nomad job run fabio.nomad
-==> Monitoring evaluation "7b96701e"
-    Evaluation triggered by job "fabio"
-    Allocation "d0e34682" created: node "28d7f859", group "fabio"
-    Allocation "238ec0f7" created: node "510898b6", group "fabio"
-    Allocation "9a2e8359" created: node "f3739267", group "fabio"
-    Evaluation status changed: "pending" -> "complete"
-==> Evaluation "7b96701e" finished with status "complete"
-```
-
-You should be able to visit any one of your client nodes at port `9998` and see the web interface for fabio.
-
-- The routing table will be empty since we have not yet deployed anything that fabio can route to.
-- Accordingly, if you visit any of the client nodes at port `9999` at this point, you will get a `404` HTTP response.
-- That will change soon.
+Nomad to Consul connectivity is over HTTP and should be secured with TLS as well as a Consul token to provide encryption of all traffic. This is done using Nomad's [Automatic Clustering with Consul][12].
 
 ---
-class:compact, col-2
+name: deployment-topology-within-a-single-region
 
+# Deployment Topology within a Single Region**
+
+A single Nomad cluster is recommended for applications deployed in the same region.
+
+Each cluster is expected to have either three or five servers. This strikes a balance between availability in the case of failure and performance, as [Raft][14] consensus gets progressively slower as more servers are added.
+
+The time taken by a new server to join an existing large cluster may increase as the size of the cluster increases.
+
+## Reference Diagram
+
+![](https://www.nomadproject.io/assets/images/nomad_reference_diagram-72c969e0.png)
+
+---
+name: deployment-topology-across-multiple-regions
+class: compact
+
+# Deployment Topology across Multiple Regions**
+
+By deploying Nomad server clusters in multiple regions, the user is able to interact with the Nomad servers by targeting any region from any Nomad server even if that server resides in a separate region.
+- However, most data is not replicated between regions as they are fully independent clusters.
+- The exceptions are [ACL tokens and policies][17], as well as [Sentinel policies in Nomad Enterprise][18], which _are_ replicated between regions.
+
+Nomad server clusters in different datacenters can be federated using WAN links.
+- The server clusters can be joined to communicate over the WAN on port 4648.
+- This same port is used for single datacenter deployments over LAN as well.
+
+Additional documentation is available to learn more about [Nomad server federation][19].
+
+[**»**][20]** Network Connectivity Details**
+
+…
+
+Nomad servers are expected to be able to communicate in high bandwidth, low latency network environments and have below 10 millisecond latencies between cluster members. Nomad servers can be spread across cloud regions or datacenters if they satisfy these latency requirements.
+
+Nomad client clusters require the ability to receive traffic as noted above in the Network Connectivity Details; however, clients can be separated into any type of infrastructure (multi-cloud, on-prem, virtual, bare metal, etc.) as long as they are reachable and can receive job requests from the Nomad servers.
+
+Additional documentation is available to learn more about [Nomad networking][21].
+
+[**»**][22]** Deployment System Requirements**
+
+Nomad server agents are responsible for maintaining the cluster state, responding to RPC queries (read operations), and for processing all write operations. Given that Nomad server agents do most of the heavy lifting, server sizing is critical for the overall performance efficiency and health of the Nomad cluster.
+
+[**»**][23]** Nomad Servers**
+
+**Size**
+
+**CPU**
+
+**Memory**
+
+**Disk**
+
+**Typical Cloud Instance Types**
+
+Small
+
+2 core
+
+8-16 GB RAM
+
+50 GB
+
+**AWS:** m5.large, m5.xlarge
+
+**Azure:** Standard_D2_v3, Standard_D4_v3
+
+**GCE:** n1-standard-8, n1-standard-16
+
+Large
+
+4-8 core
+
+32-64 GB RAM
+
+100 GB
+
+**AWS:** m5.2xlarge, m5.2xlarge
+
+**Azure:** Standard_D4_v3, Standard_D8_v3
+
+**GCE:** n1-standard-16, n1-standard-32
+
+[**»**][24]** Hardware Sizing Considerations**
+
+- The small size would be appropriate for most initial production deployments, or for development/testing environments.
+- The large size is for production environments where there is a consistently high workload.
+
+**NOTE** For large workloads, ensure that the disks support a high number of IOPS to keep up with the rapid Raft log update rate.
+
+Nomad clients can be setup with specialized workloads as well. For example, if workloads require GPU processing, a Nomad datacenter can be created to serve those GPU specific jobs and joined to a Nomad server cluster. For more information on specialized workloads, see the documentation on [job constraints][25] to target specific client nodes.
+
+[**»**][26]** High Availability**
+
+A Nomad server cluster is the highly-available unit of deployment within a single datacenter. A recommended approach is to deploy a three or five node Nomad server cluster. With this configuration, during a Nomad server outage, failover is handled immediately without human intervention.
+
+When setting up high availability across regions, multiple Nomad server clusters are deployed and connected via WAN gossip. Nomad clusters in regions are fully independent from each other and do not share jobs, clients, or state. Data residing in a single region-specific cluster is not replicated to other clusters in other regions.
+
+[**»**][27]** Failure Scenarios**
+
+Typical distribution in a cloud environment is to spread Nomad server nodes into separate Availability Zones (AZs) within a high bandwidth, low latency network, such as an AWS Region. The diagram below shows Nomad servers deployed in multiple AZs promoting a single voting member per AZ and providing both AZ-level and node-level failure protection.
+
+…
+
+Additional documentation is available to learn more about [cluster sizing and failure tolerances][28] as well as [outage recovery][29].
+
+[**»**][30]** Availability Zone Failure**
+
+In the event of a single AZ failure, only a single Nomad server will be affected which would not impact job scheduling as long as there is still a Raft quorum (i.e. 2 available servers in a 3 server cluster, 3 available servers in a 5 server cluster, etc.). There are two scenarios that could occur should an AZ fail in a multiple AZ setup: leader loss or follower loss.
+
+[**»**][31]** Leader Server Loss**
+
+If the AZ containing the Nomad leader server fails, the remaining quorum members would elect a new leader. The new leader then begins to accept new log entries and replicates these entries to the remaining followers.
+
+[**»**][32]** Follower Server Loss**
+
+If the AZ containing a Nomad follower server fails, there is no immediate impact to the Nomad leader server or cluster operations. However, there still must be a Raft quorum in order to properly manage a future failure of the Nomad leader server.
+
+[**»**][33]** Region Failure**
+
+In the event of a region-level failure (which would contain an entire Nomad server cluster), clients will still be able to submit jobs to another region that is properly federated. However, there will likely be data loss as Nomad server clusters do not replicate their data to other region clusters. See [Multi-region Federation][34] for more setup information.
+
+[**»**][35]
+
+
+[1]: https://www.nomadproject.io/guides/install/production/reference-architecture.html#ra
+[2]: https://www.nomadproject.io/guides/install/production/reference-architecture.html#one-region
+[3]: https://www.nomadproject.io/guides/install/production/reference-architecture.html#multi-region
+[4]: https://www.nomadproject.io/guides/install/production/reference-architecture.html#net
+[5]: https://www.nomadproject.io/guides/install/production/reference-architecture.html#system-reqs
+[6]: https://www.nomadproject.io/guides/install/production/reference-architecture.html#high-availability
+[7]: https://www.nomadproject.io/guides/install/production/reference-architecture.html#failure-scenarios
+[8]: https://www.nomadproject.io/guides/integrations/consul-integration/index.html
+[9]: https://www.nomadproject.io/guides/install/production/reference-architecture.html#reference-architecture
+[10]: https://www.nomadproject.io/docs/internals/gossip.html
+[11]: https://www.nomadproject.io/guides/install/production/requirements.html
+[12]: https://www.nomadproject.io/guides/operations/cluster/automatic.html
+[13]: https://www.nomadproject.io/guides/install/production/reference-architecture.html#deployment-topology-within-a-single-region
+[14]: https://raft.github.io/
+[15]: https://www.nomadproject.io/guides/install/production/reference-architecture.html#reference-diagram
+[16]: https://www.nomadproject.io/guides/install/production/reference-architecture.html#deployment-topology-across-multiple-regions
+[17]: https://www.nomadproject.io/guides/security/acl.html
+[18]: https://www.nomadproject.io/guides/governance-and-policy/sentinel/sentinel-policy.html
+[19]: https://www.nomadproject.io/guides/operations/federation.html
+[20]: https://www.nomadproject.io/guides/install/production/reference-architecture.html#network-connectivity-details
+[21]: https://www.nomadproject.io/guides/install/production/requirements.html#network-topology
+[22]: https://www.nomadproject.io/guides/install/production/reference-architecture.html#deployment-system-requirements
+[23]: https://www.nomadproject.io/guides/install/production/reference-architecture.html#nomad-servers
+[24]: https://www.nomadproject.io/guides/install/production/reference-architecture.html#hardware-sizing-considerations
+[25]: https://www.nomadproject.io/docs/job-specification/constraint.html
+[26]: https://www.nomadproject.io/guides/install/production/reference-architecture.html#high-availability
+[27]: https://www.nomadproject.io/guides/install/production/reference-architecture.html#failure-scenarios
+[28]: https://www.nomadproject.io/docs/internals/consensus.html#deployment-table
+[29]: https://www.nomadproject.io/guides/operations/outage.html
+[30]: https://www.nomadproject.io/guides/install/production/reference-architecture.html#availability-zone-failure
+[31]: https://www.nomadproject.io/guides/install/production/reference-architecture.html#leader-server-loss
+[32]: https://www.nomadproject.io/guides/install/production/reference-architecture.html#follower-server-loss
+[33]: https://www.nomadproject.io/guides/install/production/reference-architecture.html#region-failure
+[34]: https://www.nomadproject.io/guides/operations/federation.html
+[35]: https://www.nomadproject.io/guides/install/production/reference-architecture.html#next-steps
