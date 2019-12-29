@@ -91,7 +91,7 @@ The agent is started with the [`nomad agent` command](https://www.nomadproject.i
 When running nomad agent, you should see output similar to this:
 
 ``` shell
-$ nomad agent -dev
+*$ nomad agent -dev
 ==> Starting Nomad agent...
 ==> Nomad agent configuration:
 
@@ -107,6 +107,8 @@ $ nomad agent -dev
 ...
 ```
 
+---
+
 There are several important messages that nomad agent outputs:
 
 - **Client**: This indicates whether the agent has enabled client mode. Client nodes fingerprint their host environment, register with servers, and run tasks.
@@ -120,10 +122,10 @@ class: compact
 
 # Stopping an Agent
 
-An agent can be stopped in two ways: gracefully or forcefully.
+An agent can be stopped in two ways: **gracefully** or **forcefully**.
 
 - By default, any signal to an agent (interrupt, terminate, kill) will cause the agent to forcefully stop.
-- Graceful termination can be configured by either setting leave_on_interrupt or leave_on_terminate to respond to the respective signals.
+- Graceful termination can be configured by either setting `leave_on_interrupt` or `leave_on_terminate` to respond to the respective signals.
 
 When gracefully exiting, clients will update their status to terminal on the servers so that tasks can be migrated to healthy agents.
 
@@ -131,7 +133,7 @@ When gracefully exiting, clients will update their status to terminal on the ser
 
 It is especially important that a server node be allowed to leave gracefully so that there will be a minimal impact on availability as the server leaves the consensus peer set.
 
-- If a server does not gracefully leave, and will not return into service, the [<u>server force-leave command](https://www.nomadproject.io/docs/commands/server/force-leave.html  )</u> should be used to eject it from the consensus peer set.
+- If a server does not gracefully leave, and will not return into service, the [`server force-leave`](https://www.nomadproject.io/docs/commands/server/force-leave.html) command should be used to eject it from the consensus peer set.
 
 ---
 name: lifecycle
