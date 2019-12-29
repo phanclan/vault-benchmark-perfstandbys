@@ -252,18 +252,22 @@ name: acl-configuration
 The [Access Control][51] guide provides instructions on configuring and enabling ACLs.
 
 ---
-# [52]** TLS configuration**
+name: tls-configuration
+
+# TLS configuration
 
 Securing Nomad's cluster communication with mutual TLS (mTLS) is recommended for production deployments and can even ease operations by preventing mistakes and misconfigurations. Nomad clients and servers should not be publicly accessible without mTLS enabled.
 
 The [Securing Nomad with TLS][53] guide provides instructions on configuring and enabling TLS.
 
 ---
+name: start-nomad
 class: compact
 
-# [54]** Start Nomad**
+# Start Nomad
 
-Enable and start Nomad using the systemctl command responsible for controlling systemd managed services. Check the status of the nomad service using systemctl.
+- Enable and start Nomad using the `systemctl` command responsible for controlling systemd managed services.
+- Check the status of the nomad service using `systemctl`.
 
 ```shell
 sudo systemctl enable nomad
@@ -271,7 +275,10 @@ sudo systemctl start nomad
 sudo systemctl status nomad
 ```
 
-# [55]** Next Steps**
+---
+name: next-steps
+
+# Next Steps
 
 - Read [Outage Recovery][56] to learn the steps required to recover from a Nomad cluster outage.
 - Read [Autopilot][57] to learn about features in Nomad 0.8 to allow for automatic operator-friendly management of Nomad servers.
@@ -319,9 +326,6 @@ sudo systemctl status nomad
 [48]: https://www.nomadproject.io/docs/configuration/client.html#enabled
 [49]: https://www.nomadproject.io/docs/configuration/client.html#options-parameters
 [51]: https://www.nomadproject.io/guides/security/acl.html
-[52]: https://www.nomadproject.io/guides/install/production/deployment-guide.html#tls-configuration
 [53]: https://www.nomadproject.io/guides/security/securing-nomad.html
-[54]: https://www.nomadproject.io/guides/install/production/deployment-guide.html#start-nomad
-[55]: https://www.nomadproject.io/guides/install/production/deployment-guide.html#next-steps
 [56]: https://www.nomadproject.io/guides/operations/outage.html
 [57]: https://www.nomadproject.io/guides/operations/autopilot.html
