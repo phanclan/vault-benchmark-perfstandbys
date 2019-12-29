@@ -121,30 +121,28 @@ WantedBy=multi-user.target
 class: compact, col-3
 
 - The following parameters are set for the `[Unit]` stanza:
-  - [Description][18] - Free-form string describing the nomad service
-  - [Documentation][19] - Link to the nomad documentation
-  - [Wants][20] - Configure a dependency on the network service
-  - [After][21] - Configure an ordering dependency on the network service being started before the nomad service
+  - [`Description`][18] - Free-form string describing the nomad service
+  - [`Documentation`][19] - Link to the nomad documentation
+  - [`Wants`][20] - Configure a dependency on the network service
+  - [`After`][21] - Configure an ordering dependency on the network service being started before the nomad service
 
-The following parameters are set for the `[Service]` stanza:
+- The following parameters are set for the `[Service]` stanza:
+  - [`ExecReload`][22] - Send Nomad a SIGHUP signal to trigger a configuration reload
+  - [`ExecStart`][23] - Start Nomad with the agent argument and path to a directory of configuration files
+  - [`KillMode`][24] - Treat nomad as a single process
+  - [`LimitNOFILE`, `LimitNPROC`][25] - Disable limits for file descriptors and processes
+  - [`RestartSec`][26] - Restart nomad after 2 seconds of it being considered 'failed'
+  - [`Restart`][27] - Restart nomad unless it returned a clean exit code
+  - [`StartLimitBurst`, `StartLimitIntervalSec`][28] - Configure unit start rate limiting
+  - [`TasksMax`][29] - Disable task limits (only available in systemd >= 226)
 
-- [ExecReload][22] - Send Nomad a SIGHUP signal to trigger a configuration reload
-- [ExecStart][23] - Start Nomad with the agent argument and path to a directory of configuration files
-- [KillMode][24] - Treat nomad as a single process
-- [LimitNOFILE, LimitNPROC][25] - Disable limits for file descriptors and processes
-- [RestartSec][26] - Restart nomad after 2 seconds of it being considered 'failed'
-- [Restart][27] - Restart nomad unless it returned a clean exit code
-- [StartLimitBurst, StartLimitIntervalSec][28] - Configure unit start rate limiting
-- [TasksMax][29] - Disable task limits (only available in systemd >= 226)
-
-The following parameters are set for the [Install] stanza:
-
-- [WantedBy][30] - Creates a weak dependency on nomad being started by the multi-user run level
+- The following parameters are set for the `[Install]` stanza:
+  - [`WantedBy`][30] - Creates a weak dependency on nomad being started by the multi-user run level
 
 ---
 class: compact
 
-#[ 31]** Configure Nomad**
+# [ 31]** Configure Nomad**
 
 Nomad uses [documented sane defaults][32] so only non-default values must be set in the configuration file. Configuration can be read from multiple files and is loaded in lexical order. See the [full description][33] for more information about configuration loading and merge semantics.
 
