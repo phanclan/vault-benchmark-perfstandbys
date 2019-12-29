@@ -91,9 +91,10 @@ sudo mkdir --parents /opt/nomad
 ```
 
 ---
+name: configure-systemd
 class: compact, col-2
 
-# [16] Configure systemd
+# Configure systemd
 
 Systemd uses [documented sane defaults][17] so only non-default values must be set in the configuration file.
 
@@ -279,7 +280,6 @@ sudo systemctl status nomad
 [12]: https://www.nomadproject.io/guides/install/production/deployment-guide.html#download-nomad
 [13]: https://releases.hashicorp.com/nomad/
 [14]: https://www.hashicorp.com/security.html
-[16]: https://www.nomadproject.io/guides/install/production/deployment-guide.html#configure-systemd
 [17]: https://www.freedesktop.org/software/systemd/man/systemd.directives.html
 [18]: https://www.freedesktop.org/software/systemd/man/systemd.unit.html#Description=
 [19]: https://www.freedesktop.org/software/systemd/man/systemd.unit.html#Documentation=
