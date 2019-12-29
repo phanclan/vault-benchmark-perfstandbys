@@ -84,7 +84,7 @@ sudo mkdir --parents /opt/nomad
 ---
 class: compact, col-2
 
-# [16]** Configure systemd**
+# [16] Configure systemd
 
 Systemd uses [documented sane defaults][17] so only non-default values must be set in the configuration file.
 
@@ -120,14 +120,13 @@ WantedBy=multi-user.target
 ---
 class: compact, col-3
 
-The following parameters are set for the [Unit] stanza:
+- The following parameters are set for the `[Unit]` stanza:
+  - [Description][18] - Free-form string describing the nomad service
+  - [Documentation][19] - Link to the nomad documentation
+  - [Wants][20] - Configure a dependency on the network service
+  - [After][21] - Configure an ordering dependency on the network service being started before the nomad service
 
-- [Description][18] - Free-form string describing the nomad service
-- [Documentation][19] - Link to the nomad documentation
-- [Wants][20] - Configure a dependency on the network service
-- [After][21] - Configure an ordering dependency on the network service being started before the nomad service
-
-The following parameters are set for the [Service] stanza:
+The following parameters are set for the `[Service]` stanza:
 
 - [ExecReload][22] - Send Nomad a SIGHUP signal to trigger a configuration reload
 - [ExecStart][23] - Start Nomad with the agent argument and path to a directory of configuration files
