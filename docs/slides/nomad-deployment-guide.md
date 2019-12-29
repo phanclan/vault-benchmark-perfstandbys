@@ -158,7 +158,7 @@ class: compact, col-2
 
 # Common configuration
 
-Create a configuration file at `/etc/nomad.d/nomad.hcl`:
+- Create a configuration file at `/etc/nomad.d/nomad.hcl`:
 
 ```shell
 sudo mkdir --parents /etc/nomad.d
@@ -166,8 +166,7 @@ sudo chmod 700 /etc/nomad.d
 sudo touch /etc/nomad.d/nomad.hcl
 ```
 
-Add this configuration to the `nomad.hcl` configuration file:
-
+- Add this configuration to the `nomad.hcl` configuration file:
 - **Note:** Replace the `datacenter` parameter value with the identifier you will use for the datacenter this Nomad cluster is deployed in.
 
 ```go
