@@ -184,14 +184,13 @@ class: compact, col-2
 
 # Server configuration
 
-Create a configuration file at `/etc/nomad.d/server.hcl`:
+- Create a configuration file at `/etc/nomad.d/server.hcl`:
 
 ```shell
 sudo touch /etc/nomad.d/server.hcl
 ```
 
-Add this configuration to the `server.hcl` configuration file:
-
+- Add this configuration to the `server.hcl` configuration file:
 - **NOTE** Replace the `bootstrap_expect` value with the number of Nomad servers you will use; three or five [is recommended][44].
 
 ```go
