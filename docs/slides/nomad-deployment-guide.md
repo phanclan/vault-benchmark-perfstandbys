@@ -205,17 +205,17 @@ server {
 
 ---
 name: client-configuration
-class: compact
+class: compact, col-2
 
 # Client configuration
 
-Create a configuration file at `/etc/nomad.d/client.hcl`:
+- Create a configuration file at `/etc/nomad.d/client.hcl`:
 
 ```shell
 sudo touch /etc/nomad.d/client.hcl
 ```
 
-Add this configuration to the `client.hcl` configuration file:
+- Add this configuration to the `client.hcl` configuration file:
 
 ```go
 client {
