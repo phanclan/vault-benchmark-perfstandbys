@@ -44,39 +44,48 @@ These setup steps should be completed on all Nomad hosts:
 - [Start Nomad][11]
 
 ---
+name: download-nomad
 class: compact
-# [12] Download Nomad
 
-Precompiled Nomad binaries are available for download at [https://releases.hashicorp.com/nomad/][13] and Nomad Enterprise binaries are available for download by following the instructions made available to HashiCorp Enterprise customers.
+# Download Nomad
+
+- Precompiled Nomad binaries are available for download at [https://releases.hashicorp.com/nomad/][13]
+- Nomad Enterprise binaries are available for download by following the instructions made available to HashiCorp Enterprise customers.
 
 ``` shell
 export NOMAD_VERSION="0.9.0"
 curl --silent --remote-name https://releases.hashicorp.com/nomad/${NOMAD_VERSION}/nomad_${NOMAD_VERSION}_linux_amd64.zip
 ```
 
-You may perform checksum verification of the zip packages using the SHA256SUMS and SHA256SUMS.sig files available for the specific release version. HashiCorp provides [a guide on checksum verification][14] for precompiled binaries.
+- You may perform checksum verification of the zip packages using the SHA256SUMS and SHA256SUMS.sig files available for the specific release version.
+- HashiCorp provides [a guide on checksum verification][14] for precompiled binaries.
 
 ---
-class: compact
+name: install-nomad
+class: compact, col-2
 
-# [15]** Install Nomad**
+# Install Nomad
 
-Unzip the downloaded package and move the nomad binary to /usr/local/bin/. Check nomad is available on the system path.
+- Unzip the downloaded package and move the `nomad` binary to `/usr/local/bin/`.
+- Check `nomad` is available on the system path.
 
 ``` shell
 unzip nomad_${NOMAD_VERSION}_linux_amd64.zip
 sudo chown root:root nomad
 sudo mv nomad /usr/local/bin/
 nomad version
+```
 
-The nomad command features opt-in autocompletion for flags, subcommands, and arguments (where supported). Enable autocompletion.
+- The `nomad` command features opt-in autocompletion for flags, subcommands, and arguments (where supported).
+- Enable autocompletion.
 
 ``` shell
 nomad -autocomplete-install
 complete -C /usr/local/bin/nomad nomad
 ```
 
-Create a data directory for Nomad.
+- Create a data directory for Nomad.
+
 ``` shell
 sudo mkdir --parents /opt/nomad
 ```
@@ -88,13 +97,13 @@ class: compact, col-2
 
 Systemd uses [documented sane defaults][17] so only non-default values must be set in the configuration file.
 
-Create a Nomad service file at /etc/systemd/system/nomad.service.
+- Create a Nomad service file at `/etc/systemd/system/nomad.service`.
 
 ```shell
 sudo touch /etc/systemd/system/nomad.service
 ```
 
-Add this configuration to the Nomad service file:
+- Add this configuration to the Nomad service file:
 ```yaml
 [Unit]
 Description=Nomad
@@ -263,7 +272,6 @@ sudo systemctl status nomad
 [4]: https://www.consul.io/docs/guides/deployment-guide.html
 [5]: https://www.nomadproject.io/guides/install/production/deployment-guide.html#overview
 [6]: https://www.nomadproject.io/guides/install/production/reference-architecture.html
-[7]: https://www.nomadproject.io/guides/install/production/deployment-guide.html#download-nomad
 [8]: https://www.nomadproject.io/guides/install/production/deployment-guide.html#install-nomad
 [9]: https://www.nomadproject.io/guides/install/production/deployment-guide.html#configure-systemd
 [10]: https://www.nomadproject.io/guides/install/production/deployment-guide.html#configure-nomad
@@ -271,7 +279,6 @@ sudo systemctl status nomad
 [12]: https://www.nomadproject.io/guides/install/production/deployment-guide.html#download-nomad
 [13]: https://releases.hashicorp.com/nomad/
 [14]: https://www.hashicorp.com/security.html
-[15]: https://www.nomadproject.io/guides/install/production/deployment-guide.html#install-nomad
 [16]: https://www.nomadproject.io/guides/install/production/deployment-guide.html#configure-systemd
 [17]: https://www.freedesktop.org/software/systemd/man/systemd.directives.html
 [18]: https://www.freedesktop.org/software/systemd/man/systemd.unit.html#Description=
