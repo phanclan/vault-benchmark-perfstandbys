@@ -111,6 +111,7 @@ Description=Nomad
 Documentation=https://nomadproject.io/docs/
 Wants=network-online.target
 After=network-online.target
+
 [Service]
 ExecReload=/bin/kill -HUP $MAINPID
 ExecStart=/usr/local/bin/nomad agent -config /etc/nomad.d
@@ -123,18 +124,22 @@ RestartSec=2
 StartLimitBurst=3
 StartLimitIntervalSec=10
 TasksMax=infinity
+
 [Install]
 WantedBy=multi-user.target
 ```
 
 ---
-class: compact, col-3
+class: compact
 
 - The following parameters are set for the `[Unit]` stanza:
   - [`Description`][18] - Free-form string describing the nomad service
   - [`Documentation`][19] - Link to the nomad documentation
   - [`Wants`][20] - Configure a dependency on the network service
   - [`After`][21] - Configure an ordering dependency on the network service being started before the nomad service
+
+---
+class: compact
 
 - The following parameters are set for the `[Service]` stanza:
   - [`ExecReload`][22] - Send Nomad a SIGHUP signal to trigger a configuration reload
@@ -150,17 +155,21 @@ class: compact, col-3
   - [`WantedBy`][30] - Creates a weak dependency on nomad being started by the multi-user run level
 
 ---
+name: configure-nomad
 class: compact
 
-# [ 31]** Configure Nomad**
+# Configure Nomad
 
-Nomad uses [documented sane defaults][32] so only non-default values must be set in the configuration file. Configuration can be read from multiple files and is loaded in lexical order. See the [full description][33] for more information about configuration loading and merge semantics.
+Nomad uses [documented sane defaults][32] so only non-default values must be set in the configuration file.
+
+- Configuration can be read from multiple files and is loaded in lexical order.
+- See the [full description][33] for more information about configuration loading and merge semantics.
 
 Some configuration settings are common to both server and client Nomad agents, while some configuration settings must only exist on one or the other. Follow the [common configuration][34] guidance on all hosts and then the specific guidance depending on whether you are configuring a Nomad [server][35] or [client][36].
 
-- [Common Nomad configuration][37]
-- [Configure a Nomad server][38]
-- [Configure a Nomad client][39]
+- [Common Nomad configuration](common-configuration)
+- [Configure a Nomad server](server-configuration)
+- [Configure a Nomad client](client-configuration)
 
 ---
 name: common-configuration
@@ -294,7 +303,6 @@ sudo systemctl status nomad
 [28]: https://www.freedesktop.org/software/systemd/man/systemd.unit.html#StartLimitIntervalSec=interval
 [29]: https://www.freedesktop.org/software/systemd/man/systemd.resource-control.html#TasksMax=N
 [30]: https://www.freedesktop.org/software/systemd/man/systemd.unit.html#WantedBy=
-[31]: https://www.nomadproject.io/guides/install/production/deployment-guide.html#configure-nomad
 [32]: https://www.nomadproject.io/docs/configuration/index.html
 [33]: https://www.nomadproject.io/docs/configuration/index.html
 [34]: https://www.nomadproject.io/guides/install/production/deployment-guide.html#common-configuration
