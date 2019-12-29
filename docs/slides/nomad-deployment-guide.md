@@ -154,7 +154,7 @@ Some configuration settings are common to both server and client Nomad agents, w
 
 ---
 name: common-configuration
-class: compact
+class: compact, col-2
 
 # Common configuration
 
@@ -180,7 +180,7 @@ data_dir = "/opt/nomad"
 
 ---
 name: server-configuration
-class: compact
+class: compact, col-2
 
 # Server configuration
 
