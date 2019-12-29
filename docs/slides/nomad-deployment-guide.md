@@ -167,9 +167,9 @@ Nomad uses [documented sane defaults][32] so only non-default values must be set
 
 Some configuration settings are common to both server and client Nomad agents, while some configuration settings must only exist on one or the other. Follow the [common configuration][34] guidance on all hosts and then the specific guidance depending on whether you are configuring a Nomad [server][35] or [client][36].
 
-- [Common Nomad configuration](common-configuration)
-- [Configure a Nomad server](server-configuration)
-- [Configure a Nomad client](client-configuration)
+- [Common Nomad configuration](#common-configuration)
+- [Configure a Nomad server](#server-configuration)
+- [Configure a Nomad client](#client-configuration)
 
 ---
 name: common-configuration
