@@ -118,7 +118,9 @@ class: compact, col-2
 
 # Stopping the Agent
 
-You can use `Ctrl-C` (the interrupt signal) to halt the agent. By default, all signals will cause the agent to forcefully shutdown. The agent [can be configured][7] to gracefully leave on either the interrupt or terminate signals.
+- You can use `Ctrl-C` (the interrupt signal) to halt the agent.
+  - By default, all signals will cause the agent to forcefully shutdown.
+  - The agent [can be configured][7] to gracefully leave on either the **interrupt** or **terminate** signals.
 
 After interrupting the agent, you should see it leave the cluster and shut down:
 
@@ -132,9 +134,20 @@ After interrupting the agent, you should see it leave the cluster and shut down:
     [INFO] agent: shutdown complete
 ```
 
-By gracefully leaving, Nomad clients update their status to prevent further tasks from being scheduled and to start migrating any tasks that are already assigned. Nomad servers notify their peers they intend to leave. When a server leaves, replication to that server stops. If a server fails, replication continues to be attempted until the node recovers. Nomad will automatically try to reconnect to _failed_ nodes, allowing it to recover from certain network conditions, while _left_ nodes are no longer contacted.
+- By gracefully leaving, Nomad clients update their status to prevent further tasks from being scheduled and to start migrating any tasks that are already assigned. 
+  - Nomad servers notify their peers they intend to leave. 
+  - When a server leaves, replication to that server stops. 
+  - If a server fails, replication continues to be attempted until the node recovers. 
+  - Nomad will automatically try to reconnect to _failed_ nodes, allowing it to recover from certain network conditions, while _left_ nodes are no longer contacted.
 
-If an agent is operating as a server, [`leave_on_terminate`][8] should only be set if the server will never rejoin the cluster again. The default value of false for `leave_on_terminate` and `leave_on_interrupt` work well for most scenarios. If Nomad servers are part of an auto scaling group where new servers are brought up to replace failed servers, using graceful leave avoids causing a potential availability outage affecting the [consensus protocol][9]. As of Nomad 0.8, Nomad includes Autopilot which automatically removes failed or dead servers. This allows the operator to skip setting `leave_on_terminate`
+---
+class: compact
+
+- If an agent is operating as a server, [`leave_on_terminate`][8] should only be set if the server will never rejoin the cluster again. 
+  - The default value of false for `leave_on_terminate` and `leave_on_interrupt` work well for most scenarios. 
+  - If Nomad servers are part of an auto scaling group where new servers are brought up to replace failed servers, using graceful leave avoids causing a potential availability outage affecting the [consensus protocol][9]. 
+  - As of Nomad 0.8, Nomad includes Autopilot which automatically removes failed or dead servers. 
+  - This allows the operator to skip setting `leave_on_terminate`
 
 ---
 class: compact
