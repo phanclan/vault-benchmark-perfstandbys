@@ -404,7 +404,10 @@ class: compact, col-2
 ---
 class: compact, col-2
 
-- Now, let's try to do an application update. In this case, we will simply change the version of redis we want to run. Edit the `example.nomad` file and change the Docker image from "`redis:3.2`" to "`redis:4.0`". This is located around line `261`.
+- Let's do an application update. 
+  - We will change the version of redis we want to run. 
+  - Edit the `example.nomad` file and change the Docker image from "`redis:3.2`" to "`redis:4.0`". 
+    - This is located around line `261`.
 
 ```go
 # Configure Docker driver with the image
@@ -416,13 +419,14 @@ config {
 ---
 class: compact, col-2
 
-- We can run plan again to see what will happen if we submit this change:
-  - The plan output shows us that one allocation will be updated and that the other two will be ignored. This is due to the `max_parallel` setting in the `update` stanza, which is set to `1` to instruct Nomad to perform only a single change at a time.
+- We can run `nomad job plan` again to see what will happen if we submit this change:
+  - The `plan` output shows us that one allocation will be updated and that the other two will be ignored. 
+  - This is due to the `max_parallel` setting in the `update` stanza, which is set to `1` to instruct Nomad to perform only a single change at a time.
 
 ```shell
 $ nomad job plan example.nomad
 +/- Job: "example"
-+/- Task Group: "cache" (1 create/destroy update, 2 ignore)
+*+/- Task Group: "cache" (1 create/destroy update, 2 ignore)
   +/- Task: "redis" (forces create/destroy update)
     +/- Config {
       +/- image:           "redis:3.2" => "redis:4.0"
@@ -449,7 +453,7 @@ class: compact, col-2
 - Once ready, use `nomad job run` to push the updated specification:
 
 ```shell
-$ nomad job run example.nomad
+*$ nomad job run example.nomad
 ==> Monitoring evaluation "293b313a"
     Evaluation triggered by job "example"
     Evaluation within deployment: "f4047b3a"
@@ -458,9 +462,39 @@ $ nomad job run example.nomad
 ==> Evaluation "293b313a" finished with status "complete"
 ```
 
+---
+class: compact, col-2
+
 - After running, the rolling upgrade can be followed by running `nomad status` and watching the deployed count.
 - We can see that Nomad handled the update in three phases, only updating a single allocation in each phase and waiting for it to be healthy for `min_healthy_time` of `10` seconds before moving on to the next. 
-  - The update strategy can be configured, but rolling updates makes it easy to upgrade an application at large scale.
+- The update strategy can be configured, but rolling updates makes it easy to upgrade an application at large scale.
+
+```shell
+*$ nomad status example
+ID            = example
+...
+Summary
+Task Group  Queued  Starting  Running  Failed  Complete  Lost
+cache       0       0         3        0       3         0
+
+Latest Deployment
+ID          = 6eb0d89e
+Status      = successful
+Description = Deployment completed successfully
+
+Deployed
+Task Group  Desired  Placed  Healthy  Unhealthy  Progress Deadline
+cache       3        3       3        0          2019-12-30T21:05:13Z
+
+Allocations
+ID        Node ID   Task Group  Version  Desired  Status    Created     Modified
+0a60166b  36f0faa2  cache       2        run      running   54s ago     42s ago
+de99d024  36f0faa2  cache       2        run      running   1m9s ago    56s ago
+50725887  36f0faa2  cache       2        run      running   1m31s ago   1m10s ago
+857be359  36f0faa2  cache       1        stop     complete  10m9s ago   1m8s ago
+cec3d753  36f0faa2  cache       1        stop     complete  10m9s ago   54s ago
+74e7c86a  36f0faa2  cache       1        stop     complete  47m43s ago  1m31s ago
+```
 
 ---
 class: compact, col-2
