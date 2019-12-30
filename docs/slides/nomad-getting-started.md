@@ -114,7 +114,7 @@ nomad.global  127.0.0.1  4648  alive   true    2         0.9.6  dc1         glob
 
 ---
 name: stopping-the-agent
-class: compact, col-2
+class: compact
 
 # Stopping the Agent
 
@@ -133,10 +133,14 @@ class: compact, col-2
     [INFO] agent: shutdown complete
 ```
 
-- By gracefully leaving, Nomad clients update their status to prevent further tasks from being scheduled and to start migrating any tasks that are already assigned. 
+---
+class: compact
+
+- By gracefully leaving, 
+  - Nomad clients update their status to prevent further tasks from being scheduled and to start migrating any tasks that are already assigned. 
   - Nomad servers notify their peers they intend to leave. 
-  - When a server leaves, replication to that server stops. 
-  - If a server fails, replication continues to be attempted until the node recovers. 
+    - When a server leaves, replication to that server stops. 
+    - If a server fails, replication continues to be attempted until the node recovers. 
   - Nomad will automatically try to reconnect to _failed_ nodes, allowing it to recover from certain network conditions, while _left_ nodes are no longer contacted.
 
 ---
@@ -146,7 +150,7 @@ class: compact
   - The default value of false for `leave_on_terminate` and `leave_on_interrupt` work well for most scenarios. 
   - If Nomad servers are part of an auto scaling group where new servers are brought up to replace failed servers, using graceful leave avoids causing a potential availability outage affecting the [consensus protocol][9]. 
   - As of Nomad 0.8, Nomad includes Autopilot which automatically removes failed or dead servers. 
-  - This allows the operator to skip setting `leave_on_terminate`
+    - This allows the operator to skip setting `leave_on_terminate`
 
 ---
 class: compact
