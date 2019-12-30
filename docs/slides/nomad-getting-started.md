@@ -35,7 +35,7 @@ class: compact, col-2
 ```
 
 ---
-class: compact, col-2
+class: compact
 
 - The Nomad agent has started and has output some log data.
   - agent is running in both **client** and **server** mode
@@ -93,7 +93,8 @@ ID        DC   Name   Class   Drain  Eligibility  Status
 171a583b  dc1  nomad  <none>  false  eligible     ready
 ```
 
-The output shows our Node ID, which is a randomly generated UUID, its datacenter, node name, node class, drain mode and current status. We can see that our node is in the ready state, and task draining is currently off.
+- The output shows our Node ID, which is a randomly generated UUID, its datacenter, node name, node class, drain mode and current status.
+- We can see that our node is in the ready state, and task draining is currently off.
 
 ---
 class: compact, col-2
