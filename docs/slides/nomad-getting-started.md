@@ -863,11 +863,14 @@ class: img-right
 
 ![intro-ui-job-detail](https://learn.hashicorp.com/static/img/intro-ui-job-detail.png)
 
-- You should be automatically redirected to `/ui/jobs` upon visiting the UI in your browser.
+- You should be redirected to `/ui/jobs` upon visiting the UI.
 - This pages lists all jobs known to Nomad, regardless of status.
 - Click the `example` job to inspect it.
 - The job detail page shows pertinent information about the job, including overall status as well as allocation statuses broken down by task group.
   - It is similar to the `nomad status` CLI command.
+
+???
+
 - **Note**: You may see a different number of allocations on your node next to **Allocation Status** depending on how many times you have stopped and restarted jobs.
 
 ---
@@ -881,7 +884,7 @@ class: img-left
 ---
 class: img-left
 
-![intro-ui-task-group-detail](https://learn.hashicorp.com/static/img/intro-ui-task-group-detail.png)
+![intro-ui-task-group-detail](https://learn.hashicorp.com/static/img/intro-ui-alloc-status.png)
 
 - Click on an `allocation` in the allocations table.
 - This page lists all tasks for an allocation as well as the recent events for each task.
