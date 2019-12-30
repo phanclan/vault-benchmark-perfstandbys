@@ -703,23 +703,27 @@ sed 's/client1/client2/g;s/5656/5657/g' client1.hcl > client2.hcl
 ```
 
 - Once you have created both `client1.hcl` and `client2.hcl`, start the agents.
-  - In the output we can see the agent is running in **_client_** mode only. 
-  - This agent will be available to run tasks but will not participate in managing the cluster or making scheduling decisions.
 
 ```shell
 nomad agent -config client1.hcl > /tmp/nomadclient1.log 2>&1 &
 nomad agent -config client2.hcl > /tmp/nomadclient2.log 2>&1 &
 ```
 
+---
+class: compact, col-2
+
+- In the output we can see the agent is running in **_client_** mode only.
+- This agent will be available to run tasks but will not participate in managing the cluster or making scheduling decisions.
+
 ```shell
-$ cat /tmp/nomadclient1.log
+$ head /tmp/nomadclient1.log
 ==> Starting Nomad agent...
 ==> Nomad agent configuration:
 
-                Client: true
+*               Client: true
              Log Level: DEBUG
                 Region: global (DC: dc1)
-                Server: false
+*               Server: false
                Version: 0.9.6
 
 ==> Nomad agent started! Log data will stream in below:
@@ -734,7 +738,7 @@ $ cat /tmp/nomadclient1.log
 class: compact, col-2
 
 - Using the [`nomad node status` command][3] we should see both nodes in the ready state:
-- We now have a simple three node cluster running. 
+- We now have a simple three node cluster running.
   - The only difference between a demo and full production cluster is that we are running a single server instead of three or five.
 
 ```shell
@@ -744,53 +748,67 @@ fca62612  dc1  client1  <none>  false  eligible     ready
 c887deef  dc1  client2  <none>  false  eligible     ready
 ```
 
-# Submit a Job**
+---
+class: compact, col-2
 
-- Now that we have a simple cluster, we can use it to schedule a job. We should still have the `example.nomad` job file from before, but verify that the count is still set to 3.
+# Submit a Job
+
+- Now that we have a simple cluster, we can use it to schedule a job. We should still have the `example.nomad` job file from before, but verify that the count is still set to `3`.
 - Then, use the [job run command][4] to submit the job:
-    - ```
-        $ nomad job run example.nomad
-        ==> Monitoring evaluation "8e0a7cf9"
-            Evaluation triggered by job "example"
-            Evaluation within deployment: "0917b771"
-            Allocation "501154ac" created: node "c887deef", group "cache"
-            Allocation "7e2b3900" created: node "fca62612", group "cache"
-            Allocation "9c66fcaf" created: node "c887deef", group "cache"
-            Evaluation status changed: "pending" -> "complete"
-        ==> Evaluation "8e0a7cf9" finished with status "complete"
-- We can see in the output that the scheduler assigned two of the tasks for one of the client nodes and the remaining task to the second client.
-- We can again use the [`status command`][5] to verify:
-    - ```
-        $ nomad status example
-        ID          = example
-        Name        = example
-        Submit Date   = 07/26/19 16:34:58 UTC
-        Type        = service
-        Priority    = 50
-        Datacenters = dc1
-        Status      = running
-        Periodic    = false
-        Parameterized = false
+  - We can see in the output that the scheduler assigned two of the tasks for one of the client nodes and the remaining task to the second client.
 
-        Summary
-        Task Group  Queued  Starting  Running  Failed  Complete  Lost
-        cache       0       0         3        0       0         0
+```shell
+$ nomad job run example.nomad
+==> Monitoring evaluation "8e0a7cf9"
+    Evaluation triggered by job "example"
+    Evaluation within deployment: "0917b771"
+    Allocation "501154ac" created: node "c887deef", group "cache"
+    Allocation "7e2b3900" created: node "fca62612", group "cache"
+    Allocation "9c66fcaf" created: node "c887deef", group "cache"
+    Evaluation status changed: "pending" -> "complete"
+==> Evaluation "8e0a7cf9" finished with status "complete"
+```
 
-        Latest Deployment
-        ID          = fc49bd6c
-        Status      = running
-        Description = Deployment is running
+---
+class: compact
 
-        Deployed
-        Task Group  Desired  Placed  Healthy  Unhealthy
-        cache       3        3       0        0
+- Use the [`nomad status` command][5] to verify:
+  - We can see that all our tasks have been allocated and are running.
+  - (optional) We can stop the job with `nomad job stop`.
 
-        Allocations
-        ID        Eval ID   Node ID   Task Group  Desired  Status   Created At
-        501154ac  8e0a7cf9  c887deef  cache       run      running  08/08/19 21:03:19 <--- client2
-        7e2b3900  8e0a7cf9  fca62612  cache       run      running  08/08/19 21:03:19 <--- client1
-        9c66fcaf  8e0a7cf9  c887deef  cache       run      running  08/08/19 21:03:19 <--- client2
-- We can see that all our tasks have been allocated and are running. Once we are satisfied that our job is happily running, we can tear it down with `nomad job stop`.
+```shell
+$ nomad status example
+ID          = example
+Name        = example
+Submit Date   = 07/26/19 16:34:58 UTC
+Type        = service
+Priority    = 50
+Datacenters = dc1
+Status      = running
+Periodic    = false
+Parameterized = false
+
+Summary
+Task Group  Queued  Starting  Running  Failed  Complete  Lost
+cache       0       0         3        0       0         0
+
+Latest Deployment
+ID          = fc49bd6c
+Status      = running
+Description = Deployment is running
+
+Deployed
+Task Group  Desired  Placed  Healthy  Unhealthy
+cache       3        3       0        0
+
+Allocations
+ID        Eval ID   Node ID   Task Group  Desired  Status   Created At
+*501154ac  8e0a7cf9  c887deef  cache       run      running  08/08/19 21:03:19 <--- client2
+*7e2b3900  8e0a7cf9  fca62612  cache       run      running  08/08/19 21:03:19 <--- client1
+*9c66fcaf  8e0a7cf9  c887deef  cache       run      running  08/08/19 21:03:19 <--- client2
+```
+
+
 - Nomad is now up and running. The cluster can be entirely managed from the command line, but Nomad also comes with a web interface that is hosted alongside the HTTP API. Next, we'll visit the UI in the browser.
 - Re-run the example job if you stopped it previously before heading to the next section.
 
