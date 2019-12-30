@@ -308,164 +308,213 @@ Time                   Type        Description
 ```
 
 ---
+class: compact, col-2
 
-- To see the logs of a task, we can use the [logs command][7]:
-    - `nomad alloc logs 8ba85cef redis`
-    - Sample Output
-        - ```
-                             _._
-                        _.-``__ ''-._
-                   _.-``    `.  `_.  ''-._           Redis 3.2.1 (00000000/0) 64 bit
-               .-`` .-```.  ```\/    _.,_ ''-._
-              (    '      ,       .-`  | `,    )     Running in standalone mode
-              |`-._`-...-` __...-.``-._|'` _.-'|     Port: 6379
-              |    `-._   `._    /     _.-'    |     PID: 1
-               `-._    `-._  `-./  _.-'    _.-'
-              |`-._`-._    `-.__.-'    _.-'_.-'|
-              |    `-._`-._        _.-'_.-'    |           http://redis.io
-               `-._    `-._`-.__.-'_.-'    _.-'
-              |`-._`-._    `-.__.-'    _.-'_.-'|
-              |    `-._`-._        _.-'_.-'    |
-               `-._    `-._`-.__.-'_.-'    _.-'
-                   `-._    `-.__.-'    _.-'
-                       `-._        _.-'
-                           `-.__.-'
-            ...
+- To see the logs of a task, we can use the [`nomad alloc logs <allocation> <task>` command][7]:
+
+```shell
+$ nomad alloc logs 8ba85cef redis
+                 _._
+            _.-``__ ''-._
+       _.-``    `.  `_.  ''-._           Redis 3.2.1 (00000000/0) 64 bit
+   .-`` .-```.  ```\/    _.,_ ''-._
+  (    '      ,       .-`  | `,    )     Running in standalone mode
+  |`-._`-...-` __...-.``-._|'` _.-'|     Port: 6379
+  |    `-._   `._    /     _.-'    |     PID: 1
+   `-._    `-._  `-./  _.-'    _.-'
+  |`-._`-._    `-.__.-'    _.-'_.-'|
+  |    `-._`-._        _.-'_.-'    |           http://redis.io
+   `-._    `-._`-.__.-'_.-'    _.-'
+  |`-._`-._    `-.__.-'    _.-'_.-'|
+  |    `-._`-._        _.-'_.-'    |
+   `-._    `-._`-.__.-'_.-'    _.-'
+       `-._    `-.__.-'    _.-'
+           `-._        _.-'
+               `-.__.-'
+...
+```
 
 ---
+class: compact, col-2
 
 # Modifying a Job
 
-- The definition of a job is not static, and is meant to be updated over time. You may update a job to change the docker container, to update the application version, or to change the count of a task group to scale with load.
+- The definition of a job is not static, and is meant to be updated over time. 
+- You may update a job 
+  - to change the docker container, 
+  - to update the application version, or 
+  - to change the count of a task group to scale with load.
 - For now, edit the `example.nomad` file to update the count and set it to `3`. This line is in the `cache` section around line `145`.
-    - ```
-        The "count" parameter specifies the number of the task groups that should
-        be running under this group. This value must be non-negative and defaults
-        to 1.
-        count = 3
-- Use the [`job plan command`][8] to **invoke a dry-run of the scheduler** to see what would happen if you ran the updated job:
-    - `nomad job plan example.nomad`
-    - Sample Output
-        - ```
-            +/- Job: "example"
-            +/- Task Group: "cache" (2 create, 1 in-place update)
-              +/- Count: "1" => "3" (forces create)
-                  Task: "redis"
-            
-            Scheduler dry-run:
-            - All tasks successfully allocated.
-            
-            Job Modify Index: 7
-            To submit the job with version verification run:
-            
-            nomad job run -check-index 7 example.nomad    <---
-            
-            When running the job with the check-index flag, the job will only be run if the
-            server side version matches the job modify index returned. If the index has
-            changed, another user has modified the job and the plan's results are
-            potentially invalid.
-    - We can see that the scheduler detected the change in count and informs us that it will cause `2` new instances to be created. The in-place update that will occur is to push the updated job specification to the existing allocation and will not cause any service interruption.
-- We can then run the job with the run command the `plan` emitted.
-- By running with the `-check-index` flag, Nomad checks that the job has not been modified since the plan was run. This is useful if multiple people are interacting with the job at the same time to ensure the job hasn't changed before you apply your modifications.
-    - `nomad job run -check-index <index> example.nomad`
-    - Sample Output
-        - ```
-            $ nomad job run -check-index 7 example.nomad 
-            ==> Monitoring evaluation "93d16471"
-                Evaluation triggered by job "example"
-                Evaluation within deployment: "0d06e1b6"
-                Allocation "3249e320" created: node "e42d6f19", group "cache"
-                Allocation "453b210f" created: node "e42d6f19", group "cache"
-                Allocation "883269bf" modified: node "e42d6f19", group "cache"
-                Evaluation status changed: "pending" -> "complete"
-            ==> Evaluation "93d16471" finished with status "complete"
-- Because we set the count of the task group to three, Nomad created two additional allocations to get to the desired state. It is idempotent to run the same job specification again and no new allocations will be created.
-- Now, let's try to do an application update. In this case, we will simply change the version of redis we want to run. Edit the `example.nomad` file and change the Docker image from "`redis:3.2`" to "`redis:4.0`". This is located around line `261`.
-    - ```
-        Configure Docker driver with the image
-        config {
-            image = "redis:4.0"
-        }
-- We can run plan again to see what will happen if we submit this change:
-    - `nomad job plan example.nomad`
-    - Sample Output
-        - ```
-            +/- Job: "example"
-            +/- Task Group: "cache" (1 create/destroy update, 2 ignore)
-              +/- Task: "redis" (forces create/destroy update)
-                +/- Config {
-                  +/- image:           "redis:3.2" => "redis:4.0"
-            
-                      port_map[0][db]: "6379"
-                    }
-            
-            Scheduler dry-run:
-            - All tasks successfully allocated.
-            
-            Job Modify Index: 1127
-            To submit the job with version verification run:
-            
-            nomad job run -check-index 1127 example.nomad
-            
-            When running the job with the check-index flag, the job will only be run if the
-            server side version matches the job modify index returned. If the index has
-            changed, another user has modified the job and the plan's results are
-            potentially invalid.
-- The plan output shows us that one allocation will be updated and that the other two will be ignored. This is due to the `max_parallel` setting in the `update` stanza, which is set to `1` to instruct Nomad to perform only a single change at a time.
-- Once ready, use `run` to push the updated specification:
-    - `$ nomad job run example.nomad`
-    - Sample Output
-        - ```
-            ==> Monitoring evaluation "293b313a"
-                Evaluation triggered by job "example"
-                Evaluation within deployment: "f4047b3a"
-                Allocation "27bd4a41" created: node "e42d6f19", group "cache"
-                Evaluation status changed: "pending" -> "complete"
-            ==> Evaluation "293b313a" finished with status "complete"
-- After running, the rolling upgrade can be followed by running `nomad status` and watching the deployed count.
-- We can see that Nomad handled the update in three phases, only updating a single allocation in each phase and waiting for it to be healthy for `min_healthy_time` of 10 seconds before moving on to the next. The update strategy can be configured, but rolling updates makes it easy to upgrade an application at large scale.
 
-**Stopping a Job**
+```shell
+# The "count" parameter specifies the number of the task groups that should
+# be running under this group. This value must be non-negative and defaults
+# to 1.
+count = 3
+```
+
+---
+class: compact, col-2
+
+- Use the [`job plan` command][8] to **invoke a dry-run of the scheduler** to see what would happen if you ran the updated job:
+  - We can see that the scheduler detected the change in count and informs us that it will cause `2` new instances to be created. The in-place update that will occur is to push the updated job specification to the existing allocation and will not cause any service interruption.
+  - We can then run the job with the run command the `plan` emitted.
+
+```shell
+$ nomad job plan example.nomad
++/- Job: "example"
++/- Task Group: "cache" (2 create, 1 in-place update)
+  +/- Count: "1" => "3" (forces create)
+      Task: "redis"
+
+Scheduler dry-run:
+- All tasks successfully allocated.
+
+Job Modify Index: 7
+To submit the job with version verification run:
+
+nomad job run -check-index 7 example.nomad
+
+When running the job with the check-index flag, the job will only be run if the
+server side version matches the job modify index returned. If the index has
+changed, another user has modified the job and the plan's results are
+potentially invalid.
+```
+
+---
+class: compact, col-2
+
+- By running with the `-check-index` flag, Nomad checks that the job has not been modified since the plan was run. This is useful if multiple people are interacting with the job at the same time to ensure the job hasn't changed before you apply your modifications.
+  - Because we set the count of the task group to three, Nomad created two additional allocations to get to the desired state. It is idempotent to run the same job specification again and no new allocations will be created.
+
+```shell
+$ nomad job run -check-index 7 example.nomad
+==> Monitoring evaluation "93d16471"
+    Evaluation triggered by job "example"
+    Evaluation within deployment: "0d06e1b6"
+*   Allocation "3249e320" created: node "e42d6f19", group "cache"
+    Allocation "453b210f" created: node "e42d6f19", group "cache"
+    Allocation "883269bf" modified: node "e42d6f19", group "cache"
+    Evaluation status changed: "pending" -> "complete"
+==> Evaluation "93d16471" finished with status "complete"
+```
+
+---
+class: compact, col-2
+
+- Now, let's try to do an application update. In this case, we will simply change the version of redis we want to run. Edit the `example.nomad` file and change the Docker image from "`redis:3.2`" to "`redis:4.0`". This is located around line `261`.
+
+```go
+# Configure Docker driver with the image
+config {
+    image = "redis:4.0"
+}
+```
+
+---
+class: compact, col-2
+
+- We can run plan again to see what will happen if we submit this change:
+  - The plan output shows us that one allocation will be updated and that the other two will be ignored. This is due to the `max_parallel` setting in the `update` stanza, which is set to `1` to instruct Nomad to perform only a single change at a time.
+
+```shell
+$ nomad job plan example.nomad
++/- Job: "example"
++/- Task Group: "cache" (1 create/destroy update, 2 ignore)
+  +/- Task: "redis" (forces create/destroy update)
+    +/- Config {
+      +/- image:           "redis:3.2" => "redis:4.0"
+          port_map[0][db]: "6379"
+        }
+
+Scheduler dry-run:
+- All tasks successfully allocated.
+
+Job Modify Index: 1127
+To submit the job with version verification run:
+
+nomad job run -check-index 1127 example.nomad
+
+When running the job with the check-index flag, the job will only be run if the
+server side version matches the job modify index returned. If the index has
+changed, another user has modified the job and the plan's results are
+potentially invalid.
+```
+
+---
+class: compact, col-2
+
+- Once ready, use `nomad job run` to push the updated specification:
+
+```shell
+$ nomad job run example.nomad
+==> Monitoring evaluation "293b313a"
+    Evaluation triggered by job "example"
+    Evaluation within deployment: "f4047b3a"
+    Allocation "27bd4a41" created: node "e42d6f19", group "cache"
+    Evaluation status changed: "pending" -> "complete"
+==> Evaluation "293b313a" finished with status "complete"
+```
+
+- After running, the rolling upgrade can be followed by running `nomad status` and watching the deployed count.
+- We can see that Nomad handled the update in three phases, only updating a single allocation in each phase and waiting for it to be healthy for `min_healthy_time` of `10` seconds before moving on to the next. 
+  - The update strategy can be configured, but rolling updates makes it easy to upgrade an application at large scale.
+
+---
+class: compact, col-2
+
+# Stopping a Job
 
 - So far we've created, run and modified a job. The final step in a job lifecycle is stopping the job. This is done with the [`job stop command`][9]:
-    - ```
-        $ nomad job stop example
-        ==> Monitoring evaluation "6d4cd6ca"
-            Evaluation triggered by job "example"
-            Evaluation within deployment: "f4047b3a"
-            Evaluation status changed: "pending" -> "complete"
-        ==> Evaluation "6d4cd6ca" finished with status "complete"
+
+```shell
+$ nomad job stop example
+==> Monitoring evaluation "6d4cd6ca"
+    Evaluation triggered by job "example"
+    Evaluation within deployment: "f4047b3a"
+    Evaluation status changed: "pending" -> "complete"
+==> Evaluation "6d4cd6ca" finished with status "complete"
+```
+
+---
+class: compact, col-2
+
 - When we stop a job, it creates an evaluation which is used to stop all the existing allocations. If we now query the job status, we can see it is now marked as `dead (stopped)`, indicating that the job has been stopped and Nomad is no longer running it:
-    - ```
-        $ nomad status example
-        ID            = example
-        Name          = example
-        Submit Date   = 08/31/19 17:30:40 UTC
-        Type          = service
-        Priority      = 50
-        Datacenters   = dc1
-        Status        = dead (stopped)
-        Periodic      = false
-        Parameterized = false
-        
-        Summary
-        Task Group  Queued  Starting  Running  Failed  Complete  Lost
-        cache       0       0         0        0       6         0
-        
-        Latest Deployment
-        ID          = f4047b3a
-        Status      = successful
-        Description = Deployment completed successfully
-        
-        Deployed
-        Task Group  Desired  Placed  Healthy  Unhealthy
-        cache       3        3       3        0
-        
-        Allocations
-        ID        Node ID   Task Group  Version  Desired  Status    Created    Modified
-        8ace140d  2cfe061e  cache       2        stop     complete  5m ago     5m ago
-        8af5330a  2cfe061e  cache       2        stop     complete  6m ago     6m ago
-        df50c3ae  2cfe061e  cache       2        stop     complete  6m ago     6m ago
+
+```shell
+$ nomad status example
+ID            = example
+Name          = example
+Submit Date   = 08/31/19 17:30:40 UTC
+Type          = service
+Priority      = 50
+Datacenters   = dc1
+Status        = dead (stopped)
+Periodic      = false
+Parameterized = false
+
+Summary
+Task Group  Queued  Starting  Running  Failed  Complete  Lost
+cache       0       0         0        0       6         0
+
+Latest Deployment
+ID          = f4047b3a
+Status      = successful
+Description = Deployment completed successfully
+
+Deployed
+Task Group  Desired  Placed  Healthy  Unhealthy
+cache       3        3       3        0
+
+Allocations
+ID        Node ID   Task Group  Version  Desired  Status    Created    Modified
+8ace140d  2cfe061e  cache       2        stop     complete  5m ago     5m ago
+8af5330a  2cfe061e  cache       2        stop     complete  6m ago     6m ago
+df50c3ae  2cfe061e  cache       2        stop     complete  6m ago     6m ago
+```
+
+---
+
 - If we wanted to start the job again, we could simply `run` it again.
 - Users of Nomad primarily interact with jobs, and we've now seen how to create and scale our job, perform an application update, and do a job tear down. Next we will add another Nomad client to create our first cluster.
 - Stop the Nomad agent with `Ctrl-C` before moving on to the next section.
