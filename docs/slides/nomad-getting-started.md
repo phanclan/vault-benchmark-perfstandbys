@@ -911,23 +911,6 @@ The Nomad UI offers a friendly and visual alternative experience to the CLI.
 
 
 ---
-class: compact, col-2
-
-# Common Nomad Commands
-
-```shell
-nomad operator raft list-peers
-nomad node status
-
-nomad job run <job_filename>
-nomad job status <job_name>
-nomad status <job_name> - similar to above
-nomad job stop <job_name>
-
-nomad alloc status <alloc_id>
-```
-
----
 
 # Sample nomad.hcl for Nomad Server
 
