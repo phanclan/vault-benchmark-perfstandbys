@@ -27,12 +27,13 @@ class: compact, col-2
 # Starting the Agent
 
 - We will run a single Nomad agent in **development** mode.
-  - This mode is used to quickly start an agent that is acting as a client and server to test job configurations or prototype interactions.
-  - It should **_not_** be used in production as it does not persist state.
+  - Used to start an agent that is acting as a client and server to test job configurations or prototype interactions.
+  - Should **_not_** be used in production; does not persist state.
 - The Nomad agent has started and has output some log data.
   - The agent is running in both **client** and **server** mode, and has claimed leadership of the cluster.
   - Additionally, the local client has been registered and marked as ready.
 
+.small[
 ```shell
 *$ sudo nomad agent -dev
 
@@ -67,9 +68,10 @@ class: compact, col-2
     [DEBUG] client: updated allocations at index 1 (0 allocs)
     [DEBUG] client: allocs: (added 0) (removed 0) (updated 0) (ignore 0)
 *    [DEBUG] client: state updated to ready
-```
+```]
 
 ???
+
 - **Note:** Typically any agent running in client mode must be run with root level privilege.
   - Nomad makes use of operating system primitives for resource isolation which require elevated permissions.
   - The agent will function as non-root, but certain task drivers will not be available.
