@@ -74,6 +74,7 @@ resource "aws_instance" "workers" {
 }
 
 module "bastion" {
+  bastion_nodes = var.bastion_nodes
   source = "./modules/services/bastion"
   vpc_id = module.vpc_usw2-1.vpc_id
   # region        = var.region

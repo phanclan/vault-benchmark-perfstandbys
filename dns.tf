@@ -104,10 +104,10 @@ resource "aws_route53_record" "hashi-vault" {
 }
 
 resource "aws_route53_record" "hashi-bastion" {
+  count   = var.bastion_nodes
   zone_id = var.zone_id
-  # name    = "server-${count.index}.${var.namespace}"
-  name    = "bastion"
+  name    = "bastion-${count.index}"
   type    = "CNAME"
-  records = [module.bastion.bastion_pub_dns]
+  records = ["${element(module.bastion.bastion_pub_dns, count.index)}"]
   ttl     = "300"
 }

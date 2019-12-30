@@ -218,8 +218,8 @@ server {
 }
 ```
 
-- [`server`][45] - Specifies if this agent should run in server mode. All other server options depend on this value being set.
-- [`bootstrap_expect`][46] - The number of expected servers in the cluster. Either this value should not be provided or the value must agree with other servers in the cluster.
+- [`server`](https://www.nomadproject.io/docs/configuration/server.html#enabled) - Specifies if this agent should run in server mode. All other server options depend on this value being set.
+- [`bootstrap_expect`](https://www.nomadproject.io/docs/configuration/server.html#bootstrap_expect) - The number of expected servers in the cluster. Either this value should not be provided or the value must agree with other servers in the cluster.
 
 ---
 name: client-configuration
@@ -241,15 +241,15 @@ client {
 }
 ```
 
-- [`client`][48] - Specifies if this agent should run in client mode. All other client options depend on this value being set.
-- **NOTE** The [options][49] parameter can be used to enable or disable specific configurations on Nomad clients, unique to your use case requirements.
+- [`client`](https://www.nomadproject.io/docs/configuration/client.html#enabled) - Specifies if this agent should run in client mode. All other client options depend on this value being set.
+- **NOTE** The [`options`](https://www.nomadproject.io/docs/configuration/client.html#options-parameters) parameter can be used to enable or disable specific configurations on Nomad clients, unique to your use case requirements.
 
 ---
 name: acl-configuration
 
 # ACL configuration
 
-The [Access Control][<https://www.nomadproject.io/guides/security/acl.html]> guide provides instructions on configuring and enabling ACLs.
+The [Access Control](<https://www.nomadproject.io/guides/security/acl.html>) guide provides instructions on configuring and enabling ACLs.
 
 ---
 name: tls-configuration
@@ -258,7 +258,7 @@ name: tls-configuration
 
 Securing Nomad's cluster communication with mutual TLS (mTLS) is recommended for production deployments and can even ease operations by preventing mistakes and misconfigurations. Nomad clients and servers should not be publicly accessible without mTLS enabled.
 
-The [Securing Nomad with TLS][<https://www.nomadproject.io/guides/security/securing-nomad.html]> guide provides instructions on configuring and enabling TLS.
+The [Securing Nomad with TLS](<https://www.nomadproject.io/guides/security/securing-nomad.html>) guide provides instructions on configuring and enabling TLS.
 
 ---
 name: start-nomad
@@ -280,8 +280,8 @@ name: next-steps
 
 # Next Steps
 
-- Read [Outage Recovery][<https://www.nomadproject.io/guides/operations/outage.html]> to learn the steps required to recover from a Nomad cluster outage.
-- Read [Autopilot][<https://www.nomadproject.io/guides/operations/autopilot.html]> to learn about features in Nomad 0.8 to allow for automatic operator-friendly management of Nomad servers.
+- Read [Outage Recovery](https://www.nomadproject.io/guides/operations/outage.html) to learn the steps required to recover from a Nomad cluster outage.
+- Read [Autopilot](https://www.nomadproject.io/guides/operations/autopilot.html) to learn about features in Nomad 0.8 to allow for automatic operator-friendly management of Nomad servers.
 
 [1]: https://www.nomadproject.io/guides/install/production/reference-architecture.html
 [2]: https://www.nomadproject.io/guides/install/production/deployment-guide.html#reference-material
@@ -321,7 +321,3 @@ name: next-steps
 [41]: https://www.nomadproject.io/docs/configuration/index.html#datacenter
 [42]: https://www.nomadproject.io/docs/configuration/index.html#data_dir
 [44]: https://www.nomadproject.io/docs/internals/consensus.html#deployment-table
-[45]: https://www.nomadproject.io/docs/configuration/server.html#enabled
-[46]: https://www.nomadproject.io/docs/configuration/server.html#bootstrap_expect
-[48]: https://www.nomadproject.io/docs/configuration/client.html#enabled
-[49]: https://www.nomadproject.io/docs/configuration/client.html#options-parameters

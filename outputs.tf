@@ -75,5 +75,5 @@ output "hashi-vault" {
 }
 
 output "hashi-bastion" {
-  value = aws_route53_record.hashi-bastion.fqdn
+  value = aws_route53_record.hashi-bastion.*.fqdn
 }

@@ -155,6 +155,10 @@ variable "worker_nodes" {
   description = "number of Consul instances"
 }
 
+variable "bastion_nodes" {
+  description = "number of Bastion instances"
+}
+
 variable "subnets" {
   description = "list of subnets to launch Vault within"
 }

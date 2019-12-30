@@ -1,14 +1,17 @@
-class: title, smokescreen, shelf, no-footer
-background-image: url(https://story.xaprb.com/slides/adirondack/leo-serrat-533922-unsplash.jpg)
+tfclass: title, smokescreen, shelf, no-footer
+background-image: url(tech-background-01.png)
 
 # Walkthrough of demo
-### Peter Phan, pphan@hashicorp.com
+## Peter Phan, pphan@hashicorp.com
 
 ---
 name: components
+class: compact
+
 # Components
 
 This demo uses multiple HashiCorp products.
+
 - Packer to build the images in AWS
 - Terraform to provision the infrastructure
 - Vault to demonstrate secrets management
@@ -26,23 +29,22 @@ layout: true
 ---
 name: diagram
 class: img-caption
+
 # Diagram
 
 ---
-name: img-right
-class: img-right
-![Yosemite](https://story.xaprb.com/slides/adirondack/leo-serrat-533922-unsplash.jpg)
-
-Some text
-
----
 name: getting-started
+class: img-right
+
 # Getting Started
+
 - Set your variables in `terraform.tfvars`
+  - Specify number of nodes desired.
 - Run `tf init` and `tf apply`
+- See outputs for address information
 - Go to websites
-  - http://consul.pphan.hashidemos.io:8500
-  - http://vault-0.pphan.hashidemos.io:8200
+  - <http://consul.pphan.hashidemos.io:8500>
+  - <http://vault-0.pphan.hashidemos.io:8200>
 
 ???
 
@@ -51,16 +53,19 @@ notes
 ---
 name: vault-configuration
 class: compact,col-2
+
 # Vault Configuration
+
 - Set your variables in `scripts/env.sh`
 - Run `00_fast_setup.sh`
-- Get vault admin token. 
-  - http://consul.pphan.hashidemos.io:8500/ui/dc1/kv/service/vault/admin-token/edit
+- Get vault admin token.
+  - <http://consul.pphan.hashidemos.io:8500/ui/dc1/kv/service/vault/admin-token/edit>
 - Log in to Vault UI with admin token
-  - http://vault-0.pphan.hashidemos.io:8200/ui/
+  - <http://vault-0.pphan.hashidemos.io:8200/ui/>
 - Test ldap login, db, and transit.
   - `./scripts/test_hr_cloud.sh`
 - NOTE: If you want to run this script again, need to reload postgres container.
+
 ``` shell
 ssh ubuntu@bastion.pphan.hashidemos.io
 #--> Go to vault repo that you cloned
@@ -68,6 +73,7 @@ cd /tmp/vault-benchmark-perfstandbys/
 #--> Stop and start container
 *docker-compose down; docker-compose up -d postgres
 ```
+
 ---
 
 - Lab Only Parameters
