@@ -617,15 +617,11 @@ server {
 class: compact, col-2
 
 - Once the file is created, start the agent in a new tab:
+- `nomad agent -config server.hcl`
+- Or...
 
 ```shell
 nomad agent -config server.hcl > /tmp/nomad.log 2>&1 &
-```
-
-- Or
-
-```shell
-$ nomad agent -config server.hcl
 ```
 
 - Note that **client** mode is disabled, and that we are only running as the server.
@@ -697,11 +693,12 @@ ports {
 ---
 class: compact, col-2
 
-- Copy the file you just created to create another one similar to it called `client2.hcl`. 
-- Change the `data_dir` to be `/tmp/client2`, the name to `client2`, and the `http` port to `5657`. 
+- Copy the file you just created to create another one similar to it called `client2.hcl`.
+  - `cp client1.hcl client2.hcl`
+- Change the `data_dir` to be `/tmp/client2`, the name to `client2`, and the `http` port to `5657`.
 
 ```shell
-
+sed 's/client1/client2/g;s/5656/5657/g' client1.hcl > client2.hcl
 ```
 
 - Once you have created both `client1.hcl` and `client2.hcl`, open a tab for each and start the agents (the process for the first agent is shown below but be sure to do the same for the second agent):
