@@ -121,8 +121,7 @@ class: compact, col-2
 - You can use `Ctrl-C` (the interrupt signal) to halt the agent.
   - By default, all signals will cause the agent to forcefully shutdown.
   - The agent [can be configured][7] to gracefully leave on either the **interrupt** or **terminate** signals.
-
-After interrupting the agent, you should see it leave the cluster and shut down:
+- After interrupting the agent, you should see it leave the cluster and shut down:
 
 ```shell
 ^C==> Caught signal: interrupt
