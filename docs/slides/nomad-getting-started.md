@@ -693,15 +693,18 @@ ports {
 ---
 class: compact, col-2
 
-- Copy the file you just created to create another one similar to it called `client2.hcl`.
+- Copy file `client1.hcl` to `client2.hcl`.
   - `cp client1.hcl client2.hcl`
-- Change the `data_dir` to be `/tmp/client2`, the name to `client2`, and the `http` port to `5657`.
+  - Change the `data_dir` to be `/tmp/client2`, the name to `client2`, and the `http` port to `5657`.
+- Or, use this command to create `client2.hcl` and make the changes.
 
 ```shell
 sed 's/client1/client2/g;s/5656/5657/g' client1.hcl > client2.hcl
 ```
 
-- Once you have created both `client1.hcl` and `client2.hcl`, open a tab for each and start the agents (the process for the first agent is shown below but be sure to do the same for the second agent):
+- Once you have created both `client1.hcl` and `client2.hcl`, start the agents.
+  - In the output we can see the agent is running in **_client_** mode only. 
+  - This agent will be available to run tasks but will not participate in managing the cluster or making scheduling decisions.
 
 ```shell
 nomad agent -config client1.hcl > /tmp/nomadclient1.log 2>&1 &
@@ -709,7 +712,7 @@ nomad agent -config client2.hcl > /tmp/nomadclient2.log 2>&1 &
 ```
 
 ```shell
-$ sudo nomad agent -config client1.hcl
+$ cat /tmp/nomadclient1.log
 ==> Starting Nomad agent...
 ==> Nomad agent configuration:
 
@@ -730,7 +733,6 @@ $ sudo nomad agent -config client1.hcl
 ---
 class: compact, col-2
 
-- In the output we can see the agent is running in **_client_** mode only. This agent will be available to run tasks but will not participate in managing the cluster or making scheduling decisions.
 - Using the [`nomad node status` command][3] we should see both nodes in the ready state:
 - We now have a simple three node cluster running. 
   - The only difference between a demo and full production cluster is that we are running a single server instead of three or five.
