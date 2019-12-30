@@ -51,6 +51,55 @@ class: img-right
 notes
 
 ---
+class: compact
+
+# Terrform Output Example
+
+```shell
+Outputs:
+
+A_Welcome_Message = 
+ooooo   ooooo                    oooo         o8o    .oooooo.
+`888'   `888'                    `888         `"'   d8P'  `Y8b
+ 888     888   .oooo.    .oooo.o  888 .oo.   oooo  888           .ooooo.  oooo d8b oo.ooooo.
+ 888ooooo888  `P  )88b  d88(  "8  888P"Y88b  `888  888          d88' `88b `888""8P  888' `88b
+ 888     888   .oP"888  `"Y88b.   888   888   888  888          888   888  888      888   888
+ 888     888  d8(  888  o.  )88b  888   888   888  `88b    ooo  888   888  888      888   888
+o888o   o888o `Y888""8o 8""888P' o888o o888o o888o  `Y8bood8P'  `Y8bod8P' d888b     888bod8P'
+                                                                                    888
+                                                                                   o888o
+ |.--------_--_------------_--__--.|
+ ||    /\ |_)|_)|   /\ | |(_ |_   ||
+ ;;`,_/``\|__|__|__/``\|_| _)|__ ,:|
+((_(-,-----------.-.----------.-.)`)
+ \__ )        ,'     `.        \ _/
+ :  :        |_________|       :  :
+ |-'|       ,'-.-.--.-.`.      |`-|
+ |_.|      (( (*  )(*  )))     |._|
+ |  |       `.-`-'--`-'.'      |  |
+ |-'|        | ,-.-.-. |       |._|
+ |  |        |(|-|-|-|)|       |  |
+ :,':        |_`-'-'-'_|       ;`.;
+  \  \     ,'           `.    /._/
+   \/ `._ /_______________\_,'  /
+    \  / :   ___________   : \,'
+     `.| |  |           |  |,'
+       `.|  |           |  |
+         |  | HashiCorp |  |
+
+consul_address = http://pphan-benchmark-consul-elb-233529192.us-west-2.elb.amazonaws.com:8500
+consul_ui = http://consul.pphan.hashidemos.io:8500
+hashi-bastion = []
+hashi-servers = []
+hashi-vault = []
+hashi-workers = []
+vault_address = http://pphan-benchmark-vault-elb-1782785251.us-west-2.elb.amazonaws.com:8200
+vault_elb_security_group = sg-08a7b92e27ba9909f
+vault_security_group = sg-086ff9c44564c1693
+vault_ui = http://vault.pphan.hashidemos.io:8200
+```
+
+---
 name: vault-configuration
 class: compact,col-2
 
