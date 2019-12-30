@@ -1,7 +1,8 @@
-tfclass: title, smokescreen, shelf, no-footer
+class: title, smokescreen, shelf, no-footer
 background-image: url(tech-background-01.png)
 
 # Walkthrough of demo
+
 ## Peter Phan, pphan@hashicorp.com
 
 ---
