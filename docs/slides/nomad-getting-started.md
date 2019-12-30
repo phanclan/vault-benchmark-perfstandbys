@@ -209,6 +209,7 @@ Example job file written to example.nomad
 
 ---
 class: compact
+
 - We can register our example job now:
 
 ```shell
@@ -224,11 +225,12 @@ class: compact
 ---
 class: compact, col-2
 
-- Anytime a job is updated, Nomad creates an evaluation to determine what actions need to take place. In this case, because this is a new job, Nomad has determined that an allocation should be created and has scheduled it on our local agent.
-- To inspect the status of our job we use the [status command][5]:
+- Anytime a job is updated, Nomad creates an evaluation to determine what actions need to take place. 
+  - In this case, because this is a new job, Nomad has determined that an allocation should be created and has scheduled it on our local agent.
+- To inspect the status of our job we use the [`nomad status` command][5]:
 
 ```shell
-$ nomad status example
+*$ nomad status example
 ID            = example
 Name          = example
 Submit Date   = 08/31/19 22:58:40 UTC
