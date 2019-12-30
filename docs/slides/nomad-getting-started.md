@@ -75,7 +75,7 @@ class: compact, col-2
 
 # Cluster Nodes
 
-If you run [nomad node status][3] in another terminal, you can see the registered nodes of the Nomad cluster:
+If you run [`nomad node status`][3] in another terminal, you can see the registered nodes of the Nomad cluster:
 
 ```shell
 *$ nomad node status
@@ -87,7 +87,7 @@ The output shows our Node ID, which is a randomly generated UUID, its datacenter
 
 ---
 class: compact, col-2
-The agent is also running in server mode, which means it is part of the [gossip protocol][4] used to connect all the server instances together. We can view the members of the gossip ring using the [server members][5] command:
+The agent is also running in server mode, which means it is part of the [gossip protocol][4] used to connect all the server instances together. We can view the members of the gossip ring using the [`server members`][5] command:
 
 ```shell
 *$ nomad server members
@@ -95,15 +95,15 @@ Name          Address    Port  Status  Leader  Protocol  Build  Datacenter  Regi
 nomad.global  127.0.0.1  4648  alive   true    2         0.9.6  dc1         global
 ```
 
-The output shows our own agent, the address it is running on, its health state, some version information, and the datacenter and region. Additional metadata can be viewed by providing the -detailed flag.
+The output shows our own agent, the address it is running on, its health state, some version information, and the datacenter and region. Additional metadata can be viewed by providing the `-detailed` flag.
 
 ---
-name:
+name: stopping-the-agent
 class: compact, col-2
 
-# [6]Stopping the Agent
+# Stopping the Agent
 
-You can use Ctrl-C (the interrupt signal) to halt the agent. By default, all signals will cause the agent to forcefully shutdown. The agent [can be configured][7] to gracefully leave on either the interrupt or terminate signals.
+You can use `Ctrl-C` (the interrupt signal) to halt the agent. By default, all signals will cause the agent to forcefully shutdown. The agent [can be configured][7] to gracefully leave on either the interrupt or terminate signals.
 
 After interrupting the agent, you should see it leave the cluster and shut down:
 
@@ -119,8 +119,10 @@ After interrupting the agent, you should see it leave the cluster and shut down:
 
 By gracefully leaving, Nomad clients update their status to prevent further tasks from being scheduled and to start migrating any tasks that are already assigned. Nomad servers notify their peers they intend to leave. When a server leaves, replication to that server stops. If a server fails, replication continues to be attempted until the node recovers. Nomad will automatically try to reconnect to _failed_ nodes, allowing it to recover from certain network conditions, while _left_ nodes are no longer contacted.
 
-If an agent is operating as a server, [leave_on_terminate][8] should only be set if the server will never rejoin the cluster again. The default value of false for leave_on_terminate and leave_on_interrupt work well for most scenarios. If Nomad servers are part of an auto scaling group where new servers are brought up to replace failed servers, using graceful leave avoids causing a potential availability outage affecting the [consensus protocol][9]. As of Nomad 0.8, Nomad includes Autopilot which automatically removes failed or dead servers. This allows the operator to skip setting leave_on_terminate
+If an agent is operating as a server, [`leave_on_terminate`][8] should only be set if the server will never rejoin the cluster again. The default value of false for `leave_on_terminate` and `leave_on_interrupt` work well for most scenarios. If Nomad servers are part of an auto scaling group where new servers are brought up to replace failed servers, using graceful leave avoids causing a potential availability outage affecting the [consensus protocol][9]. As of Nomad 0.8, Nomad includes Autopilot which automatically removes failed or dead servers. This allows the operator to skip setting `leave_on_terminate`
 
+---
+class: compact
 If a server does forcefully exit and will not be returning into service, the [server force-leave command][10] should be used to force the server from a _failed_ to a _left_ state.
 
 Start the agent again with the `sudo nomad agent -dev` command before continuing to the next section.
@@ -132,7 +134,6 @@ Start the agent again with the `sudo nomad agent -dev` command before continuing
 [3]: https://www.nomadproject.io/docs/commands/node/status.html
 [4]: https://www.nomadproject.io/docs/internals/gossip.html
 [5]: https://www.nomadproject.io/docs/commands/server/members.html
-[6]: https://learn.hashicorp.com/nomad/getting-started/running#stopping-the-agent
 [7]: https://www.nomadproject.io/docs/configuration/index.html#leave_on_terminate
 [8]: https://www.nomadproject.io/docs/configuration/index.html#leave_on_terminate
 [9]: https://www.nomadproject.io/docs/internals/consensus.html
