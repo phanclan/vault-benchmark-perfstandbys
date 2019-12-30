@@ -593,7 +593,7 @@ class: compact, col-2
 
 # Starting the Server
 
-- The first step is to create the config file for the server. Either download the [file from the repository][1], or paste this into a file called `server.hcl`:
+- The first step is to create the config file for the server. Either download the [file from the repository](https://raw.githubusercontent.com/hashicorp/nomad/master/demo/vagrant/server.hcl), or paste this into a file called `server.hcl`:
   - This is a minimal server configuration file, but it is enough to start an agent in server only mode and have it elected as a leader. 
   - The major change that should be made for production is to run more than one server, and to change the corresponding `bootstrap_expect` value.
 
@@ -662,7 +662,7 @@ class: compact, col-2
 # Starting the Clients
 
 - Similar to the server, we must first configure the clients. 
-- Either download the configuration for `client1` and `client2` from the [repository here][2], or paste the following into `client1.hcl`:
+- Either download the configuration for `client1` and `client2` from the [repository here](https://github.com/hashicorp/nomad/tree/master/demo/vagrant), or paste the following into `client1.hcl`:
 
 ```go
 # Increase log verbosity
@@ -737,7 +737,7 @@ $ head /tmp/nomadclient1.log
 ---
 class: compact, col-2
 
-- Using the [`nomad node status` command][3] we should see both nodes in the ready state:
+- Using the [`nomad node status` command](https://www.nomadproject.io/docs/commands/node/status.html) we should see both nodes in the ready state:
 - We now have a simple three node cluster running.
   - The only difference between a demo and full production cluster is that we are running a single server instead of three or five.
 
@@ -755,7 +755,7 @@ class: compact, col-2
 
 - Now that we have a simple cluster, we can use it to schedule a job.
 - We should still have the `example.nomad` job file. Verify that the count is set to `3`.
-- Then, use the [`nomad job run` command][4] to submit the job:
+- Then, use the [`nomad job run` command](https://www.nomadproject.io/docs/commands/job/run.html) to submit the job:
   - Note in the output that the scheduler assigned two of the tasks to one of the client nodes and the remaining task to the second client.
 
 ```shell
@@ -773,9 +773,12 @@ $ nomad job run example.nomad
 ---
 class: compact, col-2
 
-- Use the [`nomad status` command][5] to verify:
+- Use the [`nomad status` command](https://www.nomadproject.io/docs/commands/status.html) to verify:
   - We can see that all our tasks have been allocated and are running.
   - (optional) We can stop the job with `nomad job stop`.
+
+- Nomad is now up and running. The cluster can be entirely managed from the command line, but Nomad also comes with a web interface that is hosted alongside the HTTP API. Next, we'll visit the UI in the browser.
+- Re-run the example job if you stopped it previously before heading to the next section.
 
 ```shell
 $ nomad status example
@@ -810,14 +813,11 @@ ID        Eval ID   Node ID   Task Group  Desired  Status   Created At
 ```
 
 
-- Nomad is now up and running. The cluster can be entirely managed from the command line, but Nomad also comes with a web interface that is hosted alongside the HTTP API. Next, we'll visit the UI in the browser.
-- Re-run the example job if you stopped it previously before heading to the next section.
 
-[1]: https://raw.githubusercontent.com/hashicorp/nomad/master/demo/vagrant/server.hcl
-[2]: https://github.com/hashicorp/nomad/tree/master/demo/vagrant
-[3]: https://www.nomadproject.io/docs/commands/node/status.html
-[4]: https://www.nomadproject.io/docs/commands/job/run.html
-[5]: https://www.nomadproject.io/docs/commands/status.html
+
+
+
+
 
 
 
@@ -830,3 +830,8 @@ class: compact, col-2
 
 # Common Nomad Commands
 
+```shell
+nomad node status
+nomad job status <job_name>
+nomad alloc status <alloc_id>
+```
