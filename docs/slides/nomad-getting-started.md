@@ -36,7 +36,9 @@ class: compact, col-2
 
 ???
 
+```shell
 nomad agent -dev > nomad.log 2>&1 &
+```
 
 ---
 class: compact, col-2
@@ -228,6 +230,8 @@ class: compact, col-2
 - Anytime a job is updated, Nomad creates an evaluation to determine what actions need to take place. 
   - In this case, because this is a new job, Nomad has determined that an allocation should be created and has scheduled it on our local agent.
 - To inspect the status of our job we use the [`nomad status` command][5]:
+  - Here we can see that the result of our evaluation was the creation of an allocation that is now running on the local node.
+  - Our Node ID can be seen with `nomad node status`
 
 ```shell
 *$ nomad status example
@@ -247,7 +251,7 @@ cache       0       0         1        0       0         0
 
 Latest Deployment
 ID          = b0a84e74
-Status      = successful
+*Status      = successful
 Description = Deployment completed successfully
 
 Deployed
@@ -256,20 +260,19 @@ cache       1        1       1        0
 
 Allocations
 ID        Node ID   Task Group  Version  Desired  Status   Created  Modified
-8ba85cef  171a583b  cache       0        run      running  5m ago   5m ago
+*8ba85cef  171a583b  cache       0        run      running  5m ago   5m ago
 ```
-
-- Here we can see that the result of our evaluation was the creation of an allocation that is now running on the local node.
 
 ---
 class: compact, col-2
 
-- An allocation represents an instance of Task Group placed on a node. To inspect an allocation we use the [`alloc status` command][6]:
+- An allocation represents an instance of **Task Group** placed on a node.
+- To inspect an allocation we use the [`nomad alloc status <alloc_id>` command][6]:
   - We can see that Nomad reports the state of the allocation as well as its current resource usage.
   - By supplying the `-stats` flag, more detailed resource usage statistics will be reported.
 
 ```shell
-$ nomad alloc status 8ba85cef
+*$ nomad alloc status 8ba85cef
 ID                  = 8ba85cef
 Eval ID             = 13ebb66d
 Name                = example.cache[0]
