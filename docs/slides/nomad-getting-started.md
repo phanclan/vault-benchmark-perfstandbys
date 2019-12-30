@@ -501,10 +501,12 @@ class: compact, col-2
 
 # Stopping a Job
 
-- So far we've created, run and modified a job. The final step in a job lifecycle is stopping the job. This is done with the [`job stop command`][9]:
+- So far we've created, ran and modified a job. 
+- The final step in a job lifecycle is stopping the job. 
+- This is done with the [`nomad job stop command`][9]:
 
 ```shell
-$ nomad job stop example
+*$ nomad job stop example
 ==> Monitoring evaluation "6d4cd6ca"
     Evaluation triggered by job "example"
     Evaluation within deployment: "f4047b3a"
@@ -515,7 +517,9 @@ $ nomad job stop example
 ---
 class: compact, col-2
 
-- When we stop a job, it creates an evaluation which is used to stop all the existing allocations. If we now query the job status, we can see it is now marked as `dead (stopped)`, indicating that the job has been stopped and Nomad is no longer running it:
+- When we stop a job, it creates an evaluation which is used to stop all the existing allocations. 
+- If we now query the job status, we can see it is now marked as `dead (stopped)`.
+  - Indicating that the job has been stopped and Nomad is no longer running it:
 
 ```shell
 $ nomad status example
@@ -525,7 +529,7 @@ Submit Date   = 08/31/19 17:30:40 UTC
 Type          = service
 Priority      = 50
 Datacenters   = dc1
-Status        = dead (stopped)
+*Status        = dead (stopped)
 Periodic      = false
 Parameterized = false
 
@@ -550,10 +554,17 @@ df50c3ae  2cfe061e  cache       2        stop     complete  6m ago     6m ago
 ```
 
 ---
+class: compact, col-2
 
 - If we wanted to start the job again, we could simply `run` it again.
-- Users of Nomad primarily interact with jobs, and we've now seen how to create and scale our job, perform an application update, and do a job tear down. Next we will add another Nomad client to create our first cluster.
+- Users of Nomad primarily interact with jobs, and we've now seen how to create and scale our job, perform an application update, and do a job tear down. 
+- Next we will add another Nomad client to create our first cluster.
 - Stop the Nomad agent with `Ctrl-C` before moving on to the next section.
+- Or
+
+```shell
+pkill nomad
+```
 
 [1]: https://www.nomadproject.io/docs/job-specification/index.html
 [2]: https://github.com/hashicorp/hcl
