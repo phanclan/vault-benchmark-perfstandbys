@@ -21,26 +21,28 @@ class: img-right-full
 
 # Getting Started
 
-- [<u>Reference Material ][1]</u>
-- [<u>Estimated Time to Complete][2]</u>
-- [<u>Challenge][3]</u>
-- [<u>Solution][4]</u>
-- [<u>Prerequisites][5]</u>
-- [<u>Steps][6]</u>
-- [<u>Next Steps][7]</u>
+- [Reference Material ][1]
+- [Estimated Time to Complete][2]
+- [Challenge][3]
+- [Solution][4]
+- [Prerequisites][5]
+- [Steps][6]
+- [Next Steps][7]
 
-This guide explains how to configure [<u>Prometheus][8]</u> to integrate with a Nomad cluster and Prometheus [<u>Alertmanager][9]</u>. 
+This guide explains how to configure [Prometheus][8] to integrate with a Nomad cluster and Prometheus [Alertmanager][9].
 
 ???
-While this guide introduces the basics of enabling [<u>telemetry][10]</u> and alerting, a Nomad operator can go much further by customizing dashboards and integrating different [<u>receivers][11]</u> for alerts.
+While this guide introduces the basics of enabling [telemetry][10] and alerting, a Nomad operator can go much further by customizing dashboards and integrating different [receivers][11] for alerts.
 
 ---
 name: reference-material
+
 # Reference Material
 
-- [<u>Configuring Prometheus][13]</u>
-- [<u>Telemetry Stanza in Nomad Agent Configuration][14]</u>
-- [<u>Alerting Overview][15]</u>
+- [Nomad Reference Install Guide](https://www.nomadproject.io/guides/install/production/deployment-guide.html)
+- [Configuring Prometheus][13]
+- [Telemetry Stanza in Nomad Agent Configuration][14]
+- [Alerting Overview][15]
 - [_Using Prometheus to Monitor Nomad Metrics_](https://www.nomadproject.io/guides/operations/monitoring-and-alerting/prometheus-metrics.html)
 
 ---
@@ -129,7 +131,7 @@ An agent can be stopped in two ways: **gracefully** or **forcefully**.
 
 When gracefully exiting, clients will update their status to terminal on the servers so that tasks can be migrated to healthy agents.
 
-- Servers will notify their intention to leave the cluster which allows them to leave the [<u>consensus](https://www.nomadproject.io/docs/internals/consensus.html)</u> peer set.
+- Servers will notify their intention to leave the cluster which allows them to leave the [consensus](https://www.nomadproject.io/docs/internals/consensus.html) peer set.
 
 It is especially important that a server node be allowed to leave gracefully so that there will be a minimal impact on availability as the server leaves the consensus peer set.
 
