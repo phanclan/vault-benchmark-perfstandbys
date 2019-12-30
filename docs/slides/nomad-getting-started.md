@@ -663,7 +663,8 @@ class: compact, col-2
 
 # Starting the Clients
 
-- Similar to the server, we must first configure the clients. Either download the configuration for `client1` and `client2` from the [repository here][2], or paste the following into `client1.hcl`:
+- Similar to the server, we must first configure the clients. 
+- Either download the configuration for `client1` and `client2` from the [repository here][2], or paste the following into `client1.hcl`:
 
 ```go
 # Increase log verbosity
@@ -696,6 +697,11 @@ class: compact, col-2
 
 - Copy the file you just created to create another one similar to it called `client2.hcl`. 
 - Change the `data_dir` to be `/tmp/client2`, the name to `client2`, and the `http` port to `5657`. 
+
+```shell
+
+```
+
 - Once you have created both `client1.hcl` and `client2.hcl`, open a tab for each and start the agents (the process for the first agent is shown below but be sure to do the same for the second agent):
 
 ```shell
@@ -722,15 +728,20 @@ $ sudo nomad agent -config client1.hcl
     ...
 ```
 
+---
+class: compact, col-2
 
 - In the output we can see the agent is running in **_client_** mode only. This agent will be available to run tasks but will not participate in managing the cluster or making scheduling decisions.
-- Using the [`node status` command][3] we should see both nodes in the ready state:
-    - ```
-        $ nomad node status
-        ID        DC   Name     Class   Drain  Eligibility  Status
-        fca62612  dc1  client1  <none>  false  eligible     ready
-        c887deef  dc1  client2  <none>  false  eligible     ready
-- We now have a simple three node cluster running. The only difference between a demo and full production cluster is that we are running a single server instead of three or five.
+- Using the [`nomad node status` command][3] we should see both nodes in the ready state:
+- We now have a simple three node cluster running. 
+  - The only difference between a demo and full production cluster is that we are running a single server instead of three or five.
+
+```shell
+$ nomad node status
+ID        DC   Name     Class   Drain  Eligibility  Status
+fca62612  dc1  client1  <none>  false  eligible     ready
+c887deef  dc1  client2  <none>  false  eligible     ready
+```
 
 # Submit a Job**
 
@@ -787,3 +798,15 @@ $ sudo nomad agent -config client1.hcl
 [3]: https://www.nomadproject.io/docs/commands/node/status.html
 [4]: https://www.nomadproject.io/docs/commands/job/run.html
 [5]: https://www.nomadproject.io/docs/commands/status.html
+
+
+
+
+
+
+
+---
+class: compact, col-2
+
+# Common Nomad Commands
+
