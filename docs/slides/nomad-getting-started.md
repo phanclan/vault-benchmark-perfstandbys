@@ -27,11 +27,12 @@ class: compact, col-2
 # Starting the Agent
 
 - We will run a single Nomad agent in **development** mode.
-  - Used to start an agent that is acting as a client and server to test job configurations or prototype interactions.
+  - Starts an agent that acts as a client and server to test job configurations or prototype interactions.
   - Should **_not_** be used in production; does not persist state.
 - The Nomad agent has started and has output some log data.
-  - The agent is running in both **client** and **server** mode, and has claimed leadership of the cluster.
-  - Additionally, the local client has been registered and marked as ready.
+  - The agent is running in both **client** and **server** mode
+  - has claimed leadership of the cluster
+  - the local client has been registered and marked as ready.
 
 .small[
 ```shell
