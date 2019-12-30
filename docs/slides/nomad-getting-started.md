@@ -26,11 +26,11 @@ class: compact, col-2
 
 For simplicity, we will run a single Nomad agent in development mode. This mode is used to quickly start an agent that is acting as a client and server to test job configurations or prototype interactions. It should **_not_** be used in production as it does not persist state.
 
-- As you can see, the Nomad agent has started and has output some log data. 
+- As you can see, the Nomad agent has started and has output some log data.
   - From the log data, you can see that our agent is running in both client and server mode, and has claimed leadership of the cluster.
   - Additionally, the local client has been registered and marked as ready.
-- **Note:** Typically any agent running in client mode must be run with root level privilege. 
-  - Nomad makes use of operating system primitives for resource isolation which require elevated permissions. 
+- **Note:** Typically any agent running in client mode must be run with root level privilege.
+  - Nomad makes use of operating system primitives for resource isolation which require elevated permissions.
   - The agent will function as non-root, but certain task drivers will not be available.
 
 ```shell
