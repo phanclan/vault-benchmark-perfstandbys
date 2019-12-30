@@ -5,6 +5,8 @@ background-image: url(tech-background-01.png)
 
 ## Peter Phan, pphan@hashicorp.com
 
+---
+
 Nomad relies on a long running agent on every machine in the cluster. The agent can run either in server or client mode. Each region must have at least one server, though a cluster of 3 or 5 servers is recommended. A single server deployment is _highly_ discouraged as data loss is inevitable in a failure scenario.
 
 All other agents run in client mode. A Nomad client is a very lightweight process that registers the host machine, performs heartbeating, and runs the tasks that are assigned to it by the servers. The agent must be run on every node that is part of the cluster so that the servers can assign work to those machines.
@@ -26,12 +28,9 @@ class: compact, col-2
 
 For simplicity, we will run a single Nomad agent in development mode. This mode is used to quickly start an agent that is acting as a client and server to test job configurations or prototype interactions. It should **_not_** be used in production as it does not persist state.
 
-- As you can see, the Nomad agent has started and has output some log data.
-  - From the log data, you can see that our agent is running in both client and server mode, and has claimed leadership of the cluster.
+- The Nomad agent has started and has output some log data.
+  - You can see that our agent is running in both **client** and **server** mode, and has claimed leadership of the cluster.
   - Additionally, the local client has been registered and marked as ready.
-- **Note:** Typically any agent running in client mode must be run with root level privilege.
-  - Nomad makes use of operating system primitives for resource isolation which require elevated permissions.
-  - The agent will function as non-root, but certain task drivers will not be available.
 
 ```shell
 *$ sudo nomad agent -dev
@@ -39,10 +38,10 @@ For simplicity, we will run a single Nomad agent in development mode. This mode 
 ==> Starting Nomad agent...
 ==> Nomad agent configuration:
 
-                Client: true
+*                Client: true
              Log Level: DEBUG
                 Region: global (DC: dc1)
-                Server: true
+*                Server: true
 
 ==> Nomad agent started! Log data will stream in below:
 
@@ -68,6 +67,11 @@ For simplicity, we will run a single Nomad agent in development mode. This mode 
     [DEBUG] client: allocs: (added 0) (removed 0) (updated 0) (ignore 0)
     [DEBUG] client: state updated to ready
 ```
+
+???
+- **Note:** Typically any agent running in client mode must be run with root level privilege.
+  - Nomad makes use of operating system primitives for resource isolation which require elevated permissions.
+  - The agent will function as non-root, but certain task drivers will not be available.
 
 ---
 name: cluster-nodes
