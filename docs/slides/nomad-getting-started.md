@@ -753,9 +753,10 @@ class: compact, col-2
 
 # Submit a Job
 
-- Now that we have a simple cluster, we can use it to schedule a job. We should still have the `example.nomad` job file from before, but verify that the count is still set to `3`.
-- Then, use the [job run command][4] to submit the job:
-  - We can see in the output that the scheduler assigned two of the tasks for one of the client nodes and the remaining task to the second client.
+- Now that we have a simple cluster, we can use it to schedule a job.
+- We should still have the `example.nomad` job file. Verify that the count is set to `3`.
+- Then, use the [`nomad job run` command][4] to submit the job:
+  - Note in the output that the scheduler assigned two of the tasks to one of the client nodes and the remaining task to the second client.
 
 ```shell
 $ nomad job run example.nomad
@@ -770,7 +771,7 @@ $ nomad job run example.nomad
 ```
 
 ---
-class: compact
+class: compact, col-2
 
 - Use the [`nomad status` command][5] to verify:
   - We can see that all our tasks have been allocated and are running.
