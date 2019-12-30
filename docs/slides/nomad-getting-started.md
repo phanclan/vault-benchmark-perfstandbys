@@ -26,10 +26,11 @@ class: compact, col-2
 
 # Starting the Agent
 
-For simplicity, we will run a single Nomad agent in development mode. This mode is used to quickly start an agent that is acting as a client and server to test job configurations or prototype interactions. It should **_not_** be used in production as it does not persist state.
-
+- We will run a single Nomad agent in **development** mode.
+  - This mode is used to quickly start an agent that is acting as a client and server to test job configurations or prototype interactions.
+  - It should **_not_** be used in production as it does not persist state.
 - The Nomad agent has started and has output some log data.
-  - You can see that our agent is running in both **client** and **server** mode, and has claimed leadership of the cluster.
+  - The agent is running in both **client** and **server** mode, and has claimed leadership of the cluster.
   - Additionally, the local client has been registered and marked as ready.
 
 ```shell
@@ -56,16 +57,16 @@ For simplicity, we will run a single Nomad agent in development mode. This mode 
     [DEBUG] raft: Votes needed: 1
     [DEBUG] raft: Vote granted. Tally: 1
     [INFO] raft: Election won. Tally: 1
-    [INFO] raft: Node at 127.0.0.1:4647 [Leader] entering Leader state
+*    [INFO] raft: Node at 127.0.0.1:4647 [Leader] entering Leader state
     [INFO] raft: Disabling EnableSingleNode (bootstrap)
     [DEBUG] raft: Node 127.0.0.1:4647 updated peer set (2): [127.0.0.1:4647]
-    [INFO] nomad: cluster leadership acquired
+*    [INFO] nomad: cluster leadership acquired
     [DEBUG] client: applied fingerprints [arch cpu host memory storage network]
     [DEBUG] client: available drivers [docker exec java]
-    [DEBUG] client: node registration complete
+*    [DEBUG] client: node registration complete
     [DEBUG] client: updated allocations at index 1 (0 allocs)
     [DEBUG] client: allocs: (added 0) (removed 0) (updated 0) (ignore 0)
-    [DEBUG] client: state updated to ready
+*    [DEBUG] client: state updated to ready
 ```
 
 ???
