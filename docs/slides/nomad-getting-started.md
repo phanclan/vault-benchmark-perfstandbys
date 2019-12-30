@@ -704,8 +704,8 @@ sed 's/client1/client2/g;s/5656/5657/g' client1.hcl > client2.hcl
 - Once you have created both `client1.hcl` and `client2.hcl`, open a tab for each and start the agents (the process for the first agent is shown below but be sure to do the same for the second agent):
 
 ```shell
-nomad agent -config nomadclient1.hcl > /tmp/nomadclient1.log 2>&1 &
-nomad agent -config nomadclient2.hcl > /tmp/nomadclient2.log 2>&1 &
+nomad agent -config client1.hcl > /tmp/nomadclient1.log 2>&1 &
+nomad agent -config client2.hcl > /tmp/nomadclient2.log 2>&1 &
 ```
 
 ```shell
