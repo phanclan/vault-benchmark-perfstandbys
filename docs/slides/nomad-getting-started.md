@@ -85,7 +85,7 @@ class: compact
 
 # Cluster Nodes
 
-If you run [`nomad node status`][3] in another terminal, you can see the registered nodes of the Nomad cluster:
+If you run [`nomad node status`](https://www.nomadproject.io/docs/commands/node/status.html) in another terminal, you can see the registered nodes of the Nomad cluster:
 
 ```shell
 *$ nomad node status
@@ -100,8 +100,8 @@ ID        DC   Name   Class   Drain  Eligibility  Status
 class: compact, col-2
 
 - The agent is also running in **server** mode.
-  - This means it is part of the [gossip protocol][4] used to connect all the server instances together.
-  - We can view the members of the gossip ring using the [`server members`][5] command:
+  - This means it is part of the [gossip protocol](https://www.nomadproject.io/docs/internals/gossip.html) used to connect all the server instances together.
+  - We can view the members of the gossip ring using the [`server members`](https://www.nomadproject.io/docs/commands/server/members.html) command:
 
 ```shell
 *$ nomad server members
@@ -120,7 +120,7 @@ class: compact
 
 - You can use `Ctrl-C` (the interrupt signal) to halt the agent.
   - By default, all signals will cause the agent to forcefully shutdown.
-  - The agent [can be configured][7] to gracefully leave on either the **interrupt** or **terminate** signals.
+  - The agent [can be configured](https://www.nomadproject.io/docs/configuration/index.html#leave_on_terminate) to gracefully leave on either the **interrupt** or **terminate** signals.
 - After interrupting the agent, you should see it leave the cluster and shut down:
 
 ```shell
@@ -146,7 +146,7 @@ class: compact
 ---
 class: compact
 
-- If an agent is operating as a server, [`leave_on_terminate`][7] should only be set if the server will never rejoin the cluster again. 
+- If an agent is operating as a server, [`leave_on_terminate`](https://www.nomadproject.io/docs/configuration/index.html#leave_on_terminate) should only be set if the server will never rejoin the cluster again. 
   - The default value of false for `leave_on_terminate` and `leave_on_interrupt` work well for most scenarios. 
   - If Nomad servers are part of an auto scaling group where new servers are brought up to replace failed servers, using graceful leave avoids causing a potential availability outage affecting the [consensus protocol](https://www.nomadproject.io/docs/internals/consensus.html). 
   - As of Nomad 0.8, Nomad includes Autopilot which automatically removes failed or dead servers. 
@@ -162,8 +162,3 @@ class: compact
 *$ sudo nomad agent -dev
 ```
 
-[3]: https://www.nomadproject.io/docs/commands/node/status.html
-[4]: https://www.nomadproject.io/docs/internals/gossip.html
-[5]: https://www.nomadproject.io/docs/commands/server/members.html
-[7]: https://www.nomadproject.io/docs/configuration/index.html#leave_on_terminate
-[8]: https://www.nomadproject.io/docs/configuration/index.html#leave_on_terminate
