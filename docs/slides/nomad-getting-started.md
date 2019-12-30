@@ -582,6 +582,8 @@ background-image: url(tech-background-01.png)
 
 # Clustering
 
+---
+
 We have started our first agent and run a job against it in development mode. This demonstrates the ease of use and the workflow of Nomad, but did not show how this could be extended to a scalable, production-grade configuration.
 
 In this step, we will create our first real cluster with multiple nodes.
@@ -627,7 +629,7 @@ $ nomad agent -config server.hcl
 ```
 
 - Note that **client** mode is disabled, and that we are only running as the server.
-- This means that this server will manage state and make scheduling decisions but will not run any tasks.
+- This server will manage state and make scheduling decisions but will not run any tasks.
 - Now we need some agents to run tasks!
 
 ```shell
@@ -635,10 +637,10 @@ $ nomad agent -config server.hcl
 ==> Starting Nomad agent...
 ==> Nomad agent configuration:
 
-                Client: false
+*               Client: false
              Log Level: DEBUG
                 Region: global (DC: dc1)
-                Server: true
+*               Server: true
                Version: 0.9.6
 
 ==> Nomad agent started! Log data will stream in below:
