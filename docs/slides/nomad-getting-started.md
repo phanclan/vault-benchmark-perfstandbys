@@ -344,7 +344,7 @@ class: compact, col-2
   - to change the docker container, 
   - to update the application version, or 
   - to change the count of a task group to scale with load.
-- For now, edit the `example.nomad` file to update the count and set it to `3`. This line is in the `cache` section around line `145`.
+- For now, edit the `example.nomad` file to update the `count` and set it to `3`. This line is in the `cache` section around line `145`.
 
 ```shell
 # The "count" parameter specifies the number of the task groups that should
@@ -356,15 +356,15 @@ count = 3
 ---
 class: compact, col-2
 
-- Use the [`job plan` command][8] to **invoke a dry-run of the scheduler** to see what would happen if you ran the updated job:
-  - We can see that the scheduler detected the change in count and informs us that it will cause `2` new instances to be created. The in-place update that will occur is to push the updated job specification to the existing allocation and will not cause any service interruption.
-  - We can then run the job with the run command the `plan` emitted.
+- Use the [`nomad job plan` command][8] to **invoke a dry-run of the scheduler** to see what would happen if you ran the updated job:
+  - Note that the scheduler detected the change in count and informs us that it will cause `2` new instances to be created. 
+    - The `in-place update` that will occur is to push the updated job specification to the existing allocation and will not cause any service interruption.
 
 ```shell
-$ nomad job plan example.nomad
+*$ nomad job plan example.nomad
 +/- Job: "example"
-+/- Task Group: "cache" (2 create, 1 in-place update)
-  +/- Count: "1" => "3" (forces create)
+*+/- Task Group: "cache" (2 create, 1 in-place update)
+* +/- Count: "1" => "3" (forces create)
       Task: "redis"
 
 Scheduler dry-run:
@@ -373,7 +373,7 @@ Scheduler dry-run:
 Job Modify Index: 7
 To submit the job with version verification run:
 
-nomad job run -check-index 7 example.nomad
+*nomad job run -check-index 7 example.nomad
 
 When running the job with the check-index flag, the job will only be run if the
 server side version matches the job modify index returned. If the index has
@@ -384,16 +384,18 @@ potentially invalid.
 ---
 class: compact, col-2
 
-- By running with the `-check-index` flag, Nomad checks that the job has not been modified since the plan was run. This is useful if multiple people are interacting with the job at the same time to ensure the job hasn't changed before you apply your modifications.
-  - Because we set the count of the task group to three, Nomad created two additional allocations to get to the desired state. It is idempotent to run the same job specification again and no new allocations will be created.
+- Run the job with the `nomad job run` command the `plan` displayed.
+  - By running with the `-check-index` flag, Nomad checks that the job has not been modified since the plan was run. 
+  - This is useful if multiple people are interacting with the job at the same time to ensure the job hasn't changed before you apply your modifications.
+  - Because we set the count of the task group to `three`, Nomad created two additional allocations to get to the desired state. It is **idempotent** to run the same job specification again (`nomad job run`) and no new allocations will be created.
 
 ```shell
-$ nomad job run -check-index 7 example.nomad
+*$ nomad job run -check-index 7 example.nomad
 ==> Monitoring evaluation "93d16471"
     Evaluation triggered by job "example"
     Evaluation within deployment: "0d06e1b6"
 *   Allocation "3249e320" created: node "e42d6f19", group "cache"
-    Allocation "453b210f" created: node "e42d6f19", group "cache"
+*   Allocation "453b210f" created: node "e42d6f19", group "cache"
     Allocation "883269bf" modified: node "e42d6f19", group "cache"
     Evaluation status changed: "pending" -> "complete"
 ==> Evaluation "93d16471" finished with status "complete"
