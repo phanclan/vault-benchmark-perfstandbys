@@ -38,11 +38,9 @@ class: compact, col-2
 class: compact, col-2
 
 - The Nomad agent has started and has output some log data.
-  - The agent is running in both **client** and **server** mode
+  - agent is running in both **client** and **server** mode
   - has claimed leadership of the cluster
-  - the local client has been registered and marked as ready.
-
-.small[small test]
+  - the local client has been **registered** and marked as **ready**.
 
 ```shell
 ==> Starting Nomad agent...
@@ -51,7 +49,6 @@ class: compact, col-2
              Log Level: DEBUG
                 Region: global (DC: dc1)
 *               Server: true
-
 ==> Nomad agent started! Log data will stream in below:
     [INFO] serf: EventMemberJoin: nomad.global 127.0.0.1
     [INFO] nomad: starting 4 scheduling worker(s) for [service batch _core]
@@ -84,7 +81,7 @@ class: compact, col-2
 
 ---
 name: cluster-nodes
-class: compact, col-2
+class: compact
 
 # Cluster Nodes
 
