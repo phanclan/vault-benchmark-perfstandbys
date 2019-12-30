@@ -98,7 +98,10 @@ ID        DC   Name   Class   Drain  Eligibility  Status
 
 ---
 class: compact, col-2
-The agent is also running in server mode, which means it is part of the [gossip protocol][4] used to connect all the server instances together. We can view the members of the gossip ring using the [`server members`][5] command:
+
+- The agent is also running in **server** mode.
+  - This means it is part of the [gossip protocol][4] used to connect all the server instances together.
+  - We can view the members of the gossip ring using the [`server members`][5] command:
 
 ```shell
 *$ nomad server members
@@ -106,7 +109,8 @@ Name          Address    Port  Status  Leader  Protocol  Build  Datacenter  Regi
 nomad.global  127.0.0.1  4648  alive   true    2         0.9.6  dc1         global
 ```
 
-The output shows our own agent, the address it is running on, its health state, some version information, and the datacenter and region. Additional metadata can be viewed by providing the `-detailed` flag.
+- The output shows our own agent, the address it is running on, its health state, some version information, and the datacenter and region.
+  - Additional metadata can be viewed by providing the `-detailed` flag.
 
 ---
 name: stopping-the-agent
