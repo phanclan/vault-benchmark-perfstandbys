@@ -593,11 +593,15 @@ class: compact, col-2
 
 # Starting the Server
 
-- The first step is to create the config file for the server. Either download the [file from the repository](https://raw.githubusercontent.com/hashicorp/nomad/master/demo/vagrant/server.hcl), or paste this into a file called `server.hcl`:
-  - This is a minimal server configuration file, but it is enough to start an agent in server only mode and have it elected as a leader. 
-  - The major change that should be made for production is to run more than one server, and to change the corresponding `bootstrap_expect` value.
+- First, create the config file for the server. 
+  - Either download the [file from the repository](https://raw.githubusercontent.com/hashicorp/nomad/master/demo/vagrant/server.hcl)
+  - Or create a file called `server.hcl`.
+  - This is a minimal server configuration file.
+  - It starts an agent in server only mode and has it elected as a leader.
+- The major change that should be made for production is to run more than one server, and to change the corresponding `bootstrap_expect` value.
 
 ```go
+tee server.hcl <<EOF
 # Increase log verbosity
 log_level = "DEBUG"
 
@@ -611,6 +615,7 @@ server {
     # Self-elect, should be 3 or 5 for production
     bootstrap_expect = 1
 }
+EOF
 ```
 
 ---
@@ -890,7 +895,7 @@ class: img-left
 - This page lists all tasks for an allocation as well as the recent events for each task.
 - It is similar to the `nomad alloc status` command.
 
-- The Nomad UI offers a friendly and visual alternative experience to the CLI.
+The Nomad UI offers a friendly and visual alternative experience to the CLI.
 
 
 
@@ -911,8 +916,105 @@ class: compact, col-2
 # Common Nomad Commands
 
 ```shell
+nomad operator raft list-peers
 nomad node status
+
+nomad job run <job_filename>
 nomad job status <job_name>
 nomad status <job_name> - similar to above
+nomad job stop <job_name>
+
 nomad alloc status <alloc_id>
+```
+
+---
+
+# Sample nomad.hcl for Nomad Server
+
+```go
+sudo tee /etc/nomad.d/config.hcl > /dev/null <<EOF
+name         = "${node_name}"
+data_dir     = "/mnt/nomad"
+```
+
+```go
+sudo tee /etc/nomad.d/config.hcl > /dev/null <<EOF
+name         = "${node_name}"
+data_dir     = "/mnt/nomad"
+enable_debug = true
+bind_addr = "0.0.0.0"
+datacenter = "${region}"
+region = "global"
+advertise {
+  http = "$(public_ip):4646"
+  rpc  = "$(public_ip):4647"
+  serf = "$(public_ip):4648"
+}
+server {
+  enabled          = true
+  bootstrap_expect = ${nomad_servers}
+  encrypt          = "${nomad_gossip_key}"
+}
+client {
+  enabled = true
+   options {
+    "driver.raw_exec.enable" = "1"
+     "docker.privileged.enabled" = "true"
+  }
+  meta {
+    "type" = "server",
+    "name" = "${node_name}"
+  }
+  host_volume "mysql_mount" {
+    path      = "/opt/mysql/data/"
+    read_only = false
+  }
+  host_volume "mongodb_mount" {
+    path      = "/opt/mongodb/data/"
+    read_only = false
+  }
+  host_volume "prometheus_mount" {
+    path      = "/opt/prometheus/data/"
+    read_only = false
+  }
+}
+tls {
+  rpc  = true
+  http = true
+  ca_file   = "/usr/local/share/ca-certificates/01-me.crt"
+  cert_file = "/etc/ssl/certs/me.crt"
+  key_file  = "/etc/ssl/certs/me.key"
+  verify_server_hostname = false
+}
+consul {
+  address = "localhost:8500"
+  server_service_name = "nomad-server"
+  client_service_name = "nomad-client"
+  auto_advertise = true
+  server_auto_join = true
+  client_auto_join = true
+}
+vault {
+  enabled          = true
+  address          = "https://active.vault.service.consul:8200"
+  ca_file          = "/usr/local/share/ca-certificates/01-me.crt"
+  cert_file        = "/etc/ssl/certs/me.crt"
+  key_file         = "/etc/ssl/certs/me.key"
+  create_from_role = "nomad-cluster"
+}
+autopilot {
+    cleanup_dead_servers = true
+    last_contact_threshold = "200ms"
+    max_trailing_logs = 250
+    server_stabilization_time = "10s"
+    enable_redundancy_zones = false
+    disable_upgrade_migration = false
+    enable_custom_upgrades = false
+}
+telemetry {
+  publish_allocation_metrics = true
+  publish_node_metrics = true
+  prometheus_metrics = true
+}
+EOF
 ```
