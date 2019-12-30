@@ -35,7 +35,7 @@ class: compact, col-2
 ```
 
 ---
-class: compact
+class: compact, col-2
 
 - The Nomad agent has started and has output some log data.
   - agent is running in both **client** and **server** mode
@@ -85,7 +85,8 @@ class: compact
 
 # Cluster Nodes
 
-If you run [`nomad node status`](https://www.nomadproject.io/docs/commands/node/status.html) in another terminal, you can see the registered nodes of the Nomad cluster:
+- Run [`nomad node status`](https://www.nomadproject.io/docs/commands/node/status.html) in another terminal
+- You can see the registered nodes of the Nomad cluster:
 
 ```shell
 *$ nomad node status
@@ -149,7 +150,7 @@ class: compact
 - If an agent is operating as a server, [`leave_on_terminate`](https://www.nomadproject.io/docs/configuration/index.html#leave_on_terminate) should only be set if the server will never rejoin the cluster again. 
   - The default value of false for `leave_on_terminate` and `leave_on_interrupt` work well for most scenarios. 
   - If Nomad servers are part of an auto scaling group where new servers are brought up to replace failed servers, using graceful leave avoids causing a potential availability outage affecting the [consensus protocol](https://www.nomadproject.io/docs/internals/consensus.html). 
-  - As of Nomad 0.8, Nomad includes Autopilot which automatically removes failed or dead servers. 
+  - As of **Nomad 0.8**, Nomad includes **Autopilot** which automatically removes failed or dead servers. 
     - This allows the operator to skip setting `leave_on_terminate`
 
 ---
