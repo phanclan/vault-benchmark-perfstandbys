@@ -777,9 +777,6 @@ class: compact, col-2
   - We can see that all our tasks have been allocated and are running.
   - (optional) We can stop the job with `nomad job stop`.
 
-- Nomad is now up and running. The cluster can be entirely managed from the command line, but Nomad also comes with a web interface that is hosted alongside the HTTP API. Next, we'll visit the UI in the browser.
-- Re-run the example job if you stopped it previously before heading to the next section.
-
 ```shell
 $ nomad status example
 ID          = example
@@ -811,6 +808,71 @@ ID        Eval ID   Node ID   Task Group  Desired  Status   Created At
 *7e2b3900  8e0a7cf9  fca62612  cache       run      running  08/08/19 21:03:19 <--- client1
 *9c66fcaf  8e0a7cf9  c887deef  cache       run      running  08/08/19 21:03:19 <--- client2
 ```
+
+---
+
+- Nomad is now up and running. 
+  - The cluster can be entirely managed from the command line, but Nomad also comes with a web interface that is hosted alongside the HTTP API. 
+  - Next, we'll visit the UI in the browser.
+- Re-run the example job if you stopped it previously before heading to the next section.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+class: title, smokescreen, shelf, no-footer
+background-image: url(tech-background-01.png)
+
+# Web UI
+
+---
+At this point we have a fully functioning cluster with a job running in it. We have learned how to inspect a job using nomad status, next we'll learn how to inspect a job in the web client.
+
+---
+class: img-right
+# Opening the Web UI
+
+![](https://learn.hashicorp.com/static/img/intro-ui-jobs-list.png)
+
+- As long as Nomad is running, the Nomad UI is also running. It is hosted at the same address and port as the Nomad HTTP API under the /ui namespace.
+- With Nomad running, visit [http://localhost:4646](http://localhost:4646/) to open the Nomad UI.
+- If you're using vagrant and can't connect, it's possible that Vagrant was unable to properly map the port from your host to the VM. Your vagrant up output will contain the new port mapping:
+
+```shell
+==> default: Fixed port collision for 4646 => 4646. Now on port 2200.
+```
+
+- In the case above you would connect to [http://localhost:2200](http://localhost:2200/) instead.
+
+---
+
+# Inspecting a Job
+
+- You should be automatically redirected to `/ui/jobs` upon visiting the UI in your browser. This pages lists all jobs known to Nomad, regardless of status. Click the `example` job to inspect it.
+![](https://learn.hashicorp.com/static/img/intro-ui-job-detail.png)
+- The job detail page shows pertinent information about the job, including overall status as well as allocation statuses broken down by task group. It is similar to the `nomad status` CLI command.
+- **Note**: You may see a different number of allocations on your node next to Allocation Status depending on how many times you have stopped and restarted jobs.
+
+---
+
+- Click on the `cache` task group to drill into the **_task group_** detail page. This page lists each allocation for the task group.
+![](https://learn.hashicorp.com/static/img/intro-ui-task-group-detail.png)
+
+- Click on the `allocation` in the allocations table. This page lists all tasks for an allocation as well as the recent events for each task. It is similar to the `nomad alloc status` command.
+  ![intro-ui-task-group-detail](https://learn.hashicorp.com/static/img/intro-ui-task-group-detail.png)
+
+- The Nomad UI offers a friendly and visual alternative experience to the CLI.
 
 
 
