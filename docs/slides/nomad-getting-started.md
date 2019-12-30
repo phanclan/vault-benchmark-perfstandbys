@@ -845,9 +845,10 @@ class: img-right
 
 ![](https://learn.hashicorp.com/static/img/intro-ui-jobs-list.png)
 
-- As long as Nomad is running, the Nomad UI is also running. It is hosted at the same address and port as the Nomad HTTP API under the /ui namespace.
-- With Nomad running, visit [http://localhost:4646](http://localhost:4646/) to open the Nomad UI.
-- If you're using vagrant and can't connect, it's possible that Vagrant was unable to properly map the port from your host to the VM. Your vagrant up output will contain the new port mapping:
+- As long as Nomad is running, the Nomad UI is also running. It is hosted at the same address and port as the Nomad HTTP API under the `/ui` namespace.
+- (If Vagrant) With Nomad running, visit [`http://localhost:4646`](http://localhost:4646/) to open the Nomad UI.
+  - If you can't connect, it's possible that Vagrant was unable to properly map the port from your host to the VM. 
+  - Your `vagrant up` output will contain the new port mapping:
 
 ```shell
 ==> default: Fixed port collision for 4646 => 4646. Now on port 2200.
@@ -856,21 +857,35 @@ class: img-right
 - In the case above you would connect to [http://localhost:2200](http://localhost:2200/) instead.
 
 ---
+class: img-right
 
 # Inspecting a Job
 
-- You should be automatically redirected to `/ui/jobs` upon visiting the UI in your browser. This pages lists all jobs known to Nomad, regardless of status. Click the `example` job to inspect it.
-![](https://learn.hashicorp.com/static/img/intro-ui-job-detail.png)
-- The job detail page shows pertinent information about the job, including overall status as well as allocation statuses broken down by task group. It is similar to the `nomad status` CLI command.
-- **Note**: You may see a different number of allocations on your node next to Allocation Status depending on how many times you have stopped and restarted jobs.
+![intro-ui-job-detail](https://learn.hashicorp.com/static/img/intro-ui-job-detail.png)
+
+- You should be automatically redirected to `/ui/jobs` upon visiting the UI in your browser.
+- This pages lists all jobs known to Nomad, regardless of status.
+- Click the `example` job to inspect it.
+- The job detail page shows pertinent information about the job, including overall status as well as allocation statuses broken down by task group.
+  - It is similar to the `nomad status` CLI command.
+- **Note**: You may see a different number of allocations on your node next to **Allocation Status** depending on how many times you have stopped and restarted jobs.
 
 ---
+class: img-left
 
-- Click on the `cache` task group to drill into the **_task group_** detail page. This page lists each allocation for the task group.
-![](https://learn.hashicorp.com/static/img/intro-ui-task-group-detail.png)
+![intro-ui-task-group-detail](https://learn.hashicorp.com/static/img/intro-ui-task-group-detail.png)
 
-- Click on the `allocation` in the allocations table. This page lists all tasks for an allocation as well as the recent events for each task. It is similar to the `nomad alloc status` command.
-  ![intro-ui-task-group-detail](https://learn.hashicorp.com/static/img/intro-ui-task-group-detail.png)
+- Click on the `cache` task group to drill into the **_task group_** detail page.
+- This page lists each allocation for the task group.
+
+---
+class: img-left
+
+![intro-ui-task-group-detail](https://learn.hashicorp.com/static/img/intro-ui-task-group-detail.png)
+
+- Click on an `allocation` in the allocations table.
+- This page lists all tasks for an allocation as well as the recent events for each task.
+- It is similar to the `nomad alloc status` command.
 
 - The Nomad UI offers a friendly and visual alternative experience to the CLI.
 
@@ -895,5 +910,6 @@ class: compact, col-2
 ```shell
 nomad node status
 nomad job status <job_name>
+nomad status <job_name> - similar to above
 nomad alloc status <alloc_id>
 ```
