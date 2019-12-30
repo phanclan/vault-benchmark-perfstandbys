@@ -146,17 +146,17 @@ class: compact
 ---
 class: compact
 
-- If an agent is operating as a server, [`leave_on_terminate`][8] should only be set if the server will never rejoin the cluster again. 
+- If an agent is operating as a server, [`leave_on_terminate`][7] should only be set if the server will never rejoin the cluster again. 
   - The default value of false for `leave_on_terminate` and `leave_on_interrupt` work well for most scenarios. 
-  - If Nomad servers are part of an auto scaling group where new servers are brought up to replace failed servers, using graceful leave avoids causing a potential availability outage affecting the [consensus protocol][9]. 
+  - If Nomad servers are part of an auto scaling group where new servers are brought up to replace failed servers, using graceful leave avoids causing a potential availability outage affecting the [consensus protocol](https://www.nomadproject.io/docs/internals/consensus.html). 
   - As of Nomad 0.8, Nomad includes Autopilot which automatically removes failed or dead servers. 
     - This allows the operator to skip setting `leave_on_terminate`
 
 ---
 class: compact
-If a server does forcefully exit and will not be returning into service, the [server force-leave command][10] should be used to force the server from a _failed_ to a _left_ state.
 
-Start the agent again with the `sudo nomad agent -dev` command before continuing to the next section.
+- If a server does forcefully exit and will not be returning into service, the [`server force-leave` command](https://www.nomadproject.io/docs/commands/server/force-leave.html) should be used to force the server from a _failed_ to a _left_ state.
+- Start the agent again with the `sudo nomad agent -dev` command before continuing to the next section.
 
 ```shell
 *$ sudo nomad agent -dev
@@ -167,5 +167,3 @@ Start the agent again with the `sudo nomad agent -dev` command before continuing
 [5]: https://www.nomadproject.io/docs/commands/server/members.html
 [7]: https://www.nomadproject.io/docs/configuration/index.html#leave_on_terminate
 [8]: https://www.nomadproject.io/docs/configuration/index.html#leave_on_terminate
-[9]: https://www.nomadproject.io/docs/internals/consensus.html
-[10]: https://www.nomadproject.io/docs/commands/server/force-leave.html
