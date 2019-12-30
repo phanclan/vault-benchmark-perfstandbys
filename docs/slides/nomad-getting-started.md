@@ -40,14 +40,12 @@ class: compact, col-2
 
 ==> Starting Nomad agent...
 ==> Nomad agent configuration:
-
 *                Client: true
              Log Level: DEBUG
                 Region: global (DC: dc1)
 *                Server: true
 
 ==> Nomad agent started! Log data will stream in below:
-
     [INFO] serf: EventMemberJoin: nomad.global 127.0.0.1
     [INFO] nomad: starting 4 scheduling worker(s) for [service batch _core]
     [INFO] client: using alloc directory /tmp/NomadClient599911093
