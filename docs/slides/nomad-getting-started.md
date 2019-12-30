@@ -29,21 +29,28 @@ class: compact, col-2
 - We will run a single Nomad agent in **development** mode.
   - Starts an agent that acts as a client and server to test job configurations or prototype interactions.
   - Should **_not_** be used in production; does not persist state.
+
+```shell
+*$ sudo nomad agent -dev
+```
+
+---
+class: compact, col-2
+
 - The Nomad agent has started and has output some log data.
   - The agent is running in both **client** and **server** mode
   - has claimed leadership of the cluster
   - the local client has been registered and marked as ready.
 
-.small[
-```shell
-*$ sudo nomad agent -dev
+.small[small test]
 
+```shell
 ==> Starting Nomad agent...
 ==> Nomad agent configuration:
-*                Client: true
+*               Client: true
              Log Level: DEBUG
                 Region: global (DC: dc1)
-*                Server: true
+*               Server: true
 
 ==> Nomad agent started! Log data will stream in below:
     [INFO] serf: EventMemberJoin: nomad.global 127.0.0.1
@@ -57,17 +64,17 @@ class: compact, col-2
     [DEBUG] raft: Votes needed: 1
     [DEBUG] raft: Vote granted. Tally: 1
     [INFO] raft: Election won. Tally: 1
-*    [INFO] raft: Node at 127.0.0.1:4647 [Leader] entering Leader state
+*   [INFO] raft: Node at 127.0.0.1:4647 [Leader] entering Leader state
     [INFO] raft: Disabling EnableSingleNode (bootstrap)
     [DEBUG] raft: Node 127.0.0.1:4647 updated peer set (2): [127.0.0.1:4647]
-*    [INFO] nomad: cluster leadership acquired
+*   [INFO] nomad: cluster leadership acquired
     [DEBUG] client: applied fingerprints [arch cpu host memory storage network]
     [DEBUG] client: available drivers [docker exec java]
-*    [DEBUG] client: node registration complete
+*   [DEBUG] client: node registration complete
     [DEBUG] client: updated allocations at index 1 (0 allocs)
     [DEBUG] client: allocs: (added 0) (removed 0) (updated 0) (ignore 0)
-*    [DEBUG] client: state updated to ready
-```]
+*   [DEBUG] client: state updated to ready
+```
 
 ???
 
