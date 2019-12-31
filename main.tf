@@ -36,7 +36,15 @@ data "template_file" "install_vault" {
 }
 
 data "template_file" "install_consul" {
-  template = "${file("${path.module}/templates/install_consul_server.sh.tpl")}"
+  template = "${join("\n", list(
+    file("${path.module}/templates/shared/base.sh"),
+    file("${path.module}/templates/servers/install_consul_server.sh.tpl"),
+    file("${path.module}/templates/servers/nomad.sh"),
+  ))}"
+# data "template_file" "install_consul" {
+#   template = "${join("\n", list(
+#     file("${path.module}/templates/servers/install_consul_server.sh.tpl"),
+#   ))}"
 
   vars = {
     install_unzip       = var.unzip_command

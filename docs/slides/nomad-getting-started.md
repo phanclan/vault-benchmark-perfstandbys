@@ -466,7 +466,7 @@ class: compact, col-2
 class: compact, col-2
 
 - After running, the rolling upgrade can be followed by running `nomad status` and watching the deployed count.
-- We can see that Nomad handled the update in three phases, only updating a single allocation in each phase and waiting for it to be healthy for `min_healthy_time` of `10` seconds before moving on to the next. 
+- We can see that Nomad handled the update in three phases, only updating a single allocation in each phase and waiting for it to be healthy for `min_healthy_time` of `10` seconds before moving on to the next.
 - The update strategy can be configured, but rolling updates makes it easy to upgrade an application at large scale.
 
 ```shell
@@ -912,6 +912,7 @@ The Nomad UI offers a friendly and visual alternative experience to the CLI.
 
 ---
 class: compact, col-2
+
 # Sample nomad.hcl for Nomad Server
 
 Super simple config.
@@ -921,9 +922,9 @@ Super simple config.
 tee server.hcl <<EOF
 # Increase log verbosity
 log_level = "DEBUG"
-
+#datacenter = "dc1"
 # Setup data dir
-data_dir = "/tmp/server1"
+data_dir = "/mnt/nomad"
 
 # Enable the server
 server {
@@ -965,7 +966,7 @@ EOF
 log_level = "DEBUG"
 
 # Setup data dir
-data_dir = "/tmp/client1"
+data_dir = "/mnt/nomad"
 
 # Give the agent a unique name. Defaults to hostname
 name = "client1"
