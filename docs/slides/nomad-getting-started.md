@@ -244,9 +244,10 @@ class: compact
 ---
 class: compact, col-2
 
-- Anytime a job is updated, Nomad creates an evaluation to determine what actions need to take place. 
-  - In this case, because this is a new job, Nomad has determined that an allocation should be created and has scheduled it on our local agent.
-- To inspect the status of our job we use the [`nomad status` command](https://www.nomadproject.io/docs/commands/status.html):
+- Anytime a job is updated, Nomad creates an evaluation to determine what actions need to take place.
+  - This is a new job, so Nomad has determined that an **allocation** should be created
+  - Schedules it on our local agent.
+- Inspect the status of our job with the [`nomad status`](https://www.nomadproject.io/docs/commands/status.html) command:
   - Here we can see that the result of our evaluation was the creation of an allocation that is now running on the local node.
   - Our Node ID can be seen with `nomad node status`
 
