@@ -17,6 +17,7 @@ layout: true
 class: compact, col-2
 
 ```shell
+nomad agent -config server.hcl > /tmp/nomad.log 2>&1 &
 nomad operator raft list-peers
 nomad node status
 
@@ -24,6 +25,8 @@ nomad job run <job_filename>
 nomad job status <job_name>
 nomad status <job_name> - similar to above
 nomad job stop <job_name>
+nomad job plan <job_filename> - job modification
+nomad job run -check-index <index> <job_filename>
 
 nomad alloc status <alloc_id>
 ```

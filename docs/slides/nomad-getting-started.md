@@ -339,10 +339,10 @@ class: compact, col-2
 
 # Modifying a Job
 
-- The definition of a job is not static, and is meant to be updated over time. 
-- You may update a job 
-  - to change the docker container, 
-  - to update the application version, or 
+- The definition of a job is not static, and is meant to be updated over time.
+- You may update a job
+  - to change the docker container,
+  - to update the application version, or
   - to change the count of a task group to scale with load.
 - For now, edit the `example.nomad` file to update the `count` and set it to `3`. This line is in the `cache` section around line `145`.
 
@@ -357,7 +357,7 @@ count = 3
 class: compact, col-2
 
 - Use the [`nomad job plan` command](https://www.nomadproject.io/docs/commands/job/plan.html) to **invoke a dry-run of the scheduler** to see what would happen if you ran the updated job:
-  - Note that the scheduler detected the change in count and informs us that it will cause `2` new instances to be created. 
+  - Note that the scheduler detected the change in count and informs us that it will cause `2` new instances to be created.
     - The `in-place update` that will occur is to push the updated job specification to the existing allocation and will not cause any service interruption.
 
 ```shell
@@ -404,9 +404,9 @@ class: compact, col-2
 ---
 class: compact, col-2
 
-- Let's do an application update. 
-  - We will change the version of redis we want to run. 
-  - Edit the `example.nomad` file and change the Docker image from "`redis:3.2`" to "`redis:4.0`". 
+- Let's do an application update.
+  - We will change the version of redis we want to run.
+  - Edit the `example.nomad` file and change the Docker image from "`redis:3.2`" to "`redis:4.0`".
     - This is located around line `261`.
 
 ```go
@@ -419,8 +419,8 @@ config {
 ---
 class: compact, col-2
 
-- We can run `nomad job plan` again to see what will happen if we submit this change:
-  - The `plan` output shows us that one allocation will be updated and that the other two will be ignored. 
+- Run `nomad job plan` again to see what will happen if we submit this change:
+  - The `plan` output shows us that one allocation will be updated and that the other two will be ignored.
   - This is due to the `max_parallel` setting in the `update` stanza, which is set to `1` to instruct Nomad to perform only a single change at a time.
 
 ```shell
@@ -911,14 +911,83 @@ The Nomad UI offers a friendly and visual alternative experience to the CLI.
 
 
 ---
-
+class: compact, col-2
 # Sample nomad.hcl for Nomad Server
+
+Super simple config.
+- Single server
+
+```go
+tee server.hcl <<EOF
+# Increase log verbosity
+log_level = "DEBUG"
+
+# Setup data dir
+data_dir = "/tmp/server1"
+
+# Enable the server
+server {
+    enabled = true
+
+    # Self-elect, should be 3 or 5 for production
+    bootstrap_expect = 1
+}
+EOF
+```
+
+---
+class: compact, col-2
+
+- Basic config
+  - Three server
 
 ```go
 sudo tee /etc/nomad.d/config.hcl > /dev/null <<EOF
-name         = "${node_name}"
-data_dir     = "/mnt/nomad"
+#name         = "${node_name}"
+# Setup data dir
+data_dir     = "/tmp/server"
+bind_addr = "0.0.0.0"
+
+# Enable the server
+server {
+    enabled = true
+
+    # Self-elect, should be 3 or 5 for production
+    bootstrap_expect = 3
+}
+EOF
 ```
+
+- Basic `client` config
+
+```go
+# Increase log verbosity
+log_level = "DEBUG"
+
+# Setup data dir
+data_dir = "/tmp/client1"
+
+# Give the agent a unique name. Defaults to hostname
+name = "client1"
+
+# Enable the client
+client {
+    enabled = true
+
+    # For demo assume we are talking to server1. For production,
+    # this should be like "nomad.service.consul:4647" and a system
+    # like Consul used for service discovery.
+    servers = ["127.0.0.1:4647"]
+}
+
+# Modify our port to avoid a collision with server1
+ports {
+    http = 5656
+}
+```
+
+---
+class: compact, col-2
 
 ```go
 sudo tee /etc/nomad.d/config.hcl > /dev/null <<EOF
@@ -1001,3 +1070,8 @@ telemetry {
 }
 EOF
 ```
+
+???
+
+- `enable_debug`
+- `consul` stanza is mostly default. only server name is non-default

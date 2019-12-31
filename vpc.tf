@@ -61,17 +61,6 @@ resource "aws_security_group_rule" "consul_vault_in" {
   cidr_blocks = flatten([local.my_ip, var.ingress_cidr_blocks])
 }
 
-# Peter - allow traffic for Nomad from CIDR
-resource "aws_security_group_rule" "nomad_in" {
-  security_group_id = aws_security_group.vault.id
-  type              = "ingress"
-  from_port         = 4646
-  to_port           = 4646
-  protocol          = "tcp"
-  # cidr_blocks       = ["0.0.0.0/0"]
-  cidr_blocks = flatten([local.my_ip, var.ingress_cidr_blocks])
-}
-
 # Peter - allow traffic for consul and vault from SG
 resource "aws_security_group_rule" "consul_vault_in_sg" {
   security_group_id = aws_security_group.vault.id
@@ -81,6 +70,30 @@ resource "aws_security_group_rule" "consul_vault_in_sg" {
   protocol          = "tcp"
   source_security_group_id = aws_security_group.vault.id
 }
+
+# Peter - allow traffic for Nomad from CIDR
+resource "aws_security_group_rule" "nomad_in" {
+  security_group_id = aws_security_group.vault.id
+  type              = "ingress"
+  from_port         = 4646
+  to_port           = 4648
+  protocol          = "tcp"
+  # cidr_blocks       = ["0.0.0.0/0"]
+  cidr_blocks = flatten([local.my_ip, var.ingress_cidr_blocks])
+}
+
+# Peter - allow traffic for Nomad from SG
+resource "aws_security_group_rule" "nomad_in_sg" {
+  security_group_id = aws_security_group.vault.id
+  type              = "ingress"
+  from_port         = 4646
+  to_port           = 4648
+  protocol          = "tcp"
+  # cidr_blocks       = ["0.0.0.0/0"]
+  source_security_group_id = aws_security_group.vault.id
+}
+
+
 
 locals {
   my_ip = "${chomp(data.http.current_ip.body)}/32"
