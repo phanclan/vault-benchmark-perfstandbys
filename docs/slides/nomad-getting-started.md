@@ -249,7 +249,7 @@ class: compact, col-2
   - Schedules it on our local agent.
 - Inspect the status of our job with the [`nomad status`](https://www.nomadproject.io/docs/commands/status.html) command:
   - Note that the result of our evaluation was the creation of an allocation that is running on the local node.
-  - Our Node ID can be seen with `nomad node status`
+  - See Node ID with `nomad node status` command.
 
 ```shell
 *$ nomad status example
