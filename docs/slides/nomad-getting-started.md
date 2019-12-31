@@ -206,12 +206,14 @@ class: compact, col-2
 Example job file written to example.nomad
 ```
 
-- You can view the contents of this file by running `cat example.nomad`.
+- View the contents of this file by running:
+  - `cat example.nomad` or
   - `grep -vE "^*#|^$" example.nomad`
-- In this example job file, we have declared a single task '`redis`' which is using the Docker driver to run the task. 
-  - The primary way you interact with Nomad is with the [`job run` command](https://www.nomadproject.io/docs/commands/job/run.html). 
-  - The `run` command takes a job file and registers it with Nomad. 
-  - This is used both to register new jobs and to update existing jobs.
+- This example job file declares a single task '`redis`'
+  - uses the Docker driver to run the task.
+- Usually, you interact with Nomad with the [`nomad job run` command](https://www.nomadproject.io/docs/commands/job/run.html).
+  - The `run` command takes a job file and registers it with Nomad.
+  - This is used to register new jobs and to update existing jobs.
 
 ---
 class: compact
