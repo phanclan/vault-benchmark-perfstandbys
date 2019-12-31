@@ -7,9 +7,14 @@ background-image: url(tech-background-01.png)
 
 ---
 
-Nomad relies on a long running agent on every machine in the cluster. The agent can run either in server or client mode. Each region must have at least one server, though a cluster of 3 or 5 servers is recommended. A single server deployment is _highly_ discouraged as data loss is inevitable in a failure scenario.
+- Nomad relies on a long running agent on every machine in the cluster.
+  - The agent can run either in server or client mode.
+  - Each region must have at least one server, though a cluster of 3 or 5 servers is recommended.
+  - A single server deployment is _highly_ discouraged as data loss is inevitable in a failure scenario.
 
-All other agents run in client mode. A Nomad client is a very lightweight process that registers the host machine, performs heartbeating, and runs the tasks that are assigned to it by the servers. The agent must be run on every node that is part of the cluster so that the servers can assign work to those machines.
+- All other agents run in client mode. 
+  - A Nomad client is a very lightweight process that registers the host machine, performs heartbeating, and runs the tasks that are assigned to it by the servers. 
+  - The agent must be run on every node that is part of the cluster so that the servers can assign work to those machines.
 
 ---
 layout: true
@@ -24,7 +29,7 @@ layout: true
 name: starting-the-agent
 class: compact, col-2
 
-# Starting the Agent
+# Starting the Agent (in dev mode)
 
 - We will run a single Nomad agent in **development** mode.
   - Starts an agent that acts as a client and server to test job configurations or prototype interactions.

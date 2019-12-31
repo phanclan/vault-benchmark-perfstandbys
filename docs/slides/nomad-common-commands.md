@@ -20,13 +20,13 @@ class: compact, col-2
 
 - `nomad server members` - Display a list of known servers and their status
 - `nomad node eligibility` -disable -self - Disable scheduling eligibility on the local node:
-
+- `nomad node status`
 ]
 
 ```shell
 nomad agent -config server.hcl > /tmp/nomad.log 2>&1 &
 nomad operator raft list-peers
-nomad node status
+
 
 
 
