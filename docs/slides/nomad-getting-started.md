@@ -248,7 +248,7 @@ class: compact, col-2
   - This is a new job, so Nomad has determined that an **allocation** should be created
   - Schedules it on our local agent.
 - Inspect the status of our job with the [`nomad status`](https://www.nomadproject.io/docs/commands/status.html) command:
-  - Here we can see that the result of our evaluation was the creation of an allocation that is now running on the local node.
+  - Note that the result of our evaluation was the creation of an allocation that is running on the local node.
   - Our Node ID can be seen with `nomad node status`
 
 ```shell
@@ -284,9 +284,9 @@ ID        Node ID   Task Group  Version  Desired  Status   Created  Modified
 ---
 class: compact, col-2
 
-- An allocation represents an instance of **Task Group** placed on a node.
-- To inspect an allocation we use the [`nomad alloc status <alloc_id>` command](https://www.nomadproject.io/docs/commands/alloc/status.html):
-  - We can see that Nomad reports the state of the allocation as well as its current resource usage.
+- An **allocation** represents an instance of **Task Group** placed on a node.
+- Inspect an allocation with the [`nomad alloc status <alloc_id>`](https://www.nomadproject.io/docs/commands/alloc/status.html) command:
+  - Nomad reports the **state** of the allocation as well as its current resource usage.
   - By supplying the `-stats` flag, more detailed resource usage statistics will be reported.
 
 ```shell
@@ -299,7 +299,7 @@ Job ID              = example
 Job Version         = 0
 Client Status       = running
 Client Description  = <none>
-Desired Status      = run
+*Desired Status      = run
 Desired Description = <none>
 Created             = 5m ago
 Modified            = 5m ago
@@ -309,7 +309,7 @@ Deployment Health   = healthy
 Task "redis" is "running"
 Task Resources
 CPU        Memory           Disk     IOPS  Addresses
-8/500 MHz  6.3 MiB/256 MiB  300 MiB  0     db: 127.0.0.1:22672
+*8/500 MHz  6.3 MiB/256 MiB  300 MiB  0     db: 127.0.0.1:22672
 
 Task Events:
 Started At     = 08/31/19 22:58:49 UTC
