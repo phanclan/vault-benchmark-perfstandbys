@@ -19,6 +19,7 @@ class: compact, col-2
 .small[
 
 - `nomad server members` - Display a list of known servers and their status
+- `nomad node eligibility` -disable -self - Disable scheduling eligibility on the local node:
 
 ]
 
