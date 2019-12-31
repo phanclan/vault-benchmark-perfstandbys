@@ -199,26 +199,37 @@ background-image: url(tech-background-01.png)
 class: compact, col-2
 # Running a Job
 
-- To get started, use the [`nomad job init` command](https://www.nomadproject.io/docs/commands/job/init.html) to generate a skeleton job file:
+- To get started, use the [`nomad job init`](https://www.nomadproject.io/docs/commands/job/init.html) command to generate a skeleton job file:
 
 ```shell
 *$ nomad job init
 Example job file written to example.nomad
 ```
 
-- View the contents of this file by running:
+- View the contents of `example.nomad` by running:
   - `cat example.nomad` or
-  - `grep -vE "^*#|^$" example.nomad`
+  - `grep -vE "^\s*#|^\s*$" example.nomad`
 - This example job file declares a single task '`redis`'
   - uses the Docker driver to run the task.
-- Usually, you interact with Nomad with the [`nomad job run` command](https://www.nomadproject.io/docs/commands/job/run.html).
+- Usually, you interact with Nomad with the [`nomad job run`](https://www.nomadproject.io/docs/commands/job/run.html) command.
   - The `run` command takes a job file and registers it with Nomad.
   - This is used to register new jobs and to update existing jobs.
+- Register our example job:
+
+```shell
+*$ nomad job run example.nomad
+==> Monitoring evaluation "13ebb66d"
+    Evaluation triggered by job "example"
+    Allocation "883269bf" created: node "e42d6f19", group "cache"
+    Evaluation within deployment: "b0a84e74"
+    Evaluation status changed: "pending" -> "complete"
+==> Evaluation "13ebb66d" finished with status "complete"
+```
 
 ---
 class: compact
 
-- We can register our example job now:
+- Register our example job:
 
 ```shell
 *$ nomad job run example.nomad
