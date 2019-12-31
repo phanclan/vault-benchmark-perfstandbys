@@ -16,10 +16,18 @@ layout: true
 ---
 class: compact, col-2
 
+.small[
+
+- `nomad server members` - Display a list of known servers and their status
+
+]
+
 ```shell
 nomad agent -config server.hcl > /tmp/nomad.log 2>&1 &
 nomad operator raft list-peers
 nomad node status
+
+
 
 nomad job run <job_filename>
 nomad job status <job_name>
