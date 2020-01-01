@@ -328,7 +328,7 @@ Time                   Type        Description
 ---
 class: compact, col-2
 
-- To see the logs of a task, we can use the [`nomad alloc logs <allocation> <task>` command](https://www.nomadproject.io/docs/commands/alloc/logs.html):
+- Disply the logs of a task with the [`nomad alloc logs <allocation> <task>`](https://www.nomadproject.io/docs/commands/alloc/logs.html) command:
 
 ```shell
 $ nomad alloc logs 8ba85cef redis
@@ -357,12 +357,13 @@ class: compact, col-2
 
 # Modifying a Job
 
-- The definition of a job is not static, and is meant to be updated over time.
-- You may update a job
+- The definition of a job is not static. It is meant to be updated over time.
+- You update a job
   - to change the docker container,
   - to update the application version, or
   - to change the count of a task group to scale with load.
-- For now, edit the `example.nomad` file to update the `count` and set it to `3`. This line is in the `cache` section around line `145`.
+- Edit the `example.nomad` file to update the `count` and set it to `3`.
+  - Located under the `cache` section around line `145`.
 
 ```shell
 # The "count" parameter specifies the number of the task groups that should
@@ -374,9 +375,9 @@ count = 3
 ---
 class: compact, col-2
 
-- Use the [`nomad job plan` command](https://www.nomadproject.io/docs/commands/job/plan.html) to **invoke a dry-run of the scheduler** to see what would happen if you ran the updated job:
-  - Note that the scheduler detected the change in count and informs us that it will cause `2` new instances to be created.
-    - The `in-place update` that will occur is to push the updated job specification to the existing allocation and will not cause any service interruption.
+- Use the [`nomad job plan`](https://www.nomadproject.io/docs/commands/job/plan.html) command to **invoke a dry-run of the scheduler** to see what would happen if you ran the updated job:
+  - The scheduler detects the change in **count** and informs us that it will cause `2` new instances to be created.
+  - The `in-place update` pushes the updated job specification to the existing allocation and will not cause any service interruption.
 
 ```shell
 *$ nomad job plan example.nomad
@@ -402,10 +403,10 @@ potentially invalid.
 ---
 class: compact, col-2
 
-- Run the job with the `nomad job run` command the `plan` displayed.
-  - By running with the `-check-index` flag, Nomad checks that the job has not been modified since the plan was run. 
+- Run the job with the `nomad job run` command from the `plan` output.
+  - By running with the `-check-index` flag, Nomad checks that the job has not been modified since the plan was run.
   - This is useful if multiple people are interacting with the job at the same time to ensure the job hasn't changed before you apply your modifications.
-  - Because we set the count of the task group to `three`, Nomad created two additional allocations to get to the desired state. It is **idempotent** to run the same job specification again (`nomad job run`) and no new allocations will be created.
+  - Because we set the `count` of the task group to `three`, Nomad created two additional allocations to get to the desired state. It is **idempotent** to run the same job specification again (`nomad job run`) and no new allocations will be created.
 
 ```shell
 *$ nomad job run -check-index 7 example.nomad
@@ -422,10 +423,12 @@ class: compact, col-2
 ---
 class: compact, col-2
 
+# Application Update (example.nomad)
+
 - Let's do an application update.
   - We will change the version of redis we want to run.
-  - Edit the `example.nomad` file and change the Docker image from "`redis:3.2`" to "`redis:4.0`".
-    - This is located around line `261`.
+  - Edit the `example.nomad` file. Change the Docker image from "`redis:3.2`" to "`redis:4.0`".
+  - This is located around line `261`.
 
 ```go
 # Configure Docker driver with the image
@@ -483,8 +486,8 @@ class: compact, col-2
 ---
 class: compact, col-2
 
-- After running, the rolling upgrade can be followed by running `nomad status` and watching the deployed count.
-- We can see that Nomad handled the update in three phases, only updating a single allocation in each phase and waiting for it to be healthy for `min_healthy_time` of `10` seconds before moving on to the next.
+- Follow the rolling upgrade with `nomad status` command. Observe the deployed count.
+- Nomad handled the update in three phases. Only updates a single allocation in each phase. Waits for it to be healthy for `min_healthy_time` of `10` seconds before moving on to the next.
 - The update strategy can be configured, but rolling updates makes it easy to upgrade an application at large scale.
 
 ```shell
@@ -839,7 +842,75 @@ ID        Eval ID   Node ID   Task Group  Desired  Status   Created At
   - Next, we'll visit the UI in the browser.
 - Re-run the example job if you stopped it previously before heading to the next section.
 
+---
+name: mysql-job
+class: compact, col-2
 
+# MySQL Job
+
+```json
+job "example" {
+  datacenters = ["dc1"]
+  type = "service"
+  update {
+    max_parallel = 1
+    min_healthy_time = "10s"
+    healthy_deadline = "3m"
+    progress_deadline = "10m"
+    auto_revert = false
+    canary = 0
+  }
+  migrate {
+    max_parallel = 1
+    health_check = "checks"
+    min_healthy_time = "10s"
+    healthy_deadline = "5m"
+  }
+  ```
+
+  ```json
+  group "cache" {
+    count = 1
+    restart {
+      attempts = 2
+      interval = "30m"
+      delay = "15s"
+      mode = "fail"
+    }
+    ephemeral_disk {
+      size = 300
+    }
+    task "redis" {
+      driver = "docker"
+      config {
+        image = "redis:3.2"
+        port_map {
+          db = 6379
+        }
+      }
+      resources {
+        cpu    = 500 # 500 MHz
+        memory = 256 # 256MB
+        network {
+          mbits = 10
+          port "db" {}
+        }
+      }
+      service {
+        name = "redis-cache"
+        tags = ["global", "cache"]
+        port = "db"
+        check {
+          name     = "alive"
+          type     = "tcp"
+          interval = "10s"
+          timeout  = "2s"
+        }
+      }
+    }
+  }
+}
+```
 
 
 
