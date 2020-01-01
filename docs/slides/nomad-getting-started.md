@@ -538,7 +538,7 @@ class: compact, col-2
 ---
 class: compact, col-2
 
-- When we stop a job, it creates an evaluation which is used to stop all the existing allocations. 
+- When we stop a job, it creates an evaluation which is used to stop all the existing allocations.
 - If we now query the job status, we can see it is now marked as `dead (stopped)`.
   - Indicating that the job has been stopped and Nomad is no longer running it:
 
@@ -578,7 +578,7 @@ df50c3ae  2cfe061e  cache       2        stop     complete  6m ago     6m ago
 class: compact, col-2
 
 - If we wanted to start the job again, we could simply `run` it again.
-- Users of Nomad primarily interact with jobs, and we've now seen how to create and scale our job, perform an application update, and do a job tear down. 
+- Users of Nomad primarily interact with jobs, and we've now seen how to create and scale our job, perform an application update, and do a job tear down.
 - Next we will add another Nomad client to create our first cluster.
 - Stop the Nomad agent with `Ctrl-C` before moving on to the next section.
 - Or
@@ -614,7 +614,7 @@ class: compact, col-2
 
 # Starting the Server
 
-- First, create the config file for the server. 
+- First, create the config file for the server.
   - Either download the [file from the repository](https://raw.githubusercontent.com/hashicorp/nomad/master/demo/vagrant/server.hcl)
   - Or create a file called `server.hcl`.
   - This is a minimal server configuration file.
@@ -642,17 +642,17 @@ EOF
 ---
 class: compact, col-2
 
-- Once the file is created, start the agent in a new tab:
-- `nomad agent -config server.hcl`
-- Or...
+- Start the agent in a new tab:
+  - `nomad agent -config server.hcl`
+- Or ...
 
 ```shell
 nomad agent -config server.hcl > /tmp/nomad.log 2>&1 &
 ```
 
-- Note that **client** mode is disabled, and that we are only running as the server.
-- This server will manage state and make scheduling decisions but will not run any tasks.
-- Now we need some agents to run tasks!
+- Note, the **client** mode is disabled. We are only running in **server** mode.
+- Server will manage state and make scheduling decisions. Will not run any tasks.
+- Now, we need some agents to run tasks!
 
 ```shell
 ==> WARNING: Bootstrap mode enabled! Potentially unsafe operation.
@@ -846,10 +846,12 @@ ID        Eval ID   Node ID   Task Group  Desired  Status   Created At
 name: mysql-job
 class: compact, col-2
 
-# MySQL Job
+# Postgres Job
+
+Sample [postgres](files/postgres.hcl) jobs file.
 
 ```json
-job "example" {
+job "postgres" {
   datacenters = ["dc1"]
   type = "service"
   update {
@@ -880,12 +882,12 @@ job "example" {
     ephemeral_disk {
       size = 300
     }
-    task "redis" {
+    task "postgres" {
       driver = "docker"
       config {
-        image = "redis:3.2"
+        image = "postgres:11"
         port_map {
-          db = 6379
+          db = 5432
         }
       }
       resources {
@@ -893,11 +895,16 @@ job "example" {
         memory = 256 # 256MB
         network {
           mbits = 10
-          port "db" {}
+          port "db" {
+            static = 5432
+          }
         }
       }
+      env {
+        POSTGRES_PASSWORD = "1234"
+      }
       service {
-        name = "redis-cache"
+        name = "postgres"
         tags = ["global", "cache"]
         port = "db"
         check {
