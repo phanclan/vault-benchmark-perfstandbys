@@ -848,9 +848,7 @@ class: compact, col-2
 
 # Postgres Job
 
-Sample [postgres](files/postgres.hcl) jobs file.
 Sample [postgres](files/postgres.hcl.txt) jobs file.
-
 
 ```json
 job "postgres" {
