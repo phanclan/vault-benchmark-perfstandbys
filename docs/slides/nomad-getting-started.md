@@ -248,8 +248,8 @@ class: compact, col-2
   - This is a new job, so Nomad has determined that an **allocation** should be created
   - Schedules it on our local agent.
 - Inspect the status of our job with the [`nomad status`](https://www.nomadproject.io/docs/commands/status.html) command:
-  - Note that the result of our evaluation was the creation of an allocation that is running on the local node.
-  - See Node ID with `nomad node status` command.
+- The result of our evaluation was the creation of an allocation that is running on the local node.
+- See Node ID with `nomad node status` command.
 
 ```shell
 *$ nomad status example
@@ -284,10 +284,10 @@ ID        Node ID   Task Group  Version  Desired  Status   Created  Modified
 ---
 class: compact, col-2
 
-- An **allocation** represents an instance of **Task Group** placed on a node.
+- An **allocation** is an instance of **Task Group** placed on a node.
 - Inspect an allocation with the [`nomad alloc status <alloc_id>`](https://www.nomadproject.io/docs/commands/alloc/status.html) command:
   - Nomad reports the **state** of the allocation as well as its current resource usage.
-  - By supplying the `-stats` flag, more detailed resource usage statistics will be reported.
+  - Supply the `-stats` flag for more detailed resource usage statistics.
 
 ```shell
 *$ nomad alloc status 8ba85cef
@@ -297,9 +297,9 @@ Name                = example.cache[0]
 Node ID             = e42d6f19
 Job ID              = example
 Job Version         = 0
-Client Status       = running
+*Client Status       = running
 Client Description  = <none>
-*Desired Status      = run
+Desired Status      = run
 Desired Description = <none>
 Created             = 5m ago
 Modified            = 5m ago
