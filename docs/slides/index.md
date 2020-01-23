@@ -1,13 +1,12 @@
 name: nomad-field-workshops-index
 class: title, shelf, no-footer, fullbleed
 background-image: url(https://hashicorp.github.io/field-workshops-assets/assets/bkgs/HashiCorp-Title-bkg.jpeg)
-count: false
 
+# HashiStack Demo
 
-# Nomad Field Workshops
-## A repository for Nomad field workshops
+## pphan@hashicorp.com
 
-![:scale 15%](https://hashicorp.github.io/field-workshops-assets/assets/logos/logo_nomad.png)
+![:scale 15%](images/HashiCorp_Icon_White.png)
 
 ???
 This is a title slide of a Remark.js slide show.
@@ -48,6 +47,9 @@ You can also indent one kind of list under another as done in this slide.  To ma
 name:workshop-slides
 # Viewing Workshop Slides
 #### You can view workshop slides with URLs like these:
+
+* [Demo Walkthrough](#demo-walkthrough)
+* [Nomad](nomad.html)
 * https://hashicorp.github.io/field-workshops-nomad/slides/aws/nomad-oss/index.html
 * https://hashicorp.github.io/field-workshops-nomad/slides/aws/nomad-oss/nomad-1.html
 * https://hashicorp.github.io/field-workshops-nomad/slides/aws/nomad-oss/nomad-2.html

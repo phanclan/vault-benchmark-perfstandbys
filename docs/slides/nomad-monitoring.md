@@ -1,5 +1,7 @@
-class: title, smokescreen, shelf, no-footer
-background-image: url(tech-background-01.png)
+name: nomad-chapter-6-title
+class: title, smokescreen, shelf, no-footer, fullbleed
+background-image: url(https://hashicorp.github.io/field-workshops-assets/assets/bkgs/HashiCorp-Title-bkg.jpeg)
+count: false
 
 # Using Prometheus to Monitor Nomad Metrics
 
@@ -174,7 +176,7 @@ Register our fabio job:
 ==> Evaluation "7b96701e" finished with status "complete"
 ```
 
-You should be able to visit any one of your client nodes at port `9998` and see the web interface for fabio.
+Connect to any of the Nomad clients on port `9998` to see the fabio web UI.
 
 - The routing table will be empty since we have not yet deployed anything that fabio can route to.
 - Accordingly, if you visit any of the client nodes at port `9999` at this point, you will get a `404` HTTP response.
@@ -294,7 +296,7 @@ class:compact, col-2
 
 # Step 5: Run the Prometheus Job
 
-We can now register our job for Prometheus:
+Register the `prometheus` job:
 
 ```shell
 *$ nomad job run prometheus.nomad
@@ -308,8 +310,8 @@ We can now register our job for Prometheus:
 
 Prometheus is now deployed.
 
-- You can visit any of your client nodes at port `9999` to visit the web interface.
-- There is only one instance of Prometheus running in the Nomad cluster, but you are automatically routed to it regardless of which node you visit because fabio is deployed and running on the cluster as well.
+- Connect to any of the Nomad clients on port `9999`.
+- There is only one instance of Prometheus, but fabio routes you to the correct node.
 
 ---
 class: compact, col-2
@@ -327,11 +329,13 @@ class: compact, col-2
 
 # ...continued
 
-Let's use Prometheus to query how many jobs are running in our Nomad cluster.
+.smaller[Use Prometheus to query how many jobs are running in our Nomad cluster.]
 
+.smaller[
 - On the main page, type `nomad_nomad_job_summary_running` into the query section.
 - You can also select the query from the drop-down list.
-
+- Click "**Execute**".
+]
 ![running-jobs](https://www.nomadproject.io/assets/images/running-jobs-564b55df.png)
 
 You can see that the value of our fabio job is `3` since it is using the [<u>**system**][36]</u> scheduler type. This makes sense because we are running three Nomad clients in our demo cluster.

@@ -87,6 +87,7 @@ module "bastion" {
   prefix        = "pphan"
   # name_prefix = ""
   subnet_id = module.vpc_usw2-1.public_subnets[0]
+  private_ip    = var.bastion_private_ip
   # tf_version     = "0.12.16"
   # vault_version  = "1.3.0"
   # consul_version = "1.6.2"

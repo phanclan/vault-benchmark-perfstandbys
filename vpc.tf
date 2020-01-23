@@ -93,6 +93,15 @@ resource "aws_security_group_rule" "nomad_in_sg" {
   source_security_group_id = aws_security_group.vault.id
 }
 
+# Peter - allow traffic for fabio and Prometheus from CIDR
+resource "aws_security_group_rule" "prometheus_vault_in" {
+  security_group_id = aws_security_group.vault.id
+  type              = "ingress"
+  from_port         = 9998
+  to_port           = 9999
+  protocol          = "tcp"
+  cidr_blocks = flatten([local.my_ip, var.ingress_cidr_blocks])
+}
 
 
 locals {
@@ -142,6 +151,16 @@ resource "aws_security_group_rule" "vault_elb_access" {
   type                     = "ingress"
   from_port                = 8200
   to_port                  = 8200
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.vault_elb.id
+}
+
+# Allow SSH from ELB
+resource "aws_security_group_rule" "ssh_elb_access" {
+  security_group_id        = aws_security_group.vault.id
+  type                     = "ingress"
+  from_port                = 22
+  to_port                  = 22
   protocol                 = "tcp"
   source_security_group_id = aws_security_group.vault_elb.id
 }
@@ -269,10 +288,22 @@ resource "aws_elb" "consul" {
   }
 }
 
+# --------------------------------------------------------
+# CREATE A SECURITY GROUP FOR ELB - VAULT
+# --------------------------------------------------------
 resource "aws_security_group" "vault_elb" {
   name        = "${var.vault_name_prefix}-elb"
   description = "Vault ELB"
   vpc_id      = module.vpc_usw2-1.vpc_id
+}
+
+resource "aws_security_group_rule" "vault_elb_ssh" {
+  security_group_id = aws_security_group.vault_elb.id
+  type              = "ingress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  cidr_blocks = ["${chomp(data.http.current_ip.body)}/32"]
 }
 
 resource "aws_security_group_rule" "vault_elb_http" {
@@ -307,6 +338,16 @@ resource "aws_security_group_rule" "vault_elb_egress_to_consul" {
   type                     = "egress"
   from_port                = 8500
   to_port                  = 8500
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.vault.id
+}
+
+# Allow ELB to get to SSH
+resource "aws_security_group_rule" "vault_elb_egress_to_ssh" {
+  security_group_id        = aws_security_group.vault_elb.id
+  type                     = "egress"
+  from_port                = 22
+  to_port                  = 22
   protocol                 = "tcp"
   source_security_group_id = aws_security_group.vault.id
 }

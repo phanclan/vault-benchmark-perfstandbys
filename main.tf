@@ -9,6 +9,7 @@ provider "aws" {
 data "http" "current_ip" {
   url = "http://ipv4.icanhazip.com/"
 }
+
 locals {
   workstation-external-cidr = "${chomp(data.http.current_ip.body)}/32"
 }
