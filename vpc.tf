@@ -63,11 +63,11 @@ resource "aws_security_group_rule" "consul_vault_in" {
 
 # Peter - allow traffic for consul and vault from SG
 resource "aws_security_group_rule" "consul_vault_in_sg" {
-  security_group_id = aws_security_group.vault.id
-  type              = "ingress"
-  from_port         = 8000
-  to_port           = 9200
-  protocol          = "tcp"
+  security_group_id        = aws_security_group.vault.id
+  type                     = "ingress"
+  from_port                = 8000
+  to_port                  = 9200
+  protocol                 = "tcp"
   source_security_group_id = aws_security_group.vault.id
 }
 
@@ -100,7 +100,7 @@ resource "aws_security_group_rule" "prometheus_vault_in" {
   from_port         = 9998
   to_port           = 9999
   protocol          = "tcp"
-  cidr_blocks = flatten([local.my_ip, var.ingress_cidr_blocks])
+  cidr_blocks       = flatten([local.my_ip, var.ingress_cidr_blocks])
 }
 
 
@@ -303,7 +303,7 @@ resource "aws_security_group_rule" "vault_elb_ssh" {
   from_port         = 22
   to_port           = 22
   protocol          = "tcp"
-  cidr_blocks = ["${chomp(data.http.current_ip.body)}/32"]
+  cidr_blocks       = ["${chomp(data.http.current_ip.body)}/32"]
 }
 
 resource "aws_security_group_rule" "vault_elb_http" {

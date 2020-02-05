@@ -16,8 +16,8 @@ class: compact
 
 This demo uses multiple HashiCorp products.
 
-- Packer to build the images in AWS
-- Terraform to provision the infrastructure
+- [Packer](#packer) to build the images in AWS
+- [Terraform](#terraform) to provision the infrastructure
 - Vault to demonstrate secrets management
 - Nomad to run jobs
 
@@ -305,19 +305,6 @@ api_addr = "https://$(public_ip):8200"
 disable_mlock = true
 ui = true
 ```
-
----
-name: packer
-
-# Packer
-
-[the components](#components)
-
-I try to build as much as I can into my gold images and using Packer. This provides the following benefits:
-
-- Consistent builds
-- Faster deploy times
-- Consistent images across various clouds
 
 ---
 name: demo-shutdown

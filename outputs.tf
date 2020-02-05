@@ -62,18 +62,34 @@ output "vault_elb_security_group" {
 #   value = [module.nomadconsul.primary_server_public_ips]
 # }
 
-output "hashi-servers" {
+output "hashi_servers" {
   value = aws_route53_record.servers.*.fqdn
 }
 
-output "hashi-workers" {
+output "hashi_workers" {
   value = aws_route53_record.workers.*.fqdn
 }
 
-output "hashi-vault" {
+output "hashi_vault" {
   value = aws_route53_record.hashi-vault.*.fqdn
 }
 
-output "hashi-bastion" {
+output "hashi_bastion" {
   value = aws_route53_record.hashi-bastion.*.fqdn
+}
+
+output "mini_vault_r53_dc2" {
+  value = module.minihashi-dc2.mini_vault_r53
+}
+
+output "mini_consul_r53_dc2" {
+  value = module.minihashi-dc2.mini_consul_r53
+}
+
+output "mini_vault_r53_dc3" {
+  value = module.minihashi-dc3.mini_vault_r53
+}
+
+output "mini_consul_r53_dc3" {
+  value = module.minihashi-dc3.mini_consul_r53
 }

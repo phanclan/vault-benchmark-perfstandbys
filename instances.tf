@@ -75,8 +75,8 @@ resource "aws_instance" "workers" {
 
 module "bastion" {
   bastion_nodes = var.bastion_nodes
-  source = "./modules/services/bastion"
-  vpc_id = module.vpc_usw2-1.vpc_id
+  source        = "./modules/services/bastion"
+  vpc_id        = module.vpc_usw2-1.vpc_id
   # region        = var.region
   instance_type = "t3.small"
   ami           = "pphan*"
@@ -86,8 +86,8 @@ module "bastion" {
   ttl           = local.ttl
   prefix        = "pphan"
   # name_prefix = ""
-  subnet_id = module.vpc_usw2-1.public_subnets[0]
-  private_ip    = var.bastion_private_ip
+  subnet_id  = module.vpc_usw2-1.public_subnets[0]
+  private_ip = var.bastion_private_ip
   # tf_version     = "0.12.16"
   # vault_version  = "1.3.0"
   # consul_version = "1.6.2"
@@ -129,3 +129,4 @@ resource "aws_instance" "vault" {
   # Consul should be up first.
   depends_on = [module.asg-consul]
 }
+

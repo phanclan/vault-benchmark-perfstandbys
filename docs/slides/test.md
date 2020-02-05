@@ -30,7 +30,7 @@ Instructor notes are included in plain text, narrative parts are in **bold**. Yo
 layout: true
 
 .footer[
-- Copyright © 2019 HashiCorp
+- Copyright © 2020 HashiCorp
 - ![:scale 100%](https://hashicorp.github.io/field-workshops-assets/assets/logos/HashiCorp_Icon_Black.svg)
 ]
 
@@ -91,7 +91,7 @@ class: title
 We use the word chapter here, because the training should feel like a story unfolding. The instructor's job is to guide the learners through this interactive story.
 
 
-# 
+#
 # Deploy Vault to AWS with Consul Storage Backend
 
 This folder contains a Terraform module for deploying Vault to AWS (within a VPC) along with Consul as the storage backend. It can be used as-is or can be modified to work in your scenario, but should serve as a strong starting point for deploying Vault. It can be used with Ubuntu 16.04 or RHEL 7.5.
@@ -208,7 +208,7 @@ us-west-2c	i-09ee3f9e1642847be	pphan-benchmark-consul	34.213.76.192
 2. SSH to Vault Public IP
 ``` shell
 ssh ubuntu@34.221.221.30
-# or 
+# or
 ssh ubuntu@$(grep vault /tmp/describe-instances.txt | grep -iv "None" | awk '{print $NF}')
 ```
 3. Run the following command.
@@ -316,7 +316,7 @@ wrk -t1 -c1 -d30s -H "X-Vault-Token: $VAULT_TOKEN" -s write-secrets.lua http://1
 
 # Transit Test
 
-We will use the `wrk` benchmarking tool to test the throughput of HashiCorp Vault's transit backend. 
+We will use the `wrk` benchmarking tool to test the throughput of HashiCorp Vault's transit backend.
 I tested on a single Vault node, connected to a 3-node Consul cluster for backend storage. Only the transit engine is mounted.
 
 - Enable the Transit secret engine and write a keyring for your testing:
@@ -345,14 +345,14 @@ sudo cp wrk /usr/local/bin
 
 ---
 
-- Run your workload. 
-  - The makers of wrk recommend running a **maximum of 1 thread per core**. 
+- Run your workload.
+  - The makers of wrk recommend running a **maximum of 1 thread per core**.
     - t3.nano - large has 2 vCPU, so 2 threads
     - t3.xlarge has 4 vCPU, t3.2xlarge has 8 vCPU
     - c5.xlarge has 4 vCPU, 2xlarge has 8 vCPU
-  - Play around with the number of connections you use to determine what the ideal settings for your system are. The connections are a total number of connections, split across your threads, as described here: https://github.com/wg/wrk#command-line-options 
-  - A sample `wrk` command to run these files looks like this: 
-    `wrk -t8 -c8 -d1m -H "X-Vault-Token: TOKEN_GOES_HERE_SO_PASTE_IT" -s /home/ubuntu/postbatch320.lua http://10.0.0.50:8200/v1/transit/encrypt/test` 
+  - Play around with the number of connections you use to determine what the ideal settings for your system are. The connections are a total number of connections, split across your threads, as described here: https://github.com/wg/wrk#command-line-options
+  - A sample `wrk` command to run these files looks like this:
+    `wrk -t8 -c8 -d1m -H "X-Vault-Token: TOKEN_GOES_HERE_SO_PASTE_IT" -s /home/ubuntu/postbatch320.lua http://10.0.0.50:8200/v1/transit/encrypt/test`
     - where the IP and path correspond to the Transit secret engine you'd configured.
   - Sample
     ```
@@ -407,7 +407,7 @@ vault audit enable file file_path=/tmp/audit.log log_raw=true
 ./test.sh
 ```
 
---- 
+---
 class: compact, fit-h1
 # Sample Results
 

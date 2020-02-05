@@ -568,32 +568,41 @@ green "#--- Create a transit encryption key by the HR team to encrypt/decrypt da
 vault write -f ${TRANSIT_PATH}/keys/hr
 
 
+#--> Create a policy named `read-gdpr-order.hcl`.
+# Bob needs `read` permissions on `EU_GDPR_data/data/orders/*`:
+tee /tmp/read-gdpr-order.hcl <<EOF
+path "EU_GDPR_data/data/orders/*" {
+  capabilities = [ "read" ]
 
+  control_group = {
+    factor "authorizer" {
+        identity {
+            group_names = [ "acct_manager" ]
+            approvals = 1
+        }
+    }
+  }
+}
+EOF
 
+#--> Create a policy for the `acct_manager` group named `acct_manager.hcl`.
+tee /tmp/acct_manager.hcl <<EOF
+# To approve the request
+path "sys/control-group/authorize" {
+    capabilities = ["create", "update"]
+}
 
+# To check control group request status
+path "sys/control-group/request" {
+    capabilities = ["create", "update"]
+}
+EOF
 
+#--> Deploy the `read-gdpr-order` and `acct_manager` policies that you wrote.
 
+# Create read-gdpr-order policy
+vault policy write read-gdpr-order /tmp/read-gdpr-order.hcl
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# Create acct_manager policy
+vault policy write acct_manager /tmp/acct_manager.hcl
 

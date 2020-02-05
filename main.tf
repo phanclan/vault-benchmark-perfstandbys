@@ -1,5 +1,6 @@
 provider "aws" {
-  region = var.region
+  region  = var.region
+  profile = "hc201906"
 }
 
 #-------------------------------------------------------------------------------
@@ -42,10 +43,10 @@ data "template_file" "install_consul" {
     file("${path.module}/templates/servers/install_consul_server.sh.tpl"),
     file("${path.module}/templates/servers/nomad.sh"),
   ))}"
-# data "template_file" "install_consul" {
-#   template = "${join("\n", list(
-#     file("${path.module}/templates/servers/install_consul_server.sh.tpl"),
-#   ))}"
+  # data "template_file" "install_consul" {
+  #   template = "${join("\n", list(
+  #     file("${path.module}/templates/servers/install_consul_server.sh.tpl"),
+  #   ))}"
 
   vars = {
     install_unzip       = var.unzip_command
@@ -56,12 +57,10 @@ data "template_file" "install_consul" {
   }
 }
 
-# Gzip cloud-init config
+# Gzip cloud-init config - VAULT
 data "template_cloudinit_config" "vault" {
-
   gzip          = true
   base64_encode = true
-
   part {
     content_type = "text/x-shellscript"
     content      = data.template_file.install_vault.rendered
@@ -116,9 +115,6 @@ data "aws_iam_policy_document" "auto_discover_cluster" {
   }
 }
 
-
-
-
 resource "random_id" "env_name" {
   byte_length = 4
   prefix      = "${var.env}-"
@@ -129,8 +125,8 @@ locals {
   common_tags = {
     Owner       = var.owner
     Environment = var.env
-    Name        = "${var.prefix}-${var.env}-usw2-1"
-    TTL         = "72"
+    # Name        = "${var.prefix}-${var.env}-usw2-1"
+    TTL = "72"
   }
-  ttl         = "72"
+  ttl = "72"
 }

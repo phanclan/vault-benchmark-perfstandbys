@@ -89,8 +89,8 @@ fi
 # . demo-magic.sh -d -p -w ${DEMO_WAIT}
 . demo-magic.sh -p -w ${DEMO_WAIT} #added type speed
 
-### FUNCTIONS ### 
-# For running psql from the postgres docker container.  
+### FUNCTIONS ###
+# For running psql from the postgres docker container.
 psql () {
 docker run --rm -it --entrypoint=/usr/bin/psql \
   -e COLUMNS=${PGCOLUMNS} \

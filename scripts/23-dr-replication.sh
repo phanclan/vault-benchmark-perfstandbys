@@ -9,11 +9,11 @@ cyan "#-------------------------------------------------------------------------
 
 cyan "We will run three Vault processes to validate Vault replication capabilities and operations.
 
-The first Vault (vault1) will be the primary for both Performance and DR replications. 
+The first Vault (vault1) will be the primary for both Performance and DR replications.
 The second Vault (vault2) will be the secondary for performance.
 The third Vault (vault3) will be the secondary for DR.
 
-More information on performance and DR replication can be found 
+More information on performance and DR replication can be found
 https://www.vaultproject.io/docs/enterprise/replication/index.html
 
 NOTE: Requires Vault Enterprise binary in your local OS flavor. "
@@ -26,19 +26,19 @@ cyan "#-------------------------------------------------------------------------
 
 cyan "Setup reusable commands so that everthing can be executed from one location
 
-Before DR replication, the Secondary DR cluster will have its own Root token and Unseal Key.  
+Before DR replication, the Secondary DR cluster will have its own Root token and Unseal Key.
 When DR replication is enabled, it will adopt the Primary's cluster Root Token and Unseal key"
 
 ################### This is from vault-snippets, but sticking with vault-guides
-# export VAULT_PRIMARY_ADDR=http://127.0.0.1:10101 
+# export VAULT_PRIMARY_ADDR=http://127.0.0.1:10101
 # export VAULT_SECONDARY_ADDR=http://127.0.0.1:10201
 
 # export VAULT_SECONDARY_CLUSTER_ADDR=http://127.0.0.1:8201
-# export VAULT_PRIMARY_CLUSTER_ADDR=http://127.0.0.1:8201 
+# export VAULT_PRIMARY_CLUSTER_ADDR=http://127.0.0.1:8201
 
 
 # vault_primary () {
-# VAULT_ADDR=${VAULT_PRIMARY_ADDR} vault $@ 
+# VAULT_ADDR=${VAULT_PRIMARY_ADDR} vault $@
 # }
 
 # vault_secondary () {
@@ -136,7 +136,7 @@ cyan "#-------------------------------------------------------------------------
     green "#--- Validate from vault2"
     curl -s http://127.0.0.1:8202/v1/sys/replication/status | jq .data
 
-    yellow "Observe that the cluster ids are the same when you run replicatiin status on 
+    yellow "Observe that the cluster ids are the same when you run replicatiin status on
     both clusters. Pay attention to mode, primary cluster address, and secondary list"
     p "Press Enter to continue..."
 
@@ -192,7 +192,7 @@ cyan "#-------------------------------------------------------------------------
   - cluster_id: Unique ID for this set of replicas. This value must match on the Primary and Secondary.
   - known_secondaries: List of the IDs of all non-revoked secondary activation tokens created by this Primary. The ID will be listed regardless of whether or not the token was used to activate an actual secondary cluster.
   - mode: This should be "primary".
-  - primary_cluster_addr: If you set a primary_cluster_addr when enabling replication, it will appear here. If you did not explicitly set this, this field will be blank on the primary. 
+  - primary_cluster_addr: If you set a primary_cluster_addr when enabling replication, it will appear here. If you did not explicitly set this, this field will be blank on the primary.
   As such, a blank field here can be completely normal.
   - state: This value should be running on the primary. If the value is idle, it indicates an issue and needs to be investigated.'
 
@@ -222,7 +222,7 @@ cyan "#-------------------------------------------------------------------------
   green "setup DR replication (vault2 -> vault4)"
 
   green "Enable DR replication primary (vault2)"
-  vault2 login root 
+  vault2 login root
   vault2 write -f sys/replication/dr/primary/enable
   PRIMARY_DR_TOKEN=$(vault2 write -format=json /sys/replication/dr/primary/secondary-token id=vault4 | jq --raw-output '.wrap_info .token' )
   echo $PRIMARY_DR_TOKEN
@@ -240,7 +240,7 @@ cyan "#-------------------------------------------------------------------------
   pe "vault4 read sys/replication/dr/status"
   echo
 
-  yellow "NOTE: The cluster ids are the same on both clusters. 
+  yellow "NOTE: The cluster ids are the same on both clusters.
   Pay attention to mode, primary cluster address, and known_secondaries list \n"
 
 
@@ -266,7 +266,7 @@ cyan "#-------------------------------------------------------------------------
 
 red "Always take care to never have two primary clusters running. You may lose data"
 
-green "#--- FIRST Demote primary vault instance. 
+green "#--- FIRST Demote primary vault instance.
 # You CANNOT Have Two primary Instances at once!!!"
 
 vault login root
@@ -287,7 +287,7 @@ cyan "#-------------------------------------------------------------------------
 # Step 4: Promote DR Secondary (vault3) to Primary
 #-------------------------------------------------------------------------------\n"
 
-cyan "To accomplish this you need a DR Operation Token on the DR Cluster 
+cyan "To accomplish this you need a DR Operation Token on the DR Cluster
 to perform any operations
 
 NOTE: A DR cluster cannot accept any external transactions normally
@@ -358,7 +358,7 @@ cyan "#-------------------------------------------------------------------------
   echo ${DR_OPERATION_TOKEN}
 
   echo
-  yellow "NOTE: The DR_PROMOTE_TOKEN must begin with a 's.'. 
+  yellow "NOTE: The DR_PROMOTE_TOKEN must begin with a 's.'.
   If it returns anything else, repeat steps to generate it again"
 
 #--- END GENERATE DR TOKEN
@@ -432,7 +432,7 @@ cp ~/.vault-token ~/.vault-token-DRTEST
 diff ~/.vault-token ~/.vault-token-DRTEST
 
 ### STOP primary vault instance  - in dev mode this blows away all cluster information
-### cntrl + c in the terminal windowd that you used to run vrd,  or pkill -fl 8200 
+### cntrl + c in the terminal windowd that you used to run vrd,  or pkill -fl 8200
 ### This will kill the primary Vault cluster, but you probably want to use the Option 1 or 2 below
 
 # OPTION 1 - Disable replication
@@ -444,13 +444,13 @@ vault write -f /sys/replication/performance/primary/disable
 # Response
 curl http://127.0.0.1:8200/v1/sys/replication/status | jq
 # Response
-{  
+{
    ...
-   "data":{  
-      "dr":{  
+   "data":{
+      "dr":{
          "mode":"disabled"
       },
-      "performance":{  
+      "performance":{
          "mode":"disabled"
       }
    },
@@ -459,15 +459,15 @@ curl http://127.0.0.1:8200/v1/sys/replication/status | jq
 
 curl     http://127.0.0.1:8202/v1/sys/replication/status | jq
 # Response:
-{  
+{
    ...
-   "data":{  
-      "dr":{  
+   "data":{
+      "dr":{
          "mode":"disabled"
       },
-      "performance":{  
+      "performance":{
          "cluster_id":"b0e7cfb8-d453-0919-48b2-9c2f33bdfee7",
-         "known_primary_cluster_addrs":[  
+         "known_primary_cluster_addrs":[
             "https://127.0.0.1:8201"
          ],
          "last_remote_wal":390,
@@ -560,11 +560,11 @@ cyan "#-------------------------------------------------------------------------
 
 
 cyan "#-------------------------------------------------------------------------------
-# FAILBACK - Option 1 - relevant for Vault 0.8-0.9 
+# FAILBACK - Option 1 - relevant for Vault 0.8-0.9
 #-------------------------------------------------------------------------------\n"
 
-  Note that this is not an ideal situation today, 
-  as we must first sync DR replication set back to vault, 
+  Note that this is not an ideal situation today,
+  as we must first sync DR replication set back to vault,
   then perform another failover such that vault is the perf primary/dr primary.
 
   # Disable replication on vault (if not already done)
@@ -578,11 +578,11 @@ cyan "#-------------------------------------------------------------------------
   sleep 10
   vault login root
   vault write /sys/replication/dr/secondary/enable token=${PRIMARY_DR_TOKEN}
-  sleep 10  
+  sleep 10
 
 
 cyan "#-------------------------------------------------------------------------------
-# FAILBACK - Option 2 - relevant for Vault >= 0.9.1 
+# FAILBACK - Option 2 - relevant for Vault >= 0.9.1
 #-------------------------------------------------------------------------------\n"
 
 This scenario assumes the primary was demoted
@@ -603,7 +603,7 @@ vault write -f /sys/replication/dr/secondary/promote dr_operation_token=${DR_OPE
 vault write -f /sys/replication/dr/primary/enable
 
 
-#Demote vault 3 to secondary to return to original setup 
+#Demote vault 3 to secondary to return to original setup
 NEW_PRIMARY_DR_TOKEN=$(vault write -format=json /sys/replication/dr/primary/secondary-token id=vault3 | jq --raw-output '.wrap_info .token' )
 echo $NEW_PRIMARY_DR_TOKEN
 vault3 write -f /sys/replication/dr/primary/demote
@@ -637,7 +637,7 @@ vault2 write /sys/replication/performance/secondary/update-primary primary_api_a
 
 
 cyan "#-------------------------------------------------------------------------------
-# 
+#
 #-------------------------------------------------------------------------------\n"
 The environment looks like the following at this step:
 
@@ -648,13 +648,13 @@ The environment looks like the following at this step:
 |                                 |                    |                                    |
 +---------------------------------+                    +------------------------------------+
 
-              ^                                                           
-              |                                                           
-              |                                                           
-              +                                                           
-+---------------------------------+                                       
-| vault3 port:8204                |                                       
-| DR primary replication          |  
+              ^
+              |
+              |
+              +
++---------------------------------+
+| vault3 port:8204                |
+| DR primary replication          |
 | Performance primary replication |
 | vault3 --> vault2               |
 +---------------------------------+
@@ -672,7 +672,7 @@ PRIMARY_DR_TOKEN=$(vault write -format=json /sys/replication/dr/primary/secondar
 sleep 10
 vault3 login root
 vault3 write /sys/replication/dr/secondary/enable token=${PRIMARY_DR_TOKEN}
-sleep 10  
+sleep 10
 
 check status on all 3
 

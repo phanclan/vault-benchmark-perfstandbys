@@ -1,6 +1,6 @@
-//-------------------------------------------------------------------
-// Vault settings
-//-------------------------------------------------------------------
+#-------------------------------------------------------------------
+# Vault settings
+#-------------------------------------------------------------------
 
 variable "unzip_command" {
   # Ubuntu: default = "sudo apt-get install -y curl unzip"
@@ -191,14 +191,13 @@ variable "public_key" {}
 
 
 #------------------------------------------------
-#----- Network Variables
+# Network Variables
 #------------------------------------------------
 variable "cidr" { default = "10.10.0.0/16" }
+variable "azs" {}
 variable "public_subnets" {
   default = ["10.10.1.0/24", "10.10.2.0/24", "10.10.3.0/24"]
 }
-variable "azs" {}
-
 variable "private_subnets" {
   default = ["10.10.11.0/24", "10.10.12.0/24", "10.10.13.0/24"]
 }
@@ -230,5 +229,5 @@ variable "ebs_optimized" {
 variable "ingress_cidr_blocks" {
   type        = list(string)
   description = "for security group rules"
-  default     = ["10.10.1.0/24","10.10.11.0/24", "10.10.12.0/24", "10.10.13.0/24"]
+  default     = ["10.10.1.0/24", "10.10.11.0/24", "10.10.12.0/24", "10.10.13.0/24"]
 }
