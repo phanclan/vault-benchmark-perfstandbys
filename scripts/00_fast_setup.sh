@@ -1,12 +1,13 @@
 #!/bin/bash
-cd ./scripts
+# cd ./scripts
+echo "#==> Source environment"
 . env.sh
-cd -
-# set -e
+# cd -
+set -e
 # shopt -s expand_aliases
 alias dc="docker-compose"
-LDAP_HOST="10.10.1.10"
-PGHOST="10.10.1.10"
+# LDAP_HOST="10.10.1.10"
+# PGHOST="10.10.1.10"
 
 # export VAULT_TOKEN=${VAULT_TOKEN:-'root'}
 
@@ -18,9 +19,9 @@ PGHOST="10.10.1.10"
 # export VAULT_ADDR=http://$(grep vault /tmp/describe-instances.txt | awk '{print $NF}'):8200
 
 
+echo $VAULT_TOKEN
 echo $VAULT_ADDR
 echo $CONSUL_HTTP_ADDR
-echo $VAULT_TOKEN
 # export LDAP_HOST=openldap
 p "Press Enter to continue"
 
@@ -46,29 +47,40 @@ p "Press Enter to continue"
 # curl -X PUT -d '{"key": "'"$(consul kv get service/vault/recovery-key)"'"}' \
 #     ${VAULT_ADDR}/v1/sys/unseal
 # export VAULT_TOKEN=$(consul kv get service/vault/root-token)
-# curl -H "X-Vault-Token: $VAULT_TOKEN" -X PUT -d @../license/licensepayload.json $VAULT_ADDR/v1/sys/license
+green "#==> License vault server"
+curl -H "X-Vault-Token: $VAULT_TOKEN" -X PUT -d @../license/licensepayload.json \
+  $VAULT_ADDR/v1/sys/license || true
+
+green "#==> Display license info"
+
+vault read sys/license
+
+p "Press Enter to continue"
 
 cyan "#-------------------------------------------------------------------------------
 # CREATE AUDIT LOG AND DISPLAY
 #-------------------------------------------------------------------------------\n"
-set +e
-vault audit enable file file_path=/tmp/audit-1.log log_raw=true
-set -e
+vault audit enable file file_path=/tmp/audit-1.log log_raw=true || true
 
 #-------------------------------------------------------------------------------
+./1_launch_db.sh
+./2_launch_ldap.sh
+
+p "Press Enter to continue"
 
 cyan "#-------------------------------------------------------------------------------
 #  CREATE ADMIN POLICY AND USER
 #-------------------------------------------------------------------------------\n"
-green "#--- Admin Policies"
-vault policy write admin ./vault/policies/admin-policy.hcl
+echo "#--- Admin Policies"
+vault policy write admin ../vault/policies/admin-policy.hcl
 
-green "#--- Create admin user and store in consul"
-vault token create -policy=admin -field=token | consul kv put service/vault/admin-token -
+echo "#--- Create admin user and store in consul"
+vault token create -policy=admin -field=token | tee ./tmp/vault-admin
+cat ./tmp/vault-admin | consul kv put service/vault/admin-token - || true
 
 #-------------------------------------------------------------------------------
 
-tput clear
+# tput clear
 cyan "#-------------------------------------------------------------------------------
 # ENABLE AND CONFIGURE THE LDAP AUTH METHOD
 #-------------------------------------------------------------------------------\n"
@@ -107,7 +119,7 @@ vault write auth/ldap-um/config \
     groupdn="${GROUP_DN}" \
     groupfilter="${UM_GROUP_FILTER}" \
     groupattr="${UM_GROUP_ATTR}" \
-    insecure_tls=true
+    insecure_tls=true || true
 
 p "Press Enter to continue"
 
@@ -133,52 +145,53 @@ vault write auth/ldap-mo/config \
     groupdn="${USER_DN}" \
     groupfilter="${MO_GROUP_FILTER}" \
     groupattr="${MO_GROUP_ATTR}" \
-    insecure_tls=true
+    insecure_tls=true || true
 
 p "Press Enter to continue"
 
 #-------------------------------------------------------------------------------
 
-tput clear
+# tput clear
 cyan "#-------------------------------------------------------------------------------
 # ENABLE USER PASSWORD AUTHENTICATION
 #-------------------------------------------------------------------------------\n"
 
 green "#--- Enable the userpass method."
-set +e
-vault auth enable userpass
-set -e
+vault auth enable userpass || true
 
 cyan "#-------------------------------------------------------------------------------
 # CREATE USERS TO INTERACT WITH VAULT
 #-------------------------------------------------------------------------------\n"
-green "#--> Create users that can consume Vault and assign a role to define authorization."
-vault write auth/userpass/users/beaker password="meep" policies="default"
-vault write auth/userpass/users/bunsen password="honeydew" policies="base"
+echo "#--> Create users that can consume Vault and assign a role to define authorization."
+vault write auth/userpass/users/beaker password="$PASSWORD" policies="default"
+vault write auth/userpass/users/bunsen password="$PASSWORD" policies="base"
 
-green "#--> Create IT user (deepak) with policies:kv-it,kv-user-template"
+echo "#--> Create IT user (deepak) with policies:kv-it,kv-user-template"
 vault write auth/userpass/users/deepak password=thispasswordsucks policies=kv-it,kv-user-template
 
-green "#--> Create Engineering user (chun) with policies: kv-user-template"
-vault write auth/userpass/users/chun password=thispasswordsucks policies=kv-user-template
+echo "#--> Create Engineering user (chun) with policies: kv-user-template"
+vault write auth/userpass/users/chun password=$PASSWORD policies=kv-user-template,base
 
 cyan "#-------------------------------------------------------------------------------
-# Step: Create an Entity
+# Step: CREATE ENTITY
 #-------------------------------------------------------------------------------\n"
 
 green "In the output, locate the Accessor value for userpass:"
-vault auth list -format=json | jq -r '."userpass/".accessor' | tee /tmp/userpass_accessor.txt
+vault auth list -format=json | jq -r '."userpass/".accessor' | tee ./tmp/userpass_accessor.txt
 
-vault write -format=json identity/entity name="engineer-chun" policies="kv-user-template" \
-    metadata=organization="ACME Inc." metadata=team="QA" \
-    | jq -r ".data.id" | tee /tmp/entity_id.txt
+echo "#--> Create entity: engineer-chun"
+vault write -format=json identity/entity name="engineer-chun" \
+  policies="kv-user-template" \
+  metadata=organization="ACME Inc." metadata=team="QA" \
+  | jq -r ".data.id" | tee ./tmp/entity_id.txt
 
 cyan "#-------------------------------------------------------------------------------
-# Step: Create an Entity Alias
+# Step: CREATE ENTITY ALIAS
 #-------------------------------------------------------------------------------\n"
+echo "#--> Create entity alias for entity"
 vault write identity/entity-alias name="chun" \
-    canonical_id=$(cat /tmp/entity_id.txt) \
-    mount_accessor=$(cat /tmp/userpass_accessor.txt)
+  canonical_id=$(cat ./tmp/entity_id.txt) \
+  mount_accessor=$(cat ./tmp/userpass_accessor.txt)
 
 #-------------------------------------------------------------------------------
 
@@ -311,23 +324,30 @@ p
 cyan "#-------------------------------------------------------------------------------
 # Running: CREATE POLICIES
 #-------------------------------------------------------------------------------\n"
-green "#--> Load the policy into Vault\n"
-vault policy write base ./vault/files/base.hcl
+echo "#==> Create policy from Vault Docs"
+tee ../vault/policies/vault-doc.hcl <<EOF
+path "secret/foo" {
+  capabilities = ["read"]
+}
+EOF
 
-green "#--> Create KV policy for IT access"
-vault policy write kv-it ./vault/policies/kv-it-policy.hcl
+echo "#--> Load the policy into Vault\n"
+vault policy write base ../vault/policies/base.hcl
 
-green "#--> Create DB policies for DB access."
-cat ./vault/policies/db-full-read-policy.hcl
-vault policy write db-full-read ./vault/policies/db-full-read-policy.hcl
-cat ./vault/policies/db-engineering-policy.hcl
-vault policy write db-engineering ./vault/policies/db-engineering-policy.hcl
-cat ./vault/policies/db-hr-policy.hcl
-vault policy write db-hr ./vault/policies/db-hr-policy.hcl
+echo "#--> Create KV policy for IT access"
+vault policy write kv-it ../vault/policies/kv-it-policy.hcl
 
-green '#--> Create Transit policies for HR.'
-cat ./vault/policies/transit-hr-policy.hcl
-vault policy write transit-hr ./vault/policies/transit-hr-policy.hcl
+echo "#--> Create DB policies for DB access."
+cat ../vault/policies/db-full-read-policy.hcl
+vault policy write db-full-read ../vault/policies/db-full-read-policy.hcl
+cat ../vault/policies/db-engineering-policy.hcl
+vault policy write db-engineering ../vault/policies/db-engineering-policy.hcl
+cat ../vault/policies/db-hr-policy.hcl
+vault policy write db-hr ../vault/policies/db-hr-policy.hcl
+
+echo '#--> Create Transit policies for HR.'
+cat ../vault/policies/transit-hr-policy.hcl
+vault policy write transit-hr ../vault/policies/transit-hr-policy.hcl
 
 p "Press Enter to continue"
 
@@ -343,7 +363,6 @@ cyan "
 green "Create/get sentinel policy"
 # wget -P ./tmp https://raw.githubusercontent.com/hashicorp/vault-guides/master/governance/validation-policies/cidr-check.sentinel
 tee ./tmp/cidr-check.sentinel <<EOF
-# dynamically generated by script: $0
 import "sockaddr"
 import "strings"
 
@@ -363,7 +382,7 @@ cidrcheck = rule {
 main = rule {
     cidrcheck
 }
-# #--- Uncomment if you want to add precond
+#--- Uncomment if you want to add precond
 # main = rule when precond {
 #     cidrcheck
 # }
@@ -454,29 +473,50 @@ set -e
 cyan "#-------------------------------------------------------------------------------
 #  3_enable_kv.sh - ENABLE STATIC SECRETS
 #-------------------------------------------------------------------------------\n"
-green "#--- Enable a KV V2 Secret engine at the path 'labsecrets' and kv-blog"
-set +e
-vault secrets enable -path=labsecrets -version=2 kv > /dev/null 2>&1
-vault secrets enable -path=kv-blog -version=2 kv > /dev/null 2>&1
-set -e
-green '#--- CLI: Create a new secret with a "key of apikey" and
+echo "#--- Enable a KV V2 Secret engine at the path 'labsecrets' and kv-blog"
+vault secrets enable -path=labsecrets -version=2 kv > /dev/null 2>&1 || true
+vault secrets enable -path=app -version=2 kv > /dev/null 2>&1 || true
+vault secrets enable -path=common -version=2 kv > /dev/null 2>&1 || true
+vault secrets enable -path=team -version=2 kv > /dev/null 2>&1 || true
+vault secrets enable -path=eu_gdpr_data -version=2 kv > /dev/null 2>&1 || true
+vault secrets enable -path=kv-blog -version=2 kv > /dev/null 2>&1 || true
+vault secrets enable -path=secret -version=2 kv > /dev/null 2>&1 || true
+vault secrets enable -path=secret1 -version=1 kv > /dev/null 2>&1 || true
+
+echo '#--- CLI: Create a new secret with a "key of apikey" and
 "value of master-api-key-111111" within the "labsecrets" path:'
 vault kv put labsecrets/apikeys/googlemain apikey=master-api-key-111111
-green "#--- API: Create a new secret called 'gvoiceapikey' with a value of 'PassTheHash!:'"
+echo "#--- API: Create a new secret called 'gvoiceapikey' with a value of 'PassTheHash!:'"
 curl -s \
     -H "X-Vault-Token: $VAULT_TOKEN" \
     -H "Content-Type: application/json" \
     -X POST \
     -d '{ "data": { "gvoiceapikey": "PassTheHash!" } }' \
     ${VAULT_ADDR}/v1/labsecrets/data/apikeys/googlevoice | jq
-green '#--- CLI: POST SECRET: MULTIPLE FIELDS'
+echo '#--- CLI: POST SECRET: MULTIPLE FIELDS'
 vault kv put labsecrets/webapp username="beaker" password="meepmeepmeep"
-green "#--- CLI: LOAD SECRET VIA FILE PAYLOAD: vault kv put <secrets engine>/<location> @<name of file>.json"
-vault kv put labsecrets/labinfo @./vault/files/data.json
-green "#--- CLI: Insert some additional secrets for use later in demo / hide action"
+echo "#--- CLI: LOAD SECRET VIA FILE PAYLOAD: vault kv put <secrets engine>/<location> @<name of file>.json"
+vault kv put labsecrets/labinfo @../vault/files/data.json
+echo "#==> CLI: Insert some additional secrets for use later in demo / hide action"
 vault kv put labsecrets/lab_keypad code="12345" >/dev/null
 vault kv put labsecrets/lab_room room="A113" >/dev/null
-green "#--- API: WRITE A SECRET"
+vault kv put eu_gdpr_data/secret secret="super-secret" >/dev/null
+echo "#==> CLI: Secrets to test with policy concepts doc"
+vault kv put secret/foo pw=hashi
+vault kv put secret/super-secret pw=hashi
+vault kv put secret/restricted pw=hashi
+vault kv put secret1/restricted/foo pw=hashi
+vault kv put secret/bar/zip pw=hashi
+vault kv put secret/bar/zip/zap pw=hashi
+vault kv put secret/zip-zap pw=hashi
+vault kv put secret/zip-zap/zong pw=hashi
+vault kv put secret/foo/teamb pw=hashi
+vault kv put secret/foo/bar/teamb pw=hashi
+vault kv put secret/foo/bar/bar/teamb pw=hashi
+vault kv put secret/bar/foo/teamb pw=hashi
+vault policy write learn ../vault/policies/learn-policy.hcl
+
+echo "#--- API: WRITE A SECRET"
 curl -s -H "X-Vault-Token: $VAULT_TOKEN" \
     -X POST \
     -d '{"data":{"gmapapikey": "where-am-i-??????"}}' \
@@ -553,6 +593,46 @@ write_db_role
 green "#--- Engineering will be granted full access to their schema - 1h \n"
 TTL=1h
 write_db_role
+
+cyan "#-------------------------------------------------------------------------------
+# 4_enable_db.sh - ENABLE DYNAMIC SECRETS - DB
+#-------------------------------------------------------------------------------\n"
+
+green "#==> Enable AWS secrets engine."
+vault secrets enable -path=aws aws || true
+
+green "#==> Tune the default lease TTL for the AWS secrets engine to 5 minutes."
+pe "vault write aws/config/lease lease=5m lease_max=10m"
+
+green "#==> Configure the credentials used with AWS to generate the IAM credentials:"
+export ACCESS_KEY_ID=$(awk '/vault-lab/ && $0 != "" { getline ; print $NF}' ~/.aws/credentials)
+export SECRET_ACCESS_KEY=$(awk '/vault-lab/ && $0 != "" { getline ; getline ; print $NF}' ~/.aws/credentials)
+
+vault write aws/config/root \
+    access_key=$ACCESS_KEY_ID \
+    secret_key=$SECRET_ACCESS_KEY > /dev/null
+
+green "#==> Configure a Vault role"
+vault write aws/roles/phan-s3-ec2-all-role \
+    credential_type=iam_user \
+    policy_document=-<<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "ec2:*",
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": "s3:*",
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+
 p "Press Enter to continue"
 
 #-------------------------------------------------------------------------------

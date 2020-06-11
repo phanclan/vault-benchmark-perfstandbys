@@ -122,7 +122,7 @@ cyan "#-------------------------------------------------------------------------
 # ENABLE PR SECONDARY CLUSTER (vault2)
 #-------------------------------------------------------------------------------\n"
 
-  green "#--- From secondary node, activate a secondary using the fetched token."
+  green "#--> From secondary node, activate a secondary using the fetched token."
   vault2 login root
   vault2 write sys/replication/performance/secondary/enable token=${PRIMARY_PERF_TOKEN}
 
@@ -153,7 +153,7 @@ cyan "#-------------------------------------------------------------------------
 # ENABLE DR REPLICATION ON PRIMARY CLUSTER (vault1)
 #-------------------------------------------------------------------------------\n"
 
-  green "#--- Enable DR replication on the primary (vault)"
+  green "#--> Enable DR replication on the primary (vault)"
   # export VAULT_TOKEN=${ROOT_TOKEN}
   # pe "vault login ${ROOT_TOKEN}"
   vault login root
@@ -273,8 +273,8 @@ vault login root
 vault write -f /sys/replication/dr/primary/demote
 # curl -H "X-Vault-Token: ${VAULT_TOKEN}" -X POST ${VAULT_PRIMARY_ADDR}/v1/sys/replication/dr/primary/demote
 
-green "Check replication status on Cluster 1"
-pe "vault read -format=json sys/replication/dr/status"
+green "#--> Check replication status on Cluster 1"
+pe "vault read -format=json sys/replication/dr/status | jq"
 
 yellow "Mode should be secondary. State should be idle."
 
@@ -299,20 +299,20 @@ cyan "#-------------------------------------------------------------------------
 # GENERATE DR OPERATION TOKEN
 #-------------------------------------------------------------------------------\n"
 
-  green "#--- Validate process hasn't started yet on vault3"
-  curl -s http://127.0.0.1:8204/v1/sys/replication/dr/secondary/generate-operation-token/attempt | jq .started
+green "#--- Validate process hasn't started yet on vault3"
+curl -s http://127.0.0.1:8204/v1/sys/replication/dr/secondary/generate-operation-token/attempt | jq .started
 
-  green "#--- 1. Generate One Time Password (OTP). Needed to Generate DR token"
-  DR_OTP=$(vault3 operator generate-root -dr-token -generate-otp)
-  echo $DR_OTP
+green "#--- 1. Generate One Time Password (OTP). Needed to Generate DR token"
+DR_OTP=$(vault3 operator generate-root -dr-token -generate-otp)
+echo $DR_OTP
 
     # green "Alternatively you can also"
     # white "vault3 operator generate-root -dr-token -init"
 
-  green "#--- 2. Initiate DR token generation. Create nonce."
-  green "Get NONCE to give to all your UNSEAL KEY holders"
-  NONCE=$(vault3 operator generate-root -dr-token -init -otp=${DR_OTP} | grep Nonce | awk '{print $2}')
-  echo ${NONCE}
+green "#--- 2. Initiate DR token generation. Create nonce."
+green "Get NONCE to give to all your UNSEAL KEY holders"
+NONCE=$(vault3 operator generate-root -dr-token -init -otp=${DR_OTP} | grep Nonce | awk '{print $2}')
+echo ${NONCE}
 
     # green "To cancel attempt at any time"
     # echo
@@ -352,10 +352,10 @@ cyan "#-------------------------------------------------------------------------
   # ENCODED_TOKEN=$(curl  --header "X-Vault-Token: ${VAULT_TOKEN}" --request PUT --data '{"key":"'"${i}"'", "nonce":"'"${NONCE}"'"}' ${VAULT_SECONDARY_ADDR}/v1/sys/replication/dr/secondary/generate-operation-token/update | jq  --raw-output '.encoded_token')
   #done
 
-  #--- 4. Generate DR TOKEN
-  green "Decode the generated DR operation token (Encoded Token)"
-  DR_OPERATION_TOKEN=$(vault3 operator generate-root -dr-token -otp=${DR_OTP} -decode=${ENCODED_TOKEN})
-  echo ${DR_OPERATION_TOKEN}
+#--- 4. Generate DR TOKEN
+green "Decode the generated DR operation token (Encoded Token)"
+DR_OPERATION_TOKEN=$(vault3 operator generate-root -dr-token -otp=${DR_OTP} -decode=${ENCODED_TOKEN})
+echo ${DR_OPERATION_TOKEN}
 
   echo
   yellow "NOTE: The DR_PROMOTE_TOKEN must begin with a 's.'.

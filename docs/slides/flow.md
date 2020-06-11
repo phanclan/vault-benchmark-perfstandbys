@@ -57,9 +57,9 @@ class: compact
 .smaller[
 | Name     |  Zones | Rule | Port | Protocol | CIDR/SG
 | -------- | -------- | --- |:---:|:---:|
+| bastion | ingress | allow_ssh_inbound | 22 | tcp | local.all_ips
 | bastion | ingress | allow_http_inbound | 80 | tcp | local.all_ips
 | bastion | ingress | allow_https_inbound | 443 | tcp | local.all_ips
-| bastion | ingress | allow_ssh_inbound | 22 | tcp | local.all_ips
 | bastion | ingress | allow_postgres_in | 5432 | tcp | ${chomp(data.http.current_ip.body)}/32
 | bastion | ingress | allow_internal_in | 0 | -1 | local.internal_ips
 | bastion | egress | allow_all_outbound | 0 | -1 | local.all_ips
@@ -70,25 +70,58 @@ class: compact
 internal_ips      = ["10.10.0.0/16"]
 
 ---
-name: firewall-rules-vault
+name: firewall-rules-hashi
 class: compact
 
-# SG Rules - vault
+# SG Rules - aws-sg
 
 .smaller[
 | Name     |  Zones | Rule | Port | Protocol | CIDR/SG
 | -------- | -------- | --- |:---:|:---:|
-| vault | ingress | allow_http_inbound | 80 | tcp | local.all_ips
-| vault | ingress | allow_https_inbound | 443 | tcp | local.all_ips
-| vault | ingress | allow_ssh_inbound | 22 | tcp | local.all_ips
-| vault | ingress | allow_postgres_in | 5432 | tcp | ${chomp(data.http.current_ip.body)}/32
-| vault | ingress | allow_internal_in | 0 | -1 | local.internal_ips
-| vault | egress | allow_all_outbound | 0 | -1 | local.all_ips
+| vault | ingress | vault_8200_in | 8200 | tcp | my_ip
+| vault | ingress | consul_vault_in | 8000-9200 | tcp | my_ip, ingress_cidr_blocks
+| vault | ingress | consul_vault_in_sg | 8000-9200 | tcp | aws-sg
+| vault | ingress | nomad_in | 4646-4648 | tcp | my_ip, ingress_cidr_blocks
+| vault | ingress | nomad_in | 4646-4648 | tcp | aws-sg
 ]
 
 ???
 
+might need a rule for 8600 UDP - Consul DNS, 8301-8302/UDP - Consul Serf
+
+
+---
+class: compact
+
+.smaller[
+| Name | Zones | Rule | Port | Protocol | CIDR/SG | Comments
+| --- | --- | --- |:---:|:---:|
+| vault | ingress | ssh_in | 22 | tcp | my_ip
+| vault | ingress | http_in | 80 | tcp | local.all_ips | need to add
+| vault | ingress | https_in | 443 | tcp | local.all_ips | need to add
+| vault | ingress | postgres_in | 5432 | tcp | my_ip
+| vault | ingress | prometheus_vault_in | 9998 | tcp | my_ip, ingress_cidr_blocks
+| vault | egress | hashi_any_out | 0 | -1 | 0/0
+]
+<!-- | vault | ingress | allow_internal_in | 0 | -1 | local.internal_ips -->
+
+???
+
 internal_ips      = ["10.10.0.0/16"]
+
+---
+
+# Required Ports for Hashi
+
+.smaller[
+| Name | Port | Protocol | Direction | Comments |
+| --- | --- | --- |:---:|:---:|
+| vault cluseter | 8201 | tcp | server --> server
+| consul dns | 8600 | tcp/udp | client --> server
+| consul rpc | 8300-8300 | tcp | client --> server
+| consul serf | 8301-8302 | tcp/udp | server --> server
+
+]
 
 ---
 name: getting-started

@@ -1,10 +1,11 @@
 # env.sh -- Environment variables to assist with this demo
 
-# This is designed to be either run from a Mac or via the included CentOS vagrant host
+# Designed to run from a Mac or CentOS vagrant host
 # Modify accordingly to run on your local system if outside these bounds
 case ${OSTYPE} in
   darwin*)
-    IP_ADDRESS=$(ipconfig getifaddr en0)
+    # IP_ADDRESS=$(ipconfig getifaddr en0)
+    IP_ADDRESS=$(ipconfig getifaddr en1)
   ;;
   linux-gnu)
     IP_ADDRESS=$(ifconfig eth0 | grep inet | grep -v inet6 | awk '{print $2}')
@@ -15,24 +16,42 @@ export IP_ADDRESS
 #------------------------------------------------------------------------------
 # VARIABLES THAT NEED TO BE CHANGED FOR YOUR ENVIRONMENT
 #------------------------------------------------------------------------------
-# FOR CLOUD ENVIRONMENT
-export VAULT_ADDR=http://vault-0.pphan.hashidemos.io:8200
-export CONSUL_HTTP_ADDR=http://consul.pphan.hashidemos.io:8500
-# Pull value from consul. If no value in consul then assign notsosecure.
-export VAULT_TOKEN=$(consul kv get service/vault/root-token)
-export VAULT_TOKEN=${VAULT_TOKEN:-"notsosecure"}
 
+export PASSWORD=notsosecure
+export VAULT_IP=192.168.64.10
+export VAULT_PORT=8200
+export VAULT_DIR=
+export VAULT_TOKEN=s.ib863JYB1swHZDnqHcpO6ltU
+
+#----------------------
+# FOR CLOUD ENVIRONMENT
+#----------------------
+# export VAULT_ADDR=http://vault-0.pphan.hashidemos.io:8200
+# export CONSUL_HTTP_ADDR=http://consul.pphan.hashidemos.io:8500
+# ## Pull value from consul. If no value in consul then assign notsosecure.
+export VAULT_TOKEN=${VAULT_TOKEN:-"$(consul kv get service/vault/root-token)"}
+export VAULT_TOKEN=${VAULT_TOKEN:-"$(jq -r ".root_token" ./tmp/vault.init)"}
+export VAULT_TOKEN=${VAULT_TOKEN:-"$PASSWORD"}
+
+#----------------------
+# FOR VAGRANT/DOCKER ENVIRONMENT
+#----------------------
 # pp Added VAULT_PORT variable and included it in VAULT_ADDR variable
 # export VAULT_PORT=${VAULT_PORT:-10101}
-# export VAULT_ADDR=http://127.0.0.1:${VAULT_PORT}
-
-# export VAULT_ADDR="http://${IP_ADDRESS}:8200"
-
-# export VAULT_TOKEN=${VAULT_ROOT_TOKEN:-"notsosecure"}
+export VAULT_ADDR=http://${VAULT_IP}:${VAULT_PORT}
 # export CONSUL_HTTP_ADDR=http://127.0.0.1:10111
 
+#----------------------
+# FOR LOCAL ENVIRONMENT
+#----------------------
+
+# export VAULT_ADDR="http://${IP_ADDRESS}:8200"
+# export VAULT_ADDR="http://127.0.0.1:8200"
+
+# export VAULT_TOKEN=${VAULT_ROOT_TOKEN:-"notsosecure"}
 
 # Dev server environment variables
+
 # export VAULT_DEV_LISTEN_ADDRESS="${IP_ADDRESS}:8200"
 export VAULT_DEV_LISTEN_ADDRESS="0.0.0.0:8200"
 export VAULT_DEV_ROOT_TOKEN_ID=${VAULT_TOKEN}
@@ -55,6 +74,7 @@ export TRANSIT_PATH=transit-blog
 export DB_PATH=db-blog
 
 # LDAP Server settings
+
 export LDAP_HOST=${LDAP_HOST:-${IP_ADDRESS}}
 export LDAP_URL="ldap://${LDAP_HOST}"
 export LDAP_ORGANISATION=${LDAP_ORGANISATION:-"OurCorp Inc"}

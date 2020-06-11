@@ -1,11 +1,13 @@
+#!/bin/bash
+set -x
 . env.sh
 
 echo
-tput clear
+# tput clear
 cyan "Running: $0: Starting Postgres Database"
-
 docker image inspect ${POSTGRES_IMAGE} &> /dev/null
 [[ $? -eq 0 ]] || docker pull ${POSTGRES_IMAGE}
+docker stop postgres
 docker rm postgres &> /dev/null
 docker run \
   --name postgres \

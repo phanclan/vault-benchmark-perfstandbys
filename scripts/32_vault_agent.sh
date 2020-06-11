@@ -1,109 +1,202 @@
 #!/bin/bash
-# set -e
+set -e
+shopt -s expand_aliases
+. env.sh
 
-# This is for the time to wait when using demo_magic.sh
-if [[ -z ${DEMO_WAIT} ]];then
-  DEMO_WAIT=0
-fi
-
-# Demo magic gives wrappers for running commands in demo mode.   Also good for learning via CLI.
-. demo-magic.sh -d -p -w ${DEMO_WAIT}
-
-cyan "Running: $0: Creating Policies"
+cyan "Running: $0: Vault Agent Templates"
 echo
 
 cyan "
-##########################################################################################
+#------------------------------------------------------------------------------
 # Step 0: Pre-requisites
-##########################################################################################"
-echo
-
-cyan ""
-green '
-
-'
+#------------------------------------------------------------------------------"
+echo ""
 
 cyan "
-##########################################################################################
+#------------------------------------------------------------------------------
 # Step 1: Start Vault and log in
-##########################################################################################"
+#------------------------------------------------------------------------------"
 echo
-export VAULT_ADDR=http://127.0.0.1:8200
-export VAULT_TOKEN=root
+# green "Start Vault dev"
+# pe "vault server -dev -dev-root-token-id=$VAULT_TOKEN -dev-listen-address=0.0.0.0:8200 > /tmp/vault.log 2>&1 &"
 
-green "Start Vault dev"
-pe "vault server -dev -dev-root-token-id=$VAULT_TOKEN -dev-listen-address=0.0.0.0:8200 > /tmp/vault.log 2>&1 &"
+# green "Login with root token"
+# pe "vault login root"
 
-green "Login with root token"
-pe "vault login root"
+# green "Enable audit device, so you can examine logs later"
+# pe "vault audit enable file file_path=/tmp/audit.log log_raw=true"
 
-green "Enable audit device, so you can examine logs later"
-pe "vault audit enable file file_path=/tmp/audit.log log_raw=true"
+#==> Begin old section
+# green "Create a policy configuration file"
+# tee /tmp/myapp.hcl <<EOF
+# path "secret/myapp/*" {
+#     capabilities = ["read", "list"]
+# }
+# EOF
 
-green "Create a policy configuration file"
-pe 'tee /tmp/myapp.hcl <<EOF
-path "secret/myapp/*" {
-    capabilities = ["read", "list"]
-}
-EOF'
+# green "Create a policy named 'myapp'"
+# vault policy write myapp /tmp/myapp.hcl
 
-green "Create a policy named 'myapp'"
-pe 'vault policy write myapp /tmp/myapp.hcl'
+# green "Write some secrets in 'secret/app/config' path"
+# vault kv put secret/myapp/config \
+#     ttl='30s' \
+#     username='appuser' \
+#     password='suP3rsec(et!' \"
 
-green "Write some secrets in 'secret/app/config' path"
-pe "vault kv put secret/myapp/config \
-    ttl='30s' \
-    username='appuser' \
-    password='suP3rsec(et!'"
+#==> End old section
 
-cyan "
-##########################################################################################
-# Step 2: Vault Agent Auto-Auth
-##########################################################################################"
+#-------------------------------------------------------------------------------
+# Step 2: Configure Vault Server for Agent Auto-Auth
+#-------------------------------------------------------------------------------"
 echo
 cyan "Vault Agent runs on the client side to automate leases and tokens lifecycle management."
 echo
-green "Enable the approle auth method on the Vault server."
-pe "vault auth enable approle"
 
-green ""
-pe '
-tee /tmp/token_update.hcl <<"EOF"
-# Permits token creation
-path "auth/token/create" {
-  capabilities = ["update"]
+green "#==> Enable a new KV (version 2) secrets engine at kvAgentDemo:"
+vault secrets enable -path=kvAgentDemo -version=2 kv || true
+
+green "#==> Write and verify the new KV:"
+vault kv put kvAgentDemo/legacy_app_creds_01 username=legacyUser password=supersecret
+# vault kv get kvAgentDemo/legacy_app_creds_01
+
+green "#==> Create policy demo-policy from demo-policy.hcl file."
+yellow "This policy gives permissions on kvAgentDemo/*, see file for details."
+tee ./tmp/demo-policy.hcl <<EOF
+# demo-policy.hcl
+path "kvAgentDemo/*" {
+  capabilities = ["create", "read", "update", "delete", "list"]
 }
 EOF
-'
+vault policy write demo-policy ./tmp/demo-policy.hcl
+p "Press Enter to continue"
 
-green 'Create a policy named, "token_update"'
-pe "vault policy write token_update /tmp/token_update.hcl"
+#==> Begin old section
+# green ""
+# pe '
+# tee /tmp/token_update.hcl <<"EOF"
+# # Permits token creation
+# path "auth/token/create" {
+#   capabilities = ["update"]
+# }
+# EOF
+# '
 
-green 'Create a role named "apps" with token_update policy attached.'
-pe 'vault write auth/approle/role/apps policies="token_update"'
+# green 'Create a policy named, "token_update"'
+# pe "vault policy write token_update /tmp/token_update.hcl"
+#==> End old section
 
-green 'Generate a role ID and stores it in a file named, "roleID.txt".'
-pe "vault read -format=json auth/approle/role/apps/role-id \
-        | jq  -r '.data.role_id' > /tmp/roleID.txt"
+green "#==> Enable approle auth method on the Vault server."
+vault auth enable approle || true
 
-yellow "The approle auth method allows machines or apps 
-to authenticate with Vault using Vault-defined roles. 
+green '#==> Create approle role. Name: "agentdemo". Policy attached: demo-policy.'
+vault write auth/approle/role/agentdemo policies="demo-policy"
+
+green "#==> Get role ID for new approle role"
+vault read -field=role_id auth/approle/role/agentdemo/role-id > ./tmp/roleid
+
+#==> Begin old section
+# green 'Create approle role. Named "apps" with token_update policy attached.'
+# pe 'vault write auth/approle/role/apps policies="token_update"'
+
+# green 'Generate a role ID and stores it in a file named, "roleID.txt".'
+# pe "vault read -format=json auth/approle/role/apps/role-id \
+#         | jq  -r '.data.role_id' > /tmp/roleID.txt"
+#==> End old section
+
+yellow "The approle auth method allows machines or apps
+to authenticate with Vault using Vault-defined roles.
 The generated roleID is equivalent to username."
 echo
 
-green 'generate a secret ID and stores it in the "secretID" file.'
-pe "vault write -f -format=json auth/approle/role/apps/secret-id \
-        | jq -r '.data.secret_id' > /tmp/secretID.txt"
+green '#==> Create a secret ID and store it in a "secretID" file.'
+# pe "vault write -f -format=json auth/approle/role/apps/secret-id \
+#         | jq -r '.data.secret_id' > /tmp/secretid.txt"
+pe "vault write -f -field=secret_id auth/approle/role/agentdemo/secret-id > ./tmp/secretid"
 
 yellow "The generated secretID is equivalent to a password.
 
 Refer to the AppRole Pull Authentication guide to learn more.
 https://learn.hashicorp.com/vault/identity-access-management/iam-authentication
 "
+p "Press Enter to continue"
+
+cyan "
+#------------------------------------------------------------------------------
+# Step 2: Vault Agent Auto-Auth
+#------------------------------------------------------------------------------"
+echo
+echo "#==> Set version of Vault to install"
+export VAULT_VERSION=1.4.0
+
+green "#==> Create cloud-init file for VM."
+tee ./tmp/multipass-init.yml <<EOF
+package_update: true
+runcmd:
+  - set -x
+  - echo apt-get update
+  - apt-get install -qq unzip
+  - echo "#==> Create directories"
+  - mkdir -p /run/mydir
+  - mkdir -p /run/tmp
+  - echo "#==> Install Vault"
+  - curl -s -o /run/mydir/vault.zip https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_amd64.zip && unzip -qqo -d /usr/local/bin/ /run/mydir/vault.zip
+EOF
+echo "More info on cloud-init: https://cloudinit.readthedocs.io/en/latest/topics/examples.html"
+
+echo "#==> Create VM. Name agent-demo. Point to cloud-init file."
+# multipass delete agent-demo -p
+
+multipass launch -n agent-demo -c 1 -m 512M -d 5G \
+  --cloud-init ./tmp/multipass-init.yml || true
+echo "#==> Reboot so multipass mount would work"
+# rebooting from the VM causes problems, so rebooting with multipass
+multipass restart agent-demo
+
+green "#==> Create the template.ctmpl file. This file defines the output that will be rendered."
+tee ./tmp/template.ctmpl <<EOF
+{{/* Read the secret at the path below */}}
+{{ with secret "kvAgentDemo/legacy_app_creds_01" }}
+ Username: {{ .Data.data.username }}
+ Password: {{ .Data.data.password }}
+Create TS: {{ .Data.metadata.created_time }}
+  Version: {{ .Data.metadata.version }}
+
+All raw metadata: {{ .Data }}
+{{ end }}
+EOF
+
+green "#==> Run vault agent"
+
+#vault agent -config=../vault/files/agent-demo.hcl
+
+multipass mount ./tmp agent-demo:/run/tmp || true
+cp ../vault/files/agent-demo.hcl ./tmp/agent-demo.hcl
+multipass exec agent-demo -- sh -c 'echo "192.168.64.10 vault.hashi.local" | sudo tee -a /etc/hosts'
+multipass exec agent-demo -- vault agent -config=/run/tmp/agent-demo.hcl
+
+# multipass shell agent-demo
+
+# Sample agent file here: https://github.com/mikegreen/vault-agent-demo/blob/master/agent-demo.hcl
+p "Press Enter to continue"
+
+
+cyan "
+#------------------------------------------------------------------------------
+# Challenge
+#------------------------------------------------------------------------------"
+
+cyan "What happens if your data gets updated?"
+green "#==> Update the secret:"
+vault kv patch kvAgentDemo/legacy_app_creds_01 \
+  password=supersecret3
+
+# vault kv patch secret/customers/acme contact_email="jenn@acme.com"
+# Takes about 4 minutes
+p "Press Enter to continue"
 
 cyan "
 ##########################################################################################
-# Step 3: Vault Agent Configuration
+# Step 3: Template Configuration
 ##########################################################################################"
 echo
 
@@ -136,7 +229,7 @@ vault {
 EOF
 '
 
-yellow "The auto_auth block points to the approle auth method, 
+yellow "The auto_auth block points to the approle auth method,
 and the acquired token gets stored in approleToken file which is the sink location."
 echo
 
@@ -155,7 +248,7 @@ green 'The agent log should include the following messages:
 [INFO]  sink.file: token written: path=approleToken
 ...'
 
-yellow 'The acquired client token is now stored in the approleToken file. 
+yellow 'The acquired client token is now stored in the approleToken file.
 Your applications can read the token from approleToken and use it to invoke the Vault API.'
 echo
 
@@ -185,15 +278,14 @@ policies             [default token_update] <---
 
 green 'You should be able to create a token using this token (permitted by the token_update policy).'
 pe "VAULT_TOKEN=$(cat approleToken) vault token create"
-
 cyan "
 ##########################################################################################
 # Step 4: Vault Agent Caching
 ##########################################################################################"
 echo
 
-cyan 'To enable Vault Agent Caching, the agent configuration file must define cache and listener stanzas. 
-The listener stanza specifies the proxy address which Vault Agent listens. 
+cyan 'To enable Vault Agent Caching, the agent configuration file must define cache and listener stanzas.
+The listener stanza specifies the proxy address which Vault Agent listens.
 All the requests will be made through this address and forwarded to the Vault server.'
 
 green 'Examine the Vault Agent configuration file, agent-config-caching.hcl.'
@@ -245,6 +337,7 @@ pe 'export VAULT_AGENT_ADDR="http://127.0.0.1:8007"'
 
 green 'Execute the following command to create a short-lived token and see how agent manages its lifecycle:'
 pe "VAULT_TOKEN=$(cat approleToken) vault token create -ttl=30s -explicit-max-ttl=2m"
+VAULT_TOKEN=$(cat /tmp/sink_file_unwrapped_2.txt) vault token create -ttl=30s -explicit-max-ttl=2m
 
 yellow 'For the purpose of demonstration, the generated token has only 30 seconds before it expires. Also, its max TTL is 2 minutes; therefore, it cannot be renewed beyond 2 minutes from its creation.
 
@@ -271,8 +364,8 @@ green 'Examine the agent log in Terminal 2. The log should include the following
 [DEBUG] cache.leasecache: secret renewed: path=/v1/auth/token/create
 '
 
-yellow 'The request was first sent to VAULT_AGENT_ADDR (agent proxy) 
-and then forwarded to the Vault server (VAULT_ADDR). 
+yellow 'The request was first sent to VAULT_AGENT_ADDR (agent proxy)
+and then forwarded to the Vault server (VAULT_ADDR).
 You should find an entry in the log indicating that the returned token was stored in the cache.'
 
 green 'Re-run the command and observe the returned token value.'
@@ -295,7 +388,7 @@ Continue watching the agent log to see how it manages the token's lifecycle.
 [DEBUG] cache.leasecache: secret renewed: path=/v1/auth/token/create
 [DEBUG] cache.leasecache: secret renewed: path=/v1/auth/token/create
 
-Vault Agent renews the token before its TTL until the token reaches its maximum TTL (2 minutes). 
+Vault Agent renews the token before its TTL until the token reaches its maximum TTL (2 minutes).
 Once the token reaches its max TTL, agent fails to renew it because the Vault server revokes it.
 
 [DEBUG] cache.leasecache: renewal halted; evicting from cache: path=/v1/auth/token/create
@@ -310,7 +403,7 @@ cyan "
 ##########################################################################################"
 echo
 
-cyan "While agent observes requests and evicts cached entries automatically, 
+cyan "While agent observes requests and evicts cached entries automatically,
 you can trigger a cache eviction by invoking the /agent/v1/cache-clear endpoint."
 echo
 green "To evict a lease, invoke the /agent/v1/cache-clear endpoint along with the ID of the lease you wish to evict."
@@ -329,7 +422,7 @@ In the agent log, you find the following:
 [DEBUG] cache.leasecache: successfully cleared matching cache entries
 
 
-
+# https://www.vaultproject.io/docs/agent/template
 
 
 

@@ -1,76 +1,77 @@
+# next block is for testing - pp
+# path "*" {
+#   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+# }
+
 # Manage auth methods broadly across Vault
-path "auth/*"
-{
+path "auth/*" {
   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }
 
 # Create, update, and delete auth methods
-path "sys/auth/*"
-{
+path "sys/auth/*" {
   capabilities = ["create", "update", "delete", "sudo"]
 }
 
 # List auth methods
 path "sys/auth"
-{
-  capabilities = ["read"]
-}
+{ capabilities = ["read"] }
 
 # Create and manage all policies (acl/rgp/egp)- pp
-path "sys/policies/*"
-{
+path "sys/policies/*" {
   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }
 
 # List existing policies
 path "sys/policies/acl"
-{
-  capabilities = ["list"]
-}
+{ capabilities = ["list"] }
 
 # Create and manage ACL policies
-path "sys/policies/acl/*"
-{
+path "sys/policies/acl/*" {
   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }
 
 # Create and manage ACL policies
-path "sys/policies/acl/*"
-{
+path "sys/policies/acl/*" {
   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }
 
 # List, create, update, and delete key/value secrets
-path "secret/*"
-{
-  capabilities = ["create", "read", "update", "delete", "list", "sudo"]
-}
-# next block is for testing - pp
-path "*"
-{
+path "secret/*" {
   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }
 
+path "eu_gdpr_data/*" {
+  capabilities = ["create", "read", "update", "delete", "list"]
+}
+
 # Manage secrets engines
-path "sys/mounts/*"
-{
+path "sys/mounts/*" {
   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }
 
 # List existing secrets engines.
-path "sys/mounts"
-{
+path "sys/mounts" {
   capabilities = ["read","list"]
 }
 
 # Read health checks
-path "sys/health"
-{
+path "sys/health"{
   capabilities = ["read", "sudo"]
 }
 
 # Manage namespaces pp
 path "sys/namespaces/*" {
+  capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+}
+
+# Manage wrap pp
+path "sys/wrapping/*" {
+  capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+}
+
+# Manage tools pp
+path "sys/tools/*" {
   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }
 

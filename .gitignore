@@ -16,6 +16,7 @@ consul/scripts/*
 .DS_Store
 license*
 license/
+*.hclic
 scripts/tmp/*
 tmp/*
 

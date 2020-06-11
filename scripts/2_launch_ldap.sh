@@ -1,4 +1,5 @@
-
+#!/bin/bash
+set -e
 # Get the relative directory name
 # Sorry windows folks, you're gonna have to figure this out and modify it for you pleasure
 IMAGE=osixia/openldap:1.2.5
@@ -8,6 +9,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 echo
 cyan "Running: $0: Starting LDAP Server"
 docker pull ${IMAGE}
+docker stop openldap
 docker rm openldap &> /dev/null
 docker run --hostname ${LDAP_HOSTNAME} \
   -p 389:389 \
@@ -21,3 +23,4 @@ docker run --hostname ${LDAP_HOSTNAME} \
   -v ${DIR}/ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom \
   --name openldap \
   --detach ${IMAGE} --copy-service
+echo "#==> Finished starting LDAP Server"

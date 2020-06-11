@@ -1,3 +1,5 @@
+#!/bin/bash
+set -e
 . env.sh
 # export VAULT_TOKEN=$(grep 'Initial Root Token:' /tmp/shamir-1.txt | awk '{print $NF}')
 # export VAULT_TOKEN=$(consul kv get service/vault/root-token)
@@ -21,11 +23,11 @@ echo
 green "#------------------------------------------------------------------------------
 # Enable a KV V2 Secret engine at the path 'labsecrets'
 #------------------------------------------------------------------------------\n"
-export KV_PATH=labsecrets
-pe "vault secrets enable -path=${KV_PATH} -version=${KV_VERSION} kv"
+pe "vault secrets enable -path=${KV_PATH} -version=${KV_VERSION} kv || true"
 
-# kv-blog for test scripts
-vault secrets enable -path=kv-blog -version=2 kv > /dev/null 2>&1
+# Changing KV_PATH from kv-blog to labsecrets
+export KV_PATH=labsecrets
+pe "vault secrets enable -path=${KV_PATH} -version=2 kv > /dev/null 2>&1 || true"
 
 green "List out the enabled secrets engines."
 pe "vault secrets list"
@@ -50,19 +52,19 @@ echo
 # We will also look at how to version and roll back secrets.
 echo
 
-green '#--- Create a new secret with a "key of apikey" and 
-"value of master-api-key-111111" within the "${KV_PATH}" path:'
+green '#==> Create a new secret.
+Key is "apikey" and value is "master-api-key-111111":'
 echo
 white 'CLI COMMAND: vault kv put <secrets engine>/<secret name> <key>=<value>'
 
 pe "vault kv put ${KV_PATH}/apikeys/googlemain apikey=master-api-key-111111"
 
 echo
-green '#--- To read it back:'
+green '#==> Read the secret:'
 pe "vault kv get ${KV_PATH}/apikeys/googlemain"
 p "Press Enter to continue"
 
-tput clear
+# tput clear
 cyan '#-------------------------------------------------------------------------------
 # ENGAGE WITH VAULT USING API
 #-------------------------------------------------------------------------------\n'
@@ -70,43 +72,43 @@ cyan '#-------------------------------------------------------------------------
 cyan 'We can also interact with Vault via the HTTP API.
 
 Vault API uses standard HTTP verbs: GET, PUT, POST, LIST, UPDATE etc...'
-echo 
+echo
 white "API COMMAND: curl -H \"X-Vault-Token: <vault token>\" -X POST -d '{\"<key>\": \"<value>\"}' \\
     \$VAULT_ADDR/v1/<secrets engine>/<location>/<secret> | jq"
 echo
-echo
 
 green "Create a new secret called 'gvoiceapikey' with a value of 'PassTheHash!:'"
+echo
 cat << EOF
 curl -s
-    -H "X-Vault-Token: $VAULT_TOKEN" 
-    -H "Content-Type: application/json" 
-    -X POST 
-    -d '{ "data": { "gvoiceapikey": "PassTheHash!" } }' 
+    -H "X-Vault-Token: $VAULT_TOKEN"
+    -H "Content-Type: application/json"
+    -X POST
+    -d '{ "data": { "gvoiceapikey": "PassTheHash!" } }'
     ${VAULT_ADDR}/v1/${KV_PATH}/data/apikeys/googlevoice
 EOF
-p "Press Enter to continue"
+# p "Press Enter to continue"
 
 curl -s \
     -H "X-Vault-Token: $VAULT_TOKEN" \
     -H "Content-Type: application/json" \
     -X POST \
     -d '{ "data": { "gvoiceapikey": "PassTheHash!" } }' \
-    http://127.0.0.1:${VAULT_PORT}/v1/${KV_PATH}/data/apikeys/googlevoice | jq 
+    http://127.0.0.1:${VAULT_PORT}/v1/${KV_PATH}/data/apikeys/googlevoice | jq
 
 echo
 p "Press Enter to continue"
 
-tput clear
-green '#--- Read the secret:'
+# tput clear
+green '#==> Read the secret:'
 echo
 cat << EOF
 curl -s
-    -H "X-Vault-Token: $VAULT_TOKEN" 
-    -X GET 
+    -H "X-Vault-Token: $VAULT_TOKEN"
+    -X GET
     ${VAULT_ADDR}/v1/${KV_PATH}/data/apikeys/googlevoice | jq .data
 EOF
-p "Press Enter to continue"
+# p "Press Enter to continue"
 
 curl -s \
     -H "X-Vault-Token: $VAULT_TOKEN" \
@@ -115,28 +117,25 @@ curl -s \
 p "Press Enter to continue"
 
 # Run through several CLI commands // also sets up the environment for later use
-tput clear
+# tput clear
 cyan "#--------------------------------------------------------------
 # ADDITIONAL EXAMPLES OF INTERACTION WITH VAULT VIA CLI
 #--------------------------------------------------------------"
 echo
 cyan "Some quick examples of the Vault CLI in action: \n"
-echo ""
-green '#--- POST SECRET: MULTIPLE FIELDS'
-echo ""
+echo
+green '#==> POST SECRET: MULTIPLE FIELDS'
 pe 'vault kv put labsecrets/webapp username="beaker" password="meepmeepmeep"'
 p "Press Enter to continue"
 
-echo ""
-green "#--- RETRIEVE SECRET:"
-echo ""
+echo
+green "#==> RETRIEVE SECRET:"
 pe "vault kv get labsecrets/webapp"
-echo ""
 p "Press Enter to continue"
 
-tput clear
-green "#--- RETRIEVE SECRET BY FIELD:"
+# tput clear
 echo ""
+green "#==> RETRIEVE SECRET BY FIELD:"
 pe "vault kv get -field=password labsecrets/webapp"
 p "Press Enter to continue"
 
@@ -149,21 +148,23 @@ p "Press Enter to continue"
 # p "Press Enter to continue"
 
 tput clear
-green "#--- LOAD SECRET VIA FILE PAYLOAD: vault kv put <secrets engine>/<location> @<name of file>.json"
+green "#==> LOAD SECRET VIA FILE PAYLOAD:"
 echo
+yellow "This method allows you to enter many values at once through a json file."
+echo
+white "USAGE: vault kv put <secrets engine>/<location> @<name of file>.json"
 echo
 yellow "TIP: Loading via payload file in CLI is recommended, or ensure history is not being recorded."
 echo ""
 green "EXAMPLE PAYLOAD:"
-pe "cat ./vault/files/data.json"
+pe "cat ../vault/files/data.json"
 echo ""
-pe "vault kv put labsecrets/labinfo @./vault/files/data.json"
+pe "vault kv put labsecrets/labinfo @../vault/files/data.json"
+p "Press Enter to continue"
 
-green "#--- Insert some additional secrets for use later in demo / hide action"
-vault kv put labsecrets/lab_keypad code="12345" >/dev/null
-vault kv put labsecrets/lab_room room="A113" >/dev/null
-
-
+echo ""
+green "#==> RETRIEVE SECRET - Confirm you see multiple values:"
+pe "vault kv get labsecrets/labinfo"
 p "Press Enter to continue"
 
 # tput clear
@@ -226,7 +227,7 @@ p "Press Enter to continue"
 # echo ""
 # white "COMMAND: vault kv list labsecrets"
 # echo ""
-# pe "vault kv list labsecrets" 
+# pe "vault kv list labsecrets"
 
 
 # DELETE KEYS

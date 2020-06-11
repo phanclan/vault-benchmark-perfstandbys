@@ -1,15 +1,7 @@
 #!/bin/bash
 # From vault guide
+. env.sh
 set -e
-
-# This is for the time to wait when using demo_magic.sh
-if [[ -z ${DEMO_WAIT} ]];then
-  DEMO_WAIT=0
-fi
-
-# Demo magic gives wrappers for running commands in demo mode.   Also good for learning via CLI.
-
-. demo-magic.sh -d -p -w ${DEMO_WAIT}
 
 # cyan "Create interfaces if running on one Ubuntu machine"
 # pe "sudo ifconfig lo:0 127.0.0.2
@@ -98,7 +90,7 @@ pe "VAULT_ADDR=http://${VAULT1}:8200 vault secrets enable transit"
 green "Create a key named 'autounseal'"
 pe "vault write -f transit/keys/autounseal"
 
-green "Create autounseal policy which permits update against 
+green "Create autounseal policy which permits update against
 transit/encrypt/autounseal and transit/decrypt/autounseal paths"
 tee /tmp/autounseal.hcl <<EOF
 path "transit/encrypt/autounseal" {
